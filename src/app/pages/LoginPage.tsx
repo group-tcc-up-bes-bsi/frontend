@@ -9,9 +9,10 @@ import {
   Container,
   CssBaseline,
   useMediaQuery,
-  Theme
+  Theme,
 } from '@mui/material';
 import CustomTypography from '../components/CustomTypography';
+import CustomAlert from '../components/CustomAlert';
 
 
 const LoginPage: React.FC = () => {
@@ -20,11 +21,12 @@ const LoginPage: React.FC = () => {
   const { theme, toggleTheme, isDarkMode } = useTheme();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  /*const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Handle login logic here
     console.log('Login submitted:', { email, password });
-  };
+  };*/
 
   return (
     <Box sx={{
@@ -145,7 +147,7 @@ const LoginPage: React.FC = () => {
             marginBottom={4}
           />
 
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+          <Box component="form" sx={{ mt: 2 }}>
             <CustomTextField
               name="email"
               label="Email"
@@ -188,6 +190,26 @@ const LoginPage: React.FC = () => {
               align="center"
               marginTop={2}
             />
+
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: '10%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 2,
+                textAlign: 'left',
+              }}>
+              <CustomAlert
+                severity="success"
+                colorType= 'success'
+                title="Login realizado com sucesso "
+                description="Sistema redirecionando em 5 segundos"
+              />
+            </Box>
           </Box>
         </Container>
       </Box>
