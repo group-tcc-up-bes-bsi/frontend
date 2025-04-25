@@ -188,6 +188,7 @@ const Login: React.FC = () => {
               text="Não tem conta? Cadastre-se"
               align="center"
               marginTop={2}
+              marginBottom={2}
             />
 
             <Box
