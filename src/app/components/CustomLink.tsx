@@ -1,8 +1,9 @@
 "use client"
-import { Link, LinkProps, Box } from '@mui/material';
+import NextLink from 'next/link';
+import { Link as MuiLink, LinkProps as MuiLinkProps, Box } from '@mui/material';
 import { useTheme } from '../theme/ThemeContext';
 
-interface CustomLinkProps extends LinkProps {
+interface CustomLinkProps extends MuiLinkProps {
     href: string;
     text: string;
     align?: 'left' | 'center' | 'right';
@@ -37,9 +38,14 @@ const CustomLink = ({
                 }
             }}
         >
-            <Link href={href} variant={variant} {...props}>
+            <MuiLink 
+                component={NextLink}
+                href={href} 
+                variant={variant} 
+                {...props}
+            >
                 {text}
-            </Link>
+            </MuiLink>
         </Box>
     );
 };
