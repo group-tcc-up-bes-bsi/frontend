@@ -21,7 +21,7 @@ const CustomTypography = ({
   align = 'center',
   gutterBottom = true,
   colorType = 'primary', // Valor padrão alterado
-  marginBottom = 4,
+  marginBottom = 0,
   fontWeight,
   sx = {},
   ...props

@@ -1,9 +1,9 @@
 "use client"
 import React, { useState } from 'react';
-import { useTheme } from '../theme/ThemeContext';
-import CustomButton from '../components/CustomButton';
-import CustomLink from '../components/CustomLink';
-import CustomTextField from '../components/CustomTextField';
+import { useTheme } from '../../theme/ThemeContext';
+import CustomButton from '../../components/CustomButton';
+import CustomLink from '../../components/CustomLink';
+import CustomTextField from '../../components/CustomTextField';
 import {
   Box,
   Container,
@@ -11,14 +11,14 @@ import {
   useMediaQuery,
   Theme,
 } from '@mui/material';
-import CustomTypography from '../components/CustomTypography';
-import CustomAlert from '../components/CustomAlert';
-import { authLoginUser } from '../api/UserRequest';
+import CustomTypography from '../../components/CustomTypography';
+import CustomAlert from '../../components/CustomAlert';
+import { authLoginUser } from '../../api/UserRequest';
 
 const Login: React.FC = () => {
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
-  const { theme, /*toggleTheme,*/ isDarkMode } = useTheme();
+  const { theme, isDarkMode } = useTheme();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
 
   const handleSubmit = () => {
@@ -75,7 +75,7 @@ const Login: React.FC = () => {
               alignItems: 'center',
               gap: 2,
               textAlign: 'center',
-              color: theme.palette.text.primary
+              color: theme.palette.text.primary,
             }}
           >
             <Box
@@ -84,7 +84,7 @@ const Login: React.FC = () => {
               alt="logo marca"
               sx={{
                 height: 80,
-                width: 80
+                width: 80,
               }}
             />
             <CustomTypography
@@ -115,7 +115,7 @@ const Login: React.FC = () => {
               display: 'flex',
               justifyContent: 'center',
               alignItems: 'center',
-              mb: 2,
+              mb: 6,
               gap: 2
             }}>
               <Box
@@ -184,7 +184,7 @@ const Login: React.FC = () => {
             />
 
             <CustomLink
-              href='/register'
+              href='/pages/register'
               text="Não tem conta? Cadastre-se"
               align="center"
               marginTop={2}

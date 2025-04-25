@@ -1,8 +1,8 @@
 "use client"
 import React, { useState } from 'react';
-import { useTheme } from '../theme/ThemeContext';
-import CustomButton from '../components/CustomButton';
-import CustomTextField from '../components/CustomTextField';
+import { useTheme } from '../../theme/ThemeContext';
+import CustomButton from '../../components/CustomButton';
+import CustomTextField from '../../components/CustomTextField';
 import {
     Box,
     Container,
@@ -10,21 +10,15 @@ import {
     useMediaQuery,
     Theme,
 } from '@mui/material';
-import CustomTypography from '../components/CustomTypography';
-import CustomAlert from '../components/CustomAlert';
-
+import CustomTypography from '../../components/CustomTypography';
+import CustomAlert from '../../components/CustomAlert';
 
 const Register: React.FC = () => {
+    const [user, setUser] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { theme, toggleTheme, isDarkMode } = useTheme();
     const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
-
-    /*const handleSubmit = (e: React.FormEvent) => {
-      e.preventDefault();
-      // Handle login logic here
-      console.log('Login submitted:', { email, password });
-    };*/
 
     return (
         <Box sx={{
@@ -74,7 +68,7 @@ const Register: React.FC = () => {
                             alignItems: 'center',
                             gap: 2,
                             textAlign: 'center',
-                            color: theme.palette.text.primary
+                            color: theme.palette.text.primary,
                         }}
                     >
                         <Box
@@ -105,7 +99,7 @@ const Register: React.FC = () => {
                     alignItems: 'center',
                     justifyContent: 'center',
                     backgroundColor: theme.palette.background.default,
-                    p: 3
+                    p: 3,
                 }}
             >
                 <Container maxWidth="sm">
@@ -114,7 +108,7 @@ const Register: React.FC = () => {
                             display: 'flex',
                             justifyContent: 'center',
                             alignItems: 'center',
-                            mb: 2,
+                            mb: 6,
                             gap: 2
                         }}>
                             <Box
@@ -137,15 +131,45 @@ const Register: React.FC = () => {
                         </Box>
                     )}
 
-                    <CustomTypography
-                        text="Crie sua conta"
-                        component="h2"
-                        variant="h5"
-                        align="center"
-                        marginBottom={4}
-                    />
+
+
+                    <Box component="form"
+                        sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                        }}
+                    >
+                        <CustomTypography
+                            text="Crie sua conta"
+                            component="h2"
+                            variant="h5"
+                            align="center"
+                        />
+
+                        <CustomButton
+                            text="Voltar"
+                            href='/'
+                            type="submit"
+                            colorType="primary"
+                            hoverColorType="primary"
+                            fullWidth={false}
+                            marginBottom={0}
+                            marginTop={0}
+                        />
+                    </Box>
 
                     <Box component="form" sx={{ mt: 2 }}>
+                        <CustomTextField
+                            name="userName"
+                            label="Usuário"
+                            type="text"
+                            value={user}
+                            onChange={(e) => setUser(e.target.value)}
+                            focusedColor="primary"
+                            hoverColor="info"
+                        />
+
                         <CustomTextField
                             name="email"
                             label="Email"
@@ -204,9 +228,9 @@ const Register: React.FC = () => {
                             />
                         </Box>
                     </Box>
-                </Container>
-            </Box>
-        </Box>
+                </Container >
+            </Box >
+        </Box >
     );
 };
 

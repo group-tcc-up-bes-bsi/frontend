@@ -11,6 +11,8 @@ interface CustomButtonProps extends ButtonProps {
   hoverColorType?: 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
   marginTop?: number;
   marginBottom?: number;
+  marginLeft?: number;
+  marginRight?: number;
   paddingY?: number;
 }
 
@@ -23,6 +25,8 @@ const CustomButton = ({
   hoverColorType,
   marginTop = 2,
   marginBottom = 2,
+  marginLeft = 0,
+  marginRight = 0,
   paddingY = 1.5,
   ...props
 }: CustomButtonProps) => {
@@ -38,6 +42,8 @@ const CustomButton = ({
       sx={{
         mt: marginTop,
         mb: marginBottom,
+        ml: marginLeft,
+        mr: marginRight,
         py: paddingY,
         backgroundColor: theme.palette[colorType].main,
         '&:hover': {
