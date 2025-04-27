@@ -40,7 +40,6 @@ const Login: React.FC = () => {
         localStorage.setItem('jwtToken', result.token);
       })
       .catch(error => setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error')));
-
   };
 
   return (
