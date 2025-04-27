@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTheme } from '../../theme/ThemeContext';
 import CustomButton from '../../components/CustomButton';
 import CustomLink from '../../components/CustomLink';
@@ -14,17 +14,33 @@ import {
 import CustomTypography from '../../components/CustomTypography';
 import CustomAlert from '../../components/CustomAlert';
 import { authLoginUser } from '../../api/UserRequest';
+import { MessageObj } from '@/app/models/MessageObj';
 
 const Login: React.FC = () => {
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
+  const [message, setMessage] = useState<MessageObj>(
+    new MessageObj('info', 'Bem-vindo', 'Por favor, faça login', 'info')
+  );
+  const [showMessage, setShowMessage] = useState(false);
   const { theme, isDarkMode } = useTheme();
   const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
 
+  useEffect(() => {
+    if (message) {
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 5000);
+    }
+  }, [message]);
+
   const handleSubmit = () => {
-    authLoginUser()
-      .then(result => console.log(JSON.stringify(result, null, 2)))
-      .catch(finalError => console.error('Falha inesperada:', finalError));
+    authLoginUser(user, password)
+      .then(result => {
+        setMessage(result.message);
+        localStorage.setItem('jwtToken', result.token);
+      })
+      .catch(error => setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error')));
+
   };
 
   return (
@@ -177,7 +193,7 @@ const Login: React.FC = () => {
 
             <CustomButton
               text="Entrar"
-              type="submit"
+              type="button"
               colorType="primary"
               hoverColorType="primary"
               onClick={handleSubmit}
@@ -190,26 +206,28 @@ const Login: React.FC = () => {
               marginTop={2}
               marginBottom={2}
             />
+            {showMessage && message && (
+              <Box
+                sx={{
+                  position: 'absolute',
+                  bottom: '10%',
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  display: 'flex',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  gap: 2,
+                  textAlign: 'left',
+                }}>
+                <CustomAlert
+                  severity={message.severity}
+                  colorType={message.colorType}
+                  title={message.title}
+                  description={message.description}
+                />
+              </Box>
 
-            <Box
-              sx={{
-                position: 'absolute',
-                bottom: '10%',
-                left: '50%',
-                transform: 'translateX(-50%)',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: 2,
-                textAlign: 'left',
-              }}>
-              <CustomAlert
-                severity="success"
-                colorType='success'
-                title="Login realizado com sucesso "
-                description="Sistema redirecionando em 5 segundos"
-              />
-            </Box>
+            )}
           </Box>
         </Container>
       </Box>
