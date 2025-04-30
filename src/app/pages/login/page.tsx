@@ -17,7 +17,7 @@ import { authLoginUser } from '../../api/UserRequest';
 import { MessageObj } from '@/app/models/MessageObj';
 
 const Login: React.FC = () => {
-  const [user, setUser] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<MessageObj>(
     new MessageObj('info', 'Bem-vindo', 'Por favor, faça login', 'info')
@@ -34,8 +34,8 @@ const Login: React.FC = () => {
   }, [message]);
 
   const handleSubmit = () => {
-    if (!user.trim()) {
-      setMessage(new MessageObj('error', 'Erro', 'O nome de usuário é obrigatório', 'error'));
+    if (!email.trim()) {
+      setMessage(new MessageObj('error', 'Erro', 'O email é obrigatório', 'error'));
       return;
   }
 
@@ -43,7 +43,7 @@ const Login: React.FC = () => {
       setMessage(new MessageObj('error', 'Erro', 'A senha inválida', 'error'));
       return;
   }
-    authLoginUser(user, password)
+    authLoginUser(email, password)
       .then(result => {
         setMessage(result.message);
         localStorage.setItem('jwtToken', result.token);
@@ -171,11 +171,11 @@ const Login: React.FC = () => {
 
           <Box component="form" sx={{ mt: 2 }}>
             <CustomTextField
-              name="Usuário"
-              label="Usuário"
-              type="text"
-              value={user}
-              onChange={(e) => setUser(e.target.value)}
+              name="email"
+              label="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               focusedColor="primary"
               hoverColor="info"
             />

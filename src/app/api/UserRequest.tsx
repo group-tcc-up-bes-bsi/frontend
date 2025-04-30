@@ -21,6 +21,15 @@ export async function createUser(UserName: string, Password: string, Email: stri
         const responseData = await response.json().catch(() => null);
 
         if (!response.ok) {
+            if (responseData.message == 'User already exists') {
+                return {
+                    message: new MessageObj(
+                        'error',
+                        getErrorTitle(responseData.statusCode),
+                        'Email ja cadastrado',
+                        'error')
+                }
+            }
             return {
                 message: new MessageObj(
                     'error',
@@ -39,21 +48,22 @@ export async function createUser(UserName: string, Password: string, Email: stri
             )
         };
     } catch (error) {
+        console.error(error)
         return {
             message: new MessageObj(
                 'error',
                 getErrorTitle(500),
-                `Erro: ${error}`,
+                `Erro: Servidor inoperante`,
                 'error'
             )
         };
     }
 }
 
-export async function authLoginUser(UserName: string, Password: string) {
+export async function authLoginUser(Email: string, Password: string) {
     const url = `http://localhost:3000/auth/login`;
     const userData = {
-        username: UserName,
+        email: Email,
         password: Password
     };
 
@@ -69,7 +79,7 @@ export async function authLoginUser(UserName: string, Password: string) {
         const responseData = await response.json().catch(() => null);
 
         if (!response.ok) {
-            if (responseData.message == 'Invalid username') {
+            if (responseData.message == 'Invalid email') {
                 return {
                     message: new MessageObj(
                         'error',
