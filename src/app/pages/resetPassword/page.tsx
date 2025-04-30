@@ -13,17 +13,15 @@ import {
 import CustomTypography from '../../components/CustomTypography';
 import CustomAlert from '../../components/CustomAlert';
 import { MessageObj } from '@/app/models/MessageObj';
-import { createUser } from '@/app/api/UserRequest';
+//import { createUser } from '@/app/api/UserRequest';
 
 const Register: React.FC = () => {
-    const [user, setUser] = useState('');
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [message, setMessage] = useState<MessageObj>();
+    const [message/*, setMessage*/] = useState<MessageObj>();
     const [showMessage, setShowMessage] = useState(false);
     const { theme, isDarkMode } = useTheme();
     const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
+    const [showResend, setShowResend] = useState(false);
 
     useEffect(() => {
         if (message) {
@@ -32,34 +30,13 @@ const Register: React.FC = () => {
         }
     }, [message]);
 
-    const handleSubmit = () => {
-        if (!user.trim()) {
-            setMessage(new MessageObj('error', 'Erro', 'O nome de usuário é obrigatório', 'error'));
-            return;
-        }
 
-        if (!email.trim()) {
-            setMessage(new MessageObj('error', 'Erro', 'O email é obrigatório', 'error'));
-            return;
-        } else if (!/\S+@\S+\.\S+/.test(email)) {
-            setMessage(new MessageObj('error', 'Erro', 'Por favor, insira um email válido', 'error'));
-            return;
+    useEffect(() => {
+        if (showResend) {
+            setShowResend(true);
         }
+    }, [showResend]);
 
-        if (password.length < 4) {
-            setMessage(new MessageObj('error', 'Erro', 'A senha deve ter no mínimo 4 caracteres', 'error'));
-            return;
-        }
-        if (password !== confirmPassword) {
-            setMessage(new MessageObj('error', 'Erro', 'As senhas não coincidem', 'error'));
-            return;
-        }
-        createUser(user, password, email)
-            .then(result => {
-                setMessage(result.message);
-            })
-            .catch(error => setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error')));
-    };
 
     return (
         <Box sx={{
@@ -96,7 +73,6 @@ const Register: React.FC = () => {
                             opacity: isDarkMode ? 0.8 : 1
                         }}
                     />
-
                     {/* Title Overlay */}
                     <Box
                         sx={{
@@ -131,6 +107,7 @@ const Register: React.FC = () => {
                     </Box>
                 </Box>
             )}
+
             <Box
                 sx={{
                     width: { xs: '100%', md: '40%' },
@@ -180,7 +157,7 @@ const Register: React.FC = () => {
                         }}
                     >
                         <CustomTypography
-                            text="Crie sua conta"
+                            text="Alteração de senha"
                             component="h2"
                             variant="h5"
                             align="center"
@@ -200,16 +177,6 @@ const Register: React.FC = () => {
 
                     <Box component="form" sx={{ mt: 2 }}>
                         <CustomTextField
-                            name="userName"
-                            label="Usuário"
-                            type="text"
-                            value={user}
-                            onChange={(e) => setUser(e.target.value)}
-                            focusedColor="primary"
-                            hoverColor="info"
-                        />
-
-                        <CustomTextField
                             name="email"
                             label="Email"
                             type="email"
@@ -218,31 +185,21 @@ const Register: React.FC = () => {
                             focusedColor="primary"
                             hoverColor="info"
                         />
-
-                        <CustomTextField
-                            name="password"
-                            label="Senha"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            showPasswordToggle
-                        />
-
-                        <CustomTextField
-                            name="password"
-                            label="Confirme a senha"
-                            type="password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            showPasswordToggle
-                        />
-
+                        {showResend && (
+                            <CustomButton
+                                text="Reenviar email"
+                                type="button"
+                                colorType="primary"
+                                hoverColorType="primary"
+                            />
+                        )}
                         <CustomButton
-                            text="Confirmar Cadastro"
+                            text="Enviar email"
                             type="button"
                             colorType="primary"
                             hoverColorType="primary"
-                            onClick={handleSubmit}
+                            disabled={showResend}
+                            onClick={() => setShowResend(true)}
                         />
 
                         {showMessage && message && (
