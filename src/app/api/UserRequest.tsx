@@ -1,19 +1,5 @@
 import { MessageObj } from "../models/MessageObj";
-
-function getErrorTitle(statusCode: number): string {
-    switch (statusCode) {
-        case 400:
-            return 'Requisição inválida';
-        case 401:
-            return 'Não autorizado';
-        case 404:
-            return 'Não encontrado';
-        case 500:
-            return 'Erro interno do servidor';
-        default:
-            return 'Erro inesperado';
-    }
-}
+import { getErrorTitle } from "./ErrorTitle";
 
 export async function createUser(UserName: string, Password: string, Email: string) {
     const url = `http://localhost:3000/users`;
@@ -36,27 +22,30 @@ export async function createUser(UserName: string, Password: string, Email: stri
 
         if (!response.ok) {
             return {
-                status: 'error',
-                message: 'Falha no cadastrar-se',
-                error: responseData?.message || `Erro HTTP: ${response.status} ${response.statusText}`,
-                statusCode: response.status,
-                data: responseData
-            };
+                message: new MessageObj(
+                    'error',
+                    getErrorTitle(responseData.statusCode),
+                    responseData.message,
+                    'error')
+            }
         }
 
         return {
-            status: 'success',
-            message: 'Usuário criado com sucesso',
-            statusCode: response.status,
-            data: responseData,
+            message: new MessageObj(
+                'success',
+                'Usuário criado',
+                'Usuário criado com sucesso',
+                'success'
+            )
         };
     } catch (error) {
         return {
-            status: 'error',
-            message: 'Erro ao tentar fazer novo cadastro',
-            error: error instanceof Error ? error.message : 'Erro desconhecido',
-            statusCode: 500,
-            stack: error instanceof Error ? error.stack : undefined
+            message: new MessageObj(
+                'error',
+                getErrorTitle(500),
+                `Erro: ${error}`,
+                'error'
+            )
         };
     }
 }
@@ -80,15 +69,6 @@ export async function authLoginUser(UserName: string, Password: string) {
         const responseData = await response.json().catch(() => null);
 
         if (!response.ok) {
-            if (responseData.message == 'Username and password are required') {
-                return {
-                    message: new MessageObj(
-                        'error',
-                        getErrorTitle(responseData.statusCode),
-                        'Usuário e senha devem ser preenchidos!!!',
-                        'error')
-                }
-            }
             if (responseData.message == 'Invalid username') {
                 return {
                     message: new MessageObj(

@@ -34,6 +34,15 @@ const Login: React.FC = () => {
   }, [message]);
 
   const handleSubmit = () => {
+    if (!user.trim()) {
+      setMessage(new MessageObj('error', 'Erro', 'O nome de usuário é obrigatório', 'error'));
+      return;
+  }
+
+  if (!password.trim()) {
+      setMessage(new MessageObj('error', 'Erro', 'A senha inválida', 'error'));
+      return;
+  }
     authLoginUser(user, password)
       .then(result => {
         setMessage(result.message);
@@ -225,7 +234,6 @@ const Login: React.FC = () => {
                   description={message.description}
                 />
               </Box>
-
             )}
           </Box>
         </Container>

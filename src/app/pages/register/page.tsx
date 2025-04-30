@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTheme } from '../../theme/ThemeContext';
 import CustomButton from '../../components/CustomButton';
 import CustomTextField from '../../components/CustomTextField';
@@ -12,13 +12,54 @@ import {
 } from '@mui/material';
 import CustomTypography from '../../components/CustomTypography';
 import CustomAlert from '../../components/CustomAlert';
+import { MessageObj } from '@/app/models/MessageObj';
+import { createUser } from '@/app/api/UserRequest';
 
 const Register: React.FC = () => {
     const [user, setUser] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { theme, toggleTheme, isDarkMode } = useTheme();
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [message, setMessage] = useState<MessageObj>();
+    const [showMessage, setShowMessage] = useState(false);
+    const { theme, isDarkMode } = useTheme();
     const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
+
+    useEffect(() => {
+        if (message) {
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 5000);
+        }
+    }, [message]);
+
+    const handleSubmit = () => {
+        if (!user.trim()) {
+            setMessage(new MessageObj('error', 'Erro', 'O nome de usuário é obrigatório', 'error'));
+            return;
+        }
+
+        if (!email.trim()) {
+            setMessage(new MessageObj('error', 'Erro', 'O email é obrigatório', 'error'));
+            return;
+        } else if (!/\S+@\S+\.\S+/.test(email)) {
+            setMessage(new MessageObj('error', 'Erro', 'Por favor, insira um email válido', 'error'));
+            return;
+        }
+
+        if (password.length < 4) {
+            setMessage(new MessageObj('error', 'Erro', 'A senha deve ter no mínimo 4 caracteres', 'error'));
+            return;
+        }
+        if (password !== confirmPassword) {
+            setMessage(new MessageObj('error', 'Erro', 'As senhas não coincidem', 'error'));
+            return;
+        }
+        createUser(user, password, email)
+            .then(result => {
+                setMessage(result.message);
+            })
+            .catch(error => setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error')));
+    };
 
     return (
         <Box sx={{
@@ -186,47 +227,47 @@ const Register: React.FC = () => {
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            focusedColor="primary"
-                            hoverColor="info"
+                            showPasswordToggle
                         />
 
                         <CustomTextField
                             name="password"
                             label="Confirme a senha"
                             type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            focusedColor="primary"
-                            hoverColor="info"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            showPasswordToggle
                         />
 
                         <CustomButton
                             text="Confirmar Cadastro"
-                            type="submit"
+                            type="button"
                             colorType="primary"
                             hoverColorType="primary"
-                            onClick={() => { toggleTheme() }}
+                            onClick={handleSubmit}
                         />
 
-                        <Box
-                            sx={{
-                                position: 'absolute',
-                                bottom: '10%',
-                                left: '50%',
-                                transform: 'translateX(-50%)',
-                                display: 'flex',
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                                gap: 2,
-                                textAlign: 'left',
-                            }}>
-                            <CustomAlert
-                                severity="success"
-                                colorType='success'
-                                title="Login realizado com sucesso "
-                                description="Sistema redirecionando em 5 segundos"
-                            />
-                        </Box>
+                        {showMessage && message && (
+                            <Box
+                                sx={{
+                                    position: 'absolute',
+                                    bottom: '10%',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    alignItems: 'center',
+                                    gap: 2,
+                                    textAlign: 'left',
+                                }}>
+                                <CustomAlert
+                                    severity={message.severity}
+                                    colorType={message.colorType}
+                                    title={message.title}
+                                    description={message.description}
+                                />
+                            </Box>
+                        )}
                     </Box>
                 </Container >
             </Box >
