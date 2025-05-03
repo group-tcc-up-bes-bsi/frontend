@@ -26,6 +26,13 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
   const [open, setOpen] = useState(true);
   const { theme } = useTheme();
 
+  const handleClose = React.useCallback(() => {
+    setOpen(false);
+    if (onClose) {
+      onClose();
+    }
+  }, [onClose]);
+
   useEffect(() => {
     if (open) {
       const timer = setTimeout(() => {
@@ -34,14 +41,7 @@ const CustomAlert: React.FC<CustomAlertProps> = ({
 
       return () => clearTimeout(timer);
     }
-  }, [open, duration]);
-
-  const handleClose = () => {
-    setOpen(false);
-    if (onClose) {
-      onClose();
-    }
-  };
+  }, [open, duration, handleClose]);
 
   if (!open) return null;
 
