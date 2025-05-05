@@ -47,6 +47,7 @@ const Login: React.FC = () => {
       .then(result => {
         setMessage(result.message);
         localStorage.setItem('jwtToken', result.token);
+        window.location.href = "/pages/dashboard";
       })
       .catch(error => setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error')));
   };
