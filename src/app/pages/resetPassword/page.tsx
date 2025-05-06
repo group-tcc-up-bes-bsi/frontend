@@ -166,7 +166,7 @@ const Register: React.FC = () => {
                         <CustomButton
                             text="Voltar"
                             href='/'
-                            type="submit"
+                            type="button"
                             colorType="primary"
                             hoverColorType="primary"
                             fullWidth={false}
