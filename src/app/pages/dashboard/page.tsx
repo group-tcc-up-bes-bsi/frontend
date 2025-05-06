@@ -17,6 +17,11 @@ const Dashboard = () => {
         setOpen(!open);
     };
 
+    const logoutUser = () => {
+        localStorage.removeItem('jwtToken');
+        window.location.href = "/";
+    }
+
     return (
         <Box className="flex h-screen"
             sx={{ backgroundColor: theme.palette.background.paper }}>
@@ -29,13 +34,14 @@ const Dashboard = () => {
             >
                 <Box className="flex items-center justify-end w-full gap-8 p-8">
                     <NotificationsIcon sx={{ color: theme.palette.text.primary }} />
+
                     {isDarkMode ? (
                         <LightModeIcon onClick={toggleTheme} sx={{ color: theme.palette.text.primary }} />
                     ) : (
                         <DarkModeIcon onClick={toggleTheme} sx={{ color: theme.palette.text.primary }} />
                     )}
 
-                    <LogoutIcon sx={{ color: theme.palette.text.primary }} />
+                    <LogoutIcon onClick={logoutUser} sx={{ color: theme.palette.text.primary }} />
                 </Box>
             </Box>
             <Drawer

@@ -20,7 +20,9 @@ const Register: React.FC = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [message, setMessage] = useState<MessageObj>();
+    const [message, setMessage] = useState<MessageObj>(
+        new MessageObj('info', 'Cadastro', 'Por favor, realize seu cadastro', 'info')
+    );
     const [showMessage, setShowMessage] = useState(false);
     const { theme, isDarkMode } = useTheme();
     const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
@@ -32,7 +34,7 @@ const Register: React.FC = () => {
         }
     }, [message]);
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!user.trim()) {
             setMessage(new MessageObj('error', 'Erro', 'O nome de usuário é obrigatório', 'error'));
             return;
@@ -55,10 +57,17 @@ const Register: React.FC = () => {
             return;
         }
         createUser(user, password, email)
-            .then(result => {
-                setMessage(result.message);
-            })
-            .catch(error => setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error')));
+        try {
+            const result = await createUser(user, password, email);
+            setMessage(result.message);
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (result.message.severity === 'success') {
+                window.location.href = "/";
+            }
+        } catch (error) {
+            setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
+        }
     };
 
     return (

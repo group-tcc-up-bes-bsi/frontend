@@ -33,23 +33,29 @@ const Login: React.FC = () => {
     }
   }, [message]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!email.trim()) {
       setMessage(new MessageObj('error', 'Erro', 'O email é obrigatório', 'error'));
       return;
-  }
+    }
 
-  if (!password.trim()) {
+    if (!password.trim()) {
       setMessage(new MessageObj('error', 'Erro', 'A senha inválida', 'error'));
       return;
-  }
+    }
     authLoginUser(email, password)
-      .then(result => {
-        setMessage(result.message);
+    try {
+      const result = await authLoginUser(email, password);
+      await setMessage(result.message);
+
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (result.message.severity === 'success') {
         localStorage.setItem('jwtToken', result.token);
         window.location.href = "/pages/dashboard";
-      })
-      .catch(error => setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error')));
+      }
+    } catch (error) {
+      setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
+    }
   };
 
   return (
