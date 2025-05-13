@@ -8,14 +8,20 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
+import Notification from '@/app/components/notification/notification';
 
 const Dashboard = () => {
     const [open, setOpen] = React.useState(false);
     const { theme, toggleTheme, isDarkMode } = useTheme();
+    const [openNotification, setOpenNotification] = React.useState(false);
 
     const toggleDrawer = () => {
         setOpen(!open);
     };
+
+    const toggleNotification = () => {
+        setOpenNotification(!openNotification)
+    }
 
     const logoutUser = () => {
         localStorage.removeItem('jwtToken');
@@ -33,7 +39,7 @@ const Dashboard = () => {
                 }}
             >
                 <Box className="flex items-center justify-end w-full gap-8 p-8">
-                    <NotificationsIcon sx={{ color: theme.palette.text.primary }} />
+                    <NotificationsIcon onClick={toggleNotification} sx={{ color: theme.palette.text.primary }} />
 
                     {isDarkMode ? (
                         <LightModeIcon onClick={toggleTheme} sx={{ color: theme.palette.text.primary }} />
@@ -193,6 +199,10 @@ const Dashboard = () => {
                     />
                 </Box>
             </main>
+            {openNotification && (
+                <Notification />
+            )
+            }
         </Box>
     );
 };

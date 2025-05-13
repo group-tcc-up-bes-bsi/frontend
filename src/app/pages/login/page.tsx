@@ -43,7 +43,6 @@ const Login: React.FC = () => {
       setMessage(new MessageObj('error', 'Erro', 'A senha inválida', 'error'));
       return;
     }
-    authLoginUser(email, password)
     try {
       const result = await authLoginUser(email, password);
       await setMessage(result.message);
