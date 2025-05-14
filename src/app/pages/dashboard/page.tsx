@@ -9,18 +9,20 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import Notification from '@/app/components/notification/notification';
+import { useNotificationStore } from '@/app/state/notificationState';
 
 const Dashboard = () => {
     const [open, setOpen] = React.useState(false);
     const { theme, toggleTheme, isDarkMode } = useTheme();
-    const [openNotification, setOpenNotification] = React.useState(false);
+    const openNotification = useNotificationStore((state) => state.openNotification);
+    const alterNotification = useNotificationStore((state) => state.alter);;
 
     const toggleDrawer = () => {
         setOpen(!open);
     };
 
     const toggleNotification = () => {
-        setOpenNotification(!openNotification)
+        alterNotification(!openNotification);
     }
 
     const logoutUser = () => {
@@ -62,6 +64,7 @@ const Dashboard = () => {
                         overflowX: 'hidden',
                         position: 'fixed',
                         height: '100vh',
+                        zIndex: 1200,
                         top: 0,
                         left: 0,
                         backgroundColor: theme.palette.background.default,
@@ -162,7 +165,7 @@ const Dashboard = () => {
                 </List>
             </Drawer>
 
-            <main
+            <main 
                 className="flex-1 p-4"
                 style={{
                     marginLeft: open ? '240px' : '56px',
@@ -171,7 +174,7 @@ const Dashboard = () => {
                     overflow: 'auto',
                 }}
             >
-                <Box
+                <Box 
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
