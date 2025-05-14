@@ -8,14 +8,22 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
+import Notification from '@/app/components/notification/notification';
+import { useNotificationStore } from '@/app/state/notificationState';
 
 const Dashboard = () => {
     const [open, setOpen] = React.useState(false);
     const { theme, toggleTheme, isDarkMode } = useTheme();
+    const openNotification = useNotificationStore((state) => state.openNotification);
+    const alterNotification = useNotificationStore((state) => state.alter);;
 
     const toggleDrawer = () => {
         setOpen(!open);
     };
+
+    const toggleNotification = () => {
+        alterNotification(!openNotification);
+    }
 
     const logoutUser = () => {
         localStorage.removeItem('jwtToken');
@@ -33,7 +41,7 @@ const Dashboard = () => {
                 }}
             >
                 <Box className="flex items-center justify-end w-full gap-8 p-8">
-                    <NotificationsIcon sx={{ color: theme.palette.text.primary }} />
+                    <NotificationsIcon onClick={toggleNotification} sx={{ color: theme.palette.text.primary }} />
 
                     {isDarkMode ? (
                         <LightModeIcon onClick={toggleTheme} sx={{ color: theme.palette.text.primary }} />
@@ -56,6 +64,7 @@ const Dashboard = () => {
                         overflowX: 'hidden',
                         position: 'fixed',
                         height: '100vh',
+                        zIndex: 1200,
                         top: 0,
                         left: 0,
                         backgroundColor: theme.palette.background.default,
@@ -156,7 +165,7 @@ const Dashboard = () => {
                 </List>
             </Drawer>
 
-            <main
+            <main 
                 className="flex-1 p-4"
                 style={{
                     marginLeft: open ? '240px' : '56px',
@@ -165,7 +174,7 @@ const Dashboard = () => {
                     overflow: 'auto',
                 }}
             >
-                <Box
+                <Box 
                     sx={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -193,6 +202,10 @@ const Dashboard = () => {
                     />
                 </Box>
             </main>
+            {openNotification && (
+                <Notification />
+            )
+            }
         </Box>
     );
 };

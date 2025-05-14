@@ -56,7 +56,6 @@ const Register: React.FC = () => {
             setMessage(new MessageObj('error', 'Erro', 'As senhas não coincidem', 'error'));
             return;
         }
-        createUser(user, password, email)
         try {
             const result = await createUser(user, password, email);
             setMessage(result.message);

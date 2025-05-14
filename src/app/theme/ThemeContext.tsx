@@ -2,6 +2,7 @@
 import { createContext, useContext, useState, useMemo, ReactNode, useEffect } from 'react';
 import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material/styles';
 import { lightTheme, darkTheme } from './theme';
+import { useThemeStore } from '../state/themeState';
 
 interface ThemeContextValue {
   theme: ReturnType<typeof createTheme>;
@@ -12,7 +13,8 @@ interface ThemeContextValue {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const isDarkMode = useThemeStore((state) => state.theme);
+  const setIsDarkMode = useThemeStore((state) => state.alter);;
   const [mounted, setMounted] = useState(false);
 
   // Wait until after client-side hydration to show
