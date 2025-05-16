@@ -14,6 +14,7 @@ interface CustomButtonProps extends ButtonProps {
   marginLeft?: number;
   marginRight?: number;
   paddingY?: number;
+  paddingX?: number;
 }
 
 const CustomButton = ({
@@ -28,6 +29,7 @@ const CustomButton = ({
   marginLeft = 0,
   marginRight = 0,
   paddingY = 1.5,
+  paddingX = 0.8,
   ...props
 }: CustomButtonProps) => {
   const { theme } = useTheme();
@@ -45,6 +47,7 @@ const CustomButton = ({
         ml: marginLeft,
         mr: marginRight,
         py: paddingY,
+        px: paddingX,
         backgroundColor: theme.palette[colorType].main,
         '&:hover': {
           backgroundColor: theme.palette[hoverColor].main,
