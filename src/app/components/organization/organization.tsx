@@ -5,7 +5,7 @@ import CustomTypography from '../CustomTypography';
 import CustomComboBox from '../CustomComboBox';
 import CustomTextField from '../CustomTextField';
 import CustomButton from '../CustomButton';
-import { IOrganization } from './IOrganization';
+import { OrganizationObj } from '../../models/OrganizationObj';
 import { Star } from '@mui/icons-material';
 
 const Organization: React.FC = () => {
@@ -23,7 +23,7 @@ const Organization: React.FC = () => {
         { value: 'ALL', label: 'Todos' },
     ];
 
-    const organizations: IOrganization[] = [
+    const organizations: OrganizationObj[] = [
         {
             id: '1',
             title: 'Tcc',
