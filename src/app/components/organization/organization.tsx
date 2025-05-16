@@ -7,15 +7,23 @@ import CustomTextField from '../CustomTextField';
 import CustomButton from '../CustomButton';
 import { OrganizationObj } from '../../models/OrganizationObj';
 import { Star } from '@mui/icons-material';
+import { useOrganizationFormStore } from '@/app/state/organizationFormState';
+import OrganizationForm from './OrganizationForm';
 
 const Organization: React.FC = () => {
     const { theme } = useTheme();
     const [selectedOrganizationType, setSelectedOrganizationType] = useState('');
     const [filter, setFilter] = useState('');
+    const organizationForm = useOrganizationFormStore((state) => state.organizationForm);
+    const alterOrganizationForm = useOrganizationFormStore((state) => state.alter);
 
     const handleChangeOrganizationType = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSelectedOrganizationType(event.target.value);
     };
+
+    const toggleOrganizationForm = () => {
+        alterOrganizationForm(!organizationForm);
+    }
 
     const organizationsType = [
         { value: 'INDIVIDUAL', label: 'Individual' },
@@ -84,6 +92,7 @@ const Organization: React.FC = () => {
                             type="button"
                             colorType="primary"
                             hoverColorType="primary"
+                            onClick={toggleOrganizationForm}
                             paddingY={2}
                             marginTop={0.5}
                         />
@@ -197,6 +206,10 @@ const Organization: React.FC = () => {
                         </Box>
                     ))}
                 </Box>
+                {organizationForm && (
+                    <OrganizationForm />
+                )
+                }
             </Box>
         </Box >
     );
