@@ -40,6 +40,11 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
         text: {
           primary: baseTheme.palette.text.primary,
         },
+        button: {
+          primary:  baseTheme.palette.button.primary,
+          star:  baseTheme.palette.button.star,
+          delete:  baseTheme.palette.button.delete,
+        }
       },
     });
   }, [isDarkMode]);

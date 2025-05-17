@@ -10,8 +10,9 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import Notification from '@/app/components/notification/notification';
 import { useNotificationStore } from '@/app/state/notificationState';
-import Organization from '@/app/components/organization/organization';
+import Organization from '@/app/components/organization/Organization';
 import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
+import HomeComponent from '@/app/components/home/HomeComponent';
 
 const Dashboard = () => {
     const [open, setOpen] = React.useState(false);
@@ -196,7 +197,7 @@ const Dashboard = () => {
                     backgroundColor: theme.palette.background.paper,
                 }}
             >
-                {/*{option == 'Home' && ()}*/}
+                {option == 'Home' && (<HomeComponent />)}
                 {/*{option == 'Documents' && ()}*/}
                 {option == 'Organizations' && (<Organization />)}
                 {/*{option == 'Favorites' && ()}*/}
