@@ -10,15 +10,30 @@ import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import Notification from '@/app/components/notification/notification';
 import { useNotificationStore } from '@/app/state/notificationState';
+import Organization from '@/app/components/organization/Organization';
+import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
+import HomeComponent from '@/app/components/home/HomeComponent';
 
 const Dashboard = () => {
     const [open, setOpen] = React.useState(false);
     const { theme, toggleTheme, isDarkMode } = useTheme();
     const openNotification = useNotificationStore((state) => state.openNotification);
-    const alterNotification = useNotificationStore((state) => state.alter);;
+    const alterNotification = useNotificationStore((state) => state.alter);
+    const option = useOptionsDashboardStore((state) => state.option);
+    const alterOption = useOptionsDashboardStore((state) => state.alter);
 
     const toggleDrawer = () => {
         setOpen(!open);
+    };
+
+    const toggleDrawerMain = () => {
+        if (open) {
+            setOpen(!open);
+        }
+    };
+
+    const toggleOption = (optionText: string) => {
+        alterOption(optionText)
     };
 
     const toggleNotification = () => {
@@ -101,15 +116,20 @@ const Dashboard = () => {
                 <Divider sx={{ backgroundColor: theme.palette.divider }} />
                 <List >
                     {[
-                        { text: 'Inicio', icon: <Home sx={{ color: theme.palette.text.primary }} /> },
-                        { text: 'Meus Arquivos', icon: <Folder sx={{ color: theme.palette.text.primary }} /> },
-                        { text: 'Organizações', icon: <Groups sx={{ color: theme.palette.text.primary }} /> },
-                        { text: 'Favoritos', icon: <Star sx={{ color: theme.palette.text.primary }} /> },
-                        { text: 'Lixeira', icon: <Leaderboard sx={{ color: theme.palette.text.primary }} /> },
+                        { optionText: 'Home', text: 'Inicio', icon: <Home sx={{ color: theme.palette.text.primary }} /> },
+                        { optionText: 'Documents', text: 'Meus Arquivos', icon: <Folder sx={{ color: theme.palette.text.primary }} /> },
+                        { optionText: 'Organizations', text: 'Organizações', icon: <Groups sx={{ color: theme.palette.text.primary }} /> },
+                        { optionText: 'Favorites', text: 'Favoritos', icon: <Star sx={{ color: theme.palette.text.primary }} /> },
+                        { optionText: 'Recycle Bin', text: 'Lixeira', icon: <Leaderboard sx={{ color: theme.palette.text.primary }} /> },
                     ].map((item) => (
                         <ListItem key={item.text} disablePadding>
                             <ListItemButton
-                                onClick={toggleDrawer}
+                                onClick={() => {
+                                    toggleDrawer();
+                                    toggleOption(item.optionText);
+                                }
+                                }
+
                                 sx={{
                                     '&:hover': {
                                         backgroundColor: theme.palette.primary.main,
@@ -138,7 +158,10 @@ const Dashboard = () => {
                 <Divider sx={{ backgroundColor: theme.palette.divider }} />
                 <List>
                     <ListItem disablePadding>
-                        <ListItemButton onClick={toggleDrawer}
+                        <ListItemButton onClick={() => {
+                            toggleDrawer();
+                            toggleOption('Settings');
+                        }}
                             sx={{
                                 '&:hover': {
                                     backgroundColor: theme.palette.primary.main,
@@ -165,42 +188,22 @@ const Dashboard = () => {
                 </List>
             </Drawer>
 
-            <main 
-                className="flex-1 p-4"
+            <main
+                onClick={toggleDrawerMain}
+                className="flex-1 p-4 overflow-hidden"
                 style={{
-                    marginLeft: open ? '240px' : '56px',
+                    marginTop: '70px',
                     transition: 'margin-left 0.3s ease',
-                    height: '100vh',
-                    overflow: 'auto',
+                    backgroundColor: theme.palette.background.paper,
                 }}
             >
-                <Box 
-                    sx={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        height: '100%',
-                        textAlign: 'center',
-                    }}
-                >
-                    <CustomTypography
-                        text='DocDash'
-                        component="h1"
-                        variant='h3'
-                        sx={{
-                            color: theme.palette.text.primary,
-                            mb: 2,
-                            fontWeight: 'bold',
-                        }}
-                    />
-                    <CustomTypography
-                        text='Esta é a área de conteúdo principal que se expande quando o menu é recolhido.'
-                        component="p"
-                        variant='body1'
-                        sx={{ color: theme.palette.text.secondary }}
-                    />
-                </Box>
+                {option == 'Home' && (<HomeComponent />)}
+                {/*{option == 'Documents' && ()}*/}
+                {option == 'Organizations' && (<Organization />)}
+                {/*{option == 'Favorites' && ()}*/}
+                {/*{option == 'Recycle Bin' && ()}*/}
+                {/*{option == 'Settings' && ()}*/}
+
             </main>
             {openNotification && (
                 <Notification />

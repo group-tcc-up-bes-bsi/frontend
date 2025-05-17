@@ -22,9 +22,9 @@ const Notification: React.FC = () => {
             <Box
                 className="fixed z-[1330] flex flex-col"
                 sx={{
-                    backgroundColor: theme.palette.background.default,
-                    width: '300px',
-                    height: '350px',
+                    backgroundColor: theme.palette.background.paper,
+                    width: '400px',
+                    height: '450px',
                     borderRadius: '4px',
                     boxShadow: theme.shadows[3],
                     top: '50%',
@@ -54,6 +54,16 @@ const Notification: React.FC = () => {
                         px: 1,
                         border: `1px solid ${theme.palette.divider}`,
                         borderRadius: '4px',
+                        '&::-webkit-scrollbar': {
+                            width: '6px',
+                        },
+                        '&::-webkit-scrollbar-track': {
+                            background: theme.palette.background.default,
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                            backgroundColor: theme.palette.primary.main,
+                            borderRadius: '3px',
+                        },
                     }}
                 >
                     <List dense sx={{ py: 0 }}>

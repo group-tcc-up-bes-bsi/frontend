@@ -16,6 +16,7 @@ interface CustomTextFieldBaseProps {
   autoComplete?: string;
   focusedColor?: 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
   hoverColor?: 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success';
+  marginTop?: number;
   marginBottom?: number;
   showPasswordToggle?: boolean;
 }
@@ -34,8 +35,11 @@ const CustomTextField = ({
   autoComplete,
   focusedColor = 'primary',
   hoverColor = 'info',
+  marginTop = 2,
   marginBottom = 3,
-  showPasswordToggle = type === 'password', // Mostra toggle apenas para campos de senha por padrão
+  showPasswordToggle = type === 'password',
+  multiline = false,
+  maxRows,
   ...props
 }: CustomTextFieldProps) => {
   const { theme } = useCustomTheme();
@@ -78,6 +82,8 @@ const CustomTextField = ({
         ) : null,
         ...props.InputProps
       }}
+      multiline={multiline}
+      maxRows={maxRows}
       sx={{
         '& .MuiInputLabel-root': {
           color: theme.palette.text.primary,
@@ -96,8 +102,20 @@ const CustomTextField = ({
           '&.Mui-focused fieldset': {
             borderColor: theme.palette[focusedColor].main
           },
+          // Estilos para a barra de rolagem
+          '& textarea::-webkit-scrollbar': {
+            width: '6px',
+          },
+          '& textarea::-webkit-scrollbar-track': {
+            background: theme.palette.background.paper,
+          },
+          '& textarea::-webkit-scrollbar-thumb': {
+            backgroundColor: theme.palette.primary.main, // Azul do tema
+            borderRadius: '3px',
+          },
         },
         mb: marginBottom,
+        mt: marginTop,
         ...props.sx
       }}
       {...props}
