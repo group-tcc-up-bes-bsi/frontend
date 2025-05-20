@@ -6,6 +6,7 @@ import Folder from '@mui/icons-material/Folder';
 import Menu from '@mui/icons-material/Menu';
 import SpaceDashboard from '@mui/icons-material/SpaceDashboard';
 import TableDocuments from './TableDocuments';
+import Documents from './Documents';
 
 const HomeComponent: React.FC = () => {
     const { theme } = useTheme();
@@ -154,28 +155,65 @@ const HomeComponent: React.FC = () => {
                     ))}
                 </Box>
             </Box>
+            <Box sx={{
+                display: 'flex',
+                width: '100%',
+                background: theme.palette.background.default,
+                marginTop: 2,
+                paddingLeft: 2
+            }}>
+                <CustomTypography
+                    text="Arquivos Recentes"
+                    component="h2"
+                    variant="h5"
+                    sx={{
+                        color: theme.palette.text.primary,
+                        mt: 1,
+                        fontWeight: 'bold',
+                    }}
+                />
+            </Box>
             {modeViewer == 1 && (
-
-                <Box sx={{ backgroundColor: theme.palette.background.default, padding: 1, marginTop: 2 }}>
-                    <Box
-                        sx={{ width: '100%', display: 'flex', marginLeft: '3rem' }}
-                    >
-                        <CustomTypography
-                            text="Arquivos Recentes"
-                            component="h2"
-                            variant="h5"
-                            sx={{
-                                color: theme.palette.text.primary,
-                                mb: 2,
-                                mt: 1,
-                                fontWeight: 'bold'
-                            }}
-                        />
-                    </Box>
+                <Box sx={{
+                    backgroundColor: theme.palette.background.default,
+                    padding: 1,
+                    maxHeight: 'calc(80vh - 150px)',
+                    overflowY: 'auto',
+                    '&::-webkit-scrollbar': {
+                        width: '6px',
+                    },
+                    '&::-webkit-scrollbar-track': {
+                        background: theme.palette.background.default,
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                        backgroundColor: theme.palette.primary.main,
+                        borderRadius: '3px',
+                    },
+                }}>
                     <TableDocuments />
                 </Box>
             )
             }
+            {modeViewer == 2 && (
+                <Box sx={{
+                    backgroundColor: theme.palette.background.default,
+                    padding: 1,
+                    maxHeight: 'calc(80vh - 150px)',
+                    overflowY: 'auto',
+                    '&::-webkit-scrollbar': {
+                        width: '6px',
+                    },
+                    '&::-webkit-scrollbar-track': {
+                        background: theme.palette.background.default,
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                        backgroundColor: theme.palette.primary.main,
+                        borderRadius: '3px',
+                    },
+                }}>
+                    <Documents />
+                </Box>
+            )}
         </Box >
     );
 };

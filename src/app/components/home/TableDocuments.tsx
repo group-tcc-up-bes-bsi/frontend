@@ -46,6 +46,50 @@ const TableDocuments = () => {
             dataCriacao: new Date('2023-08-05'),
             ultimaAlteracao: new Date('2023-10-15'),
             versao: '1.5'
+        },
+        {
+            id: '4',
+            nome: 'Apresentação.pptx',
+            tipo: 'PowerPoint',
+            dataCriacao: new Date('2023-08-05'),
+            ultimaAlteracao: new Date('2023-10-15'),
+            versao: '1.5'
+        },
+        {
+            id: '5',
+            nome: 'Apresentação.pptx',
+            tipo: 'PowerPoint',
+            dataCriacao: new Date('2023-08-05'),
+            ultimaAlteracao: new Date('2023-10-15'),
+            versao: '1.5'
+        }, {
+            id: '6',
+            nome: 'Apresentação.pptx',
+            tipo: 'PowerPoint',
+            dataCriacao: new Date('2023-08-05'),
+            ultimaAlteracao: new Date('2023-10-15'),
+            versao: '1.5'
+        }, {
+            id: '7',
+            nome: 'Apresentação.pptx',
+            tipo: 'PowerPoint',
+            dataCriacao: new Date('2023-08-05'),
+            ultimaAlteracao: new Date('2023-10-15'),
+            versao: '1.5'
+        }, {
+            id: '8',
+            nome: 'Apresentação.pptx',
+            tipo: 'PowerPoint',
+            dataCriacao: new Date('2023-08-05'),
+            ultimaAlteracao: new Date('2023-10-15'),
+            versao: '1.5'
+        }, {
+            id: '9',
+            nome: 'Apresentação.pptx',
+            tipo: 'PowerPoint',
+            dataCriacao: new Date('2023-08-05'),
+            ultimaAlteracao: new Date('2023-10-15'),
+            versao: '1.5'
         }
     ];
 
@@ -60,7 +104,7 @@ const TableDocuments = () => {
     };
 
     return (
-        <TableContainer sx={{ mt: 0 }}>
+        <TableContainer>
             <Table sx={{ minWidth: 650 }} aria-label="tabela de arquivos">
                 <TableHead>
                     <TableRow sx={{ backgroundColor: theme.palette.background.default }}>
