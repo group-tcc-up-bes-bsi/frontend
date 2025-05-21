@@ -105,10 +105,10 @@ const TableDocuments = () => {
 
     return (
         <TableContainer>
-            <Table sx={{ minWidth: 650 }} aria-label="tabela de arquivos">
+            <Table sx={{ minWidth: 650 }} aria-label="tabela de Documentos">
                 <TableHead>
                     <TableRow sx={{ backgroundColor: theme.palette.background.default }}>
-                        <TableCell>Arquivo</TableCell>
+                        <TableCell>Documento</TableCell>
                         <TableCell>Tipo</TableCell>
                         <TableCell>
                             <TableSortLabel>Data de Criação</TableSortLabel>
