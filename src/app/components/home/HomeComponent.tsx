@@ -163,7 +163,7 @@ const HomeComponent: React.FC = () => {
                 paddingLeft: 2
             }}>
                 <CustomTypography
-                    text="Arquivos Recentes"
+                    text="Documentos Recentes"
                     component="h2"
                     variant="h5"
                     sx={{
