@@ -13,6 +13,7 @@ import { useNotificationStore } from '@/app/state/notificationState';
 import Organization from '@/app/components/organization/Organization';
 import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
 import HomeComponent from '@/app/components/home/HomeComponent';
+import DocumentsComponent from '@/app/components/Documents/DocumentsComponent';
 
 const Dashboard = () => {
     const [open, setOpen] = React.useState(false);
@@ -117,7 +118,7 @@ const Dashboard = () => {
                 <List >
                     {[
                         { optionText: 'Home', text: 'Inicio', icon: <Home sx={{ color: theme.palette.text.primary }} /> },
-                        { optionText: 'Documents', text: 'Meus Arquivos', icon: <Folder sx={{ color: theme.palette.text.primary }} /> },
+                        { optionText: 'Documents', text: 'Meus Documentos', icon: <Folder sx={{ color: theme.palette.text.primary }} /> },
                         { optionText: 'Organizations', text: 'Organizações', icon: <Groups sx={{ color: theme.palette.text.primary }} /> },
                         { optionText: 'Favorites', text: 'Favoritos', icon: <Star sx={{ color: theme.palette.text.primary }} /> },
                         { optionText: 'Recycle Bin', text: 'Lixeira', icon: <Leaderboard sx={{ color: theme.palette.text.primary }} /> },
@@ -198,7 +199,7 @@ const Dashboard = () => {
                 }}
             >
                 {option == 'Home' && (<HomeComponent />)}
-                {/*{option == 'Documents' && ()}*/}
+                {option == 'Documents' && (<DocumentsComponent />)}
                 {option == 'Organizations' && (<Organization />)}
                 {/*{option == 'Favorites' && ()}*/}
                 {/*{option == 'Recycle Bin' && ()}*/}
