@@ -44,7 +44,7 @@ const FavoritesComponent: React.FC = () => {
                     <Box sx={{ width: '60%' }}>
                         <CustomTextField
                             name="filter"
-                            label="Search something"
+                            label="Informe algo"
                             type="text"
                             value={filter}
                             onChange={(e) => setFilter(e.target.value)}
