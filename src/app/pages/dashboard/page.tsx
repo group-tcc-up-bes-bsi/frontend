@@ -13,7 +13,8 @@ import { useNotificationStore } from '@/app/state/notificationState';
 import Organization from '@/app/components/organization/Organization';
 import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
 import HomeComponent from '@/app/components/home/HomeComponent';
-import DocumentsComponent from '@/app/components/Documents/DocumentsComponent';
+import DocumentsComponent from '@/app/components/documents/DocumentsComponent';
+import FavoritesComponent from '@/app/components/favorites/FavoritesComponent';
 
 const Dashboard = () => {
     const [open, setOpen] = React.useState(false);
@@ -201,7 +202,7 @@ const Dashboard = () => {
                 {option == 'Home' && (<HomeComponent />)}
                 {option == 'Documents' && (<DocumentsComponent />)}
                 {option == 'Organizations' && (<Organization />)}
-                {/*{option == 'Favorites' && ()}*/}
+                {option == 'Favorites' && (<FavoritesComponent />)}
                 {/*{option == 'Recycle Bin' && ()}*/}
                 {/*{option == 'Settings' && ()}*/}
 
