@@ -1,7 +1,7 @@
 "use client"
 import React from 'react';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box } from '@mui/material';
-import { Settings, Star, Folder, Groups, Home, Leaderboard } from '@mui/icons-material';
+import { Settings, Star, Folder, Groups, Home, Delete } from '@mui/icons-material';
 import { useTheme } from '@/app/theme/ThemeContext';
 import CustomTypography from '@/app/components/CustomTypography';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -13,7 +13,8 @@ import { useNotificationStore } from '@/app/state/notificationState';
 import Organization from '@/app/components/organization/Organization';
 import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
 import HomeComponent from '@/app/components/home/HomeComponent';
-import DocumentsComponent from '@/app/components/Documents/DocumentsComponent';
+import DocumentsComponent from '@/app/components/documents/DocumentsComponent';
+import FavoritesComponent from '@/app/components/favorites/FavoritesComponent';
 
 const Dashboard = () => {
     const [open, setOpen] = React.useState(false);
@@ -121,7 +122,7 @@ const Dashboard = () => {
                         { optionText: 'Documents', text: 'Meus Documentos', icon: <Folder sx={{ color: theme.palette.text.primary }} /> },
                         { optionText: 'Organizations', text: 'Organizações', icon: <Groups sx={{ color: theme.palette.text.primary }} /> },
                         { optionText: 'Favorites', text: 'Favoritos', icon: <Star sx={{ color: theme.palette.text.primary }} /> },
-                        { optionText: 'Recycle Bin', text: 'Lixeira', icon: <Leaderboard sx={{ color: theme.palette.text.primary }} /> },
+                        { optionText: 'Recycle Bin', text: 'Lixeira', icon: <Delete sx={{ color: theme.palette.text.primary }} /> },
                     ].map((item) => (
                         <ListItem key={item.text} disablePadding>
                             <ListItemButton
@@ -201,7 +202,7 @@ const Dashboard = () => {
                 {option == 'Home' && (<HomeComponent />)}
                 {option == 'Documents' && (<DocumentsComponent />)}
                 {option == 'Organizations' && (<Organization />)}
-                {/*{option == 'Favorites' && ()}*/}
+                {option == 'Favorites' && (<FavoritesComponent />)}
                 {/*{option == 'Recycle Bin' && ()}*/}
                 {/*{option == 'Settings' && ()}*/}
 
