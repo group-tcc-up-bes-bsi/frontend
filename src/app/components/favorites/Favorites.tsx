@@ -9,7 +9,7 @@ import CustomTypography from '../CustomTypography';
 import CustomTextField from '../CustomTextField';
 import { Star } from '@mui/icons-material';
 
-const FavoritesComponent: React.FC = () => {
+const Favorites: React.FC = () => {
     const { theme } = useTheme();
     const [filter, setFilter] = useState('');
 
@@ -41,7 +41,7 @@ const FavoritesComponent: React.FC = () => {
         <Box sx={{ maxWidth: '100%' }}>
             <Box>
                 <Box sx={{ display: 'flex', justifyContent: 'left' }}>
-                    <Box sx={{ width: '60%' }}>
+                    <Box sx={{ width: '50%' }}>
                         <CustomTextField
                             name="filter"
                             label="Informe algo"
@@ -68,7 +68,23 @@ const FavoritesComponent: React.FC = () => {
                                 fontWeight: 'bold'
                             }}
                         />
-                        <Box>
+                        <Box
+                            sx={{
+                                backgroundColor: theme.palette.background.default,
+                                padding: 1,
+                                maxHeight: 'calc(80vh - 150px)',
+                                overflowY: 'auto',
+                                '&::-webkit-scrollbar': {
+                                    width: '6px',
+                                },
+                                '&::-webkit-scrollbar-track': {
+                                    background: theme.palette.background.default,
+                                },
+                                '&::-webkit-scrollbar-thumb': {
+                                    backgroundColor: theme.palette.primary.main,
+                                    borderRadius: '3px',
+                                },
+                            }}>
                             <TableContainer component={Paper} sx={{ background: 'transparent', boxShadow: 'none' }}>
                                 <Table size="small">
                                     <TableHead>
@@ -119,7 +135,24 @@ const FavoritesComponent: React.FC = () => {
                             }}
                         />
 
-                        <Box>
+                        <Box
+                            sx={{
+                                backgroundColor: theme.palette.background.default,
+                                padding: 1,
+                                maxHeight: 'calc(80vh - 150px)',
+                                overflowY: 'auto',
+                                '&::-webkit-scrollbar': {
+                                    width: '6px',
+                                },
+                                '&::-webkit-scrollbar-track': {
+                                    background: theme.palette.background.default,
+                                },
+                                '&::-webkit-scrollbar-thumb': {
+                                    backgroundColor: theme.palette.primary.main,
+                                    borderRadius: '3px',
+                                },
+                            }}
+                        >
                             <TableContainer component={Paper} sx={{ background: 'transparent', boxShadow: 'none' }}>
                                 <Table size="small">
                                     <TableHead>
@@ -152,4 +185,4 @@ const FavoritesComponent: React.FC = () => {
     );
 };
 
-export default FavoritesComponent;
+export default Favorites;
