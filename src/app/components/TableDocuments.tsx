@@ -7,89 +7,106 @@ import {
     TableRow,
     TableSortLabel,
     Box,
-    IconButton
+    IconButton,
+    Menu,
+    MenuItem
 } from '@mui/material';
 import { Delete, MoreVert } from '@mui/icons-material';
 import { useTheme } from '@/app/theme/ThemeContext';
-interface FileItem {
-    id: string;
-    nome: string;
-    tipo: string;
-    dataCriacao: Date;
-    ultimaAlteracao: Date;
-    versao: string;
-}
+import { FileItem } from '../models/FileItem';
+
+import React, { useState } from 'react';
+import { useDocumentStateStore } from '../state/DocumentState';
+import { useOptionsDashboardStore } from '../state/optionsDashboard';
 
 const TableDocuments = () => {
     const { theme } = useTheme();
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
+    const alterFile = useDocumentStateStore((state) => state.alter);
+    const alterOption = useOptionsDashboardStore((state) => state.alter);
+
     const files: FileItem[] = [
         {
             id: '1',
-            nome: 'Documento.pdf',
-            tipo: 'PDF',
-            dataCriacao: new Date('2023-10-15'),
-            ultimaAlteracao: new Date('2023-10-20'),
-            versao: 'Teste'
+            name: 'Document.pdf',
+            type: 'PDF',
+            createdAt: new Date('2023-10-15'),
+            updatedAt: new Date('2023-10-20'),
+            version: 'Test',
+            creator: 'User A'
         },
         {
             id: '2',
-            nome: 'Planilha.xlsx',
-            tipo: 'Excel',
-            dataCriacao: new Date('2023-09-10'),
-            ultimaAlteracao: new Date('2023-10-18'),
-            versao: '2.0'
+            name: 'Spreadsheet.xlsx',
+            type: 'Excel',
+            createdAt: new Date('2023-09-10'),
+            updatedAt: new Date('2023-10-18'),
+            version: '2.0',
+            creator: 'User B'
         },
         {
             id: '3',
-            nome: 'Apresentação.pptx',
-            tipo: 'PowerPoint',
-            dataCriacao: new Date('2023-08-05'),
-            ultimaAlteracao: new Date('2023-10-15'),
-            versao: '1.5'
+            name: 'Presentation.pptx',
+            type: 'PowerPoint',
+            createdAt: new Date('2023-08-05'),
+            updatedAt: new Date('2023-10-15'),
+            version: '1.5',
+            creator: 'User C'
         },
         {
             id: '4',
-            nome: 'Apresentação.pptx',
-            tipo: 'PowerPoint',
-            dataCriacao: new Date('2023-08-05'),
-            ultimaAlteracao: new Date('2023-10-15'),
-            versao: '1.5'
+            name: 'Presentation.pptx',
+            type: 'PowerPoint',
+            createdAt: new Date('2023-08-05'),
+            updatedAt: new Date('2023-10-15'),
+            version: '1.5',
+            creator: 'User D'
         },
         {
             id: '5',
-            nome: 'Apresentação.pptx',
-            tipo: 'PowerPoint',
-            dataCriacao: new Date('2023-08-05'),
-            ultimaAlteracao: new Date('2023-10-15'),
-            versao: '1.5'
-        }, {
+            name: 'Presentation.pptx',
+            type: 'PowerPoint',
+            createdAt: new Date('2023-08-05'),
+            updatedAt: new Date('2023-10-15'),
+            version: '1.5',
+            creator: 'User E'
+        },
+        {
             id: '6',
-            nome: 'Apresentação.pptx',
-            tipo: 'PowerPoint',
-            dataCriacao: new Date('2023-08-05'),
-            ultimaAlteracao: new Date('2023-10-15'),
-            versao: '1.5'
-        }, {
+            name: 'Presentation.pptx',
+            type: 'PowerPoint',
+            createdAt: new Date('2023-08-05'),
+            updatedAt: new Date('2023-10-15'),
+            version: '1.5',
+            creator: 'User F'
+        },
+        {
             id: '7',
-            nome: 'Apresentação.pptx',
-            tipo: 'PowerPoint',
-            dataCriacao: new Date('2023-08-05'),
-            ultimaAlteracao: new Date('2023-10-15'),
-            versao: '1.5'
-        }, {
+            name: 'Presentation.pptx',
+            type: 'PowerPoint',
+            createdAt: new Date('2023-08-05'),
+            updatedAt: new Date('2023-10-15'),
+            version: '1.5',
+            creator: 'User G'
+        },
+        {
             id: '8',
-            nome: 'Apresentação.pptx',
-            tipo: 'PowerPoint',
-            dataCriacao: new Date('2023-08-05'),
-            ultimaAlteracao: new Date('2023-10-15'),
-            versao: '1.5'
-        }, {
+            name: 'Presentation.pptx',
+            type: 'PowerPoint',
+            createdAt: new Date('2023-08-05'),
+            updatedAt: new Date('2023-10-15'),
+            version: '1.5',
+            creator: 'User H'
+        },
+        {
             id: '9',
-            nome: 'Apresentação.pptx',
-            tipo: 'PowerPoint',
-            dataCriacao: new Date('2023-08-05'),
-            ultimaAlteracao: new Date('2023-10-15'),
-            versao: '1.5'
+            name: 'Presentation.pptx',
+            type: 'PowerPoint',
+            createdAt: new Date('2023-08-05'),
+            updatedAt: new Date('2023-10-15'),
+            version: '1.5',
+            creator: 'User I'
         }
     ];
 
@@ -123,10 +140,10 @@ const TableDocuments = () => {
                 <TableBody>
                     {files.map((file) => (
                         <TableRow key={file.id}>
-                            <TableCell sx={{ background: theme.palette.background.default }}>{file.nome}</TableCell>
-                            <TableCell sx={{ background: theme.palette.background.default }}>{file.tipo}</TableCell>
-                            <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(file.dataCriacao)}</TableCell>
-                            <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(file.ultimaAlteracao)}</TableCell>
+                            <TableCell sx={{ background: theme.palette.background.default }}>{file.name}</TableCell>
+                            <TableCell sx={{ background: theme.palette.background.default }}>{file.type}</TableCell>
+                            <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(file.createdAt)}</TableCell>
+                            <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(file.updatedAt)}</TableCell>
                             <TableCell sx={{ background: theme.palette.background.default }}>
                                 <Box
                                     sx={{
@@ -137,16 +154,31 @@ const TableDocuments = () => {
                                         display: 'inline-block'
                                     }}
                                 >
-                                    {file.versao}
+                                    {file.version}
                                 </Box>
                             </TableCell>
                             <TableCell sx={{ background: theme.palette.background.default }}>
                                 <IconButton aria-label="delete">
                                     <Delete color="error" />
                                 </IconButton>
-                                <IconButton aria-label="more">
+                                <IconButton
+                                    aria-label="more"
+                                    onClick={(event) => {
+                                        setAnchorEl(event.currentTarget);
+                                        setSelectedFile(file);
+                                    }}
+                                >
                                     <MoreVert />
                                 </IconButton>
+                                <Menu
+                                    anchorEl={anchorEl}
+                                    open={Boolean(anchorEl) && selectedFile?.id === file.id}
+                                    onClose={() => setAnchorEl(null)}
+                                >
+                                    <MenuItem onClick={() => { setAnchorEl(null); }}>Alterar</MenuItem>
+                                    <MenuItem onClick={() => { setAnchorEl(null); }}>Versões</MenuItem>
+                                    <MenuItem onClick={() => { alterOption('Stats'); if (selectedFile) alterFile(selectedFile); setAnchorEl(null); }}>Estatísticas</MenuItem>
+                                </Menu>
                             </TableCell>
                         </TableRow>
                     ))}

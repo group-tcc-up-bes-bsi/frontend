@@ -17,6 +17,7 @@ import DocumentsComponent from '@/app/components/documents/DocumentsComponent';
 import Favorites from '@/app/components/favorites/Favorites';
 import Trash from '@/app/components/trash/Trash';
 import SettingsComponent from '@/app/components/settings/SettingsComponent';
+import StatsDocument from '@/app/components/StatsDocument';
 
 const Dashboard = () => {
     const [open, setOpen] = React.useState(false);
@@ -207,6 +208,7 @@ const Dashboard = () => {
                 {option == 'Favorites' && (<Favorites />)}
                 {option == 'Recycle Bin' && (<Trash />)}
                 {option == 'Settings' && (<SettingsComponent />)}
+                {option == 'Stats' && (<StatsDocument />)}
 
             </main>
             {openNotification && (

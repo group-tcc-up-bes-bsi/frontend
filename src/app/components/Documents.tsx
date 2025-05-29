@@ -5,15 +5,7 @@ import {
   IconButton,
 } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-
-interface FileItem {
-  id: string;
-  nome: string;
-  tipo: string;
-  dataCriacao: Date;
-  ultimaAlteracao: Date;
-  versao: string;
-}
+import { FileItem } from '../models/FileItem';
 
 const Documents: React.FC = () => {
   const { theme } = useTheme();
@@ -21,116 +13,130 @@ const Documents: React.FC = () => {
   const files: FileItem[] = [
     {
       id: '1',
-      nome: 'Documento.pdf',
-      tipo: 'PDF',
-      dataCriacao: new Date('2023-10-15'),
-      ultimaAlteracao: new Date('2023-10-20'),
-      versao: 'Teste'
+      name: 'Documento.pdf',
+      type: 'PDF',
+      createdAt: new Date('2023-10-15'),
+      updatedAt: new Date('2023-10-20'),
+      version: 'Teste',
+      creator: 'Usuário 1'
     },
     {
       id: '2',
-      nome: 'Planilha.xlsx',
-      tipo: 'Excel',
-      dataCriacao: new Date('2023-09-10'),
-      ultimaAlteracao: new Date('2023-10-18'),
-      versao: '2.0'
+      name: 'Planilha.xlsx',
+      type: 'Excel',
+      createdAt: new Date('2023-09-10'),
+      updatedAt: new Date('2023-10-18'),
+      version: '2.0',
+      creator: 'Usuário 2'
     },
     {
       id: '3',
-      nome: 'Apresentação.pptx',
-      tipo: 'PowerPoint',
-      dataCriacao: new Date('2023-08-05'),
-      ultimaAlteracao: new Date('2023-10-15'),
-      versao: '1.5'
+      name: 'Apresentação.pptx',
+      type: 'PowerPoint',
+      createdAt: new Date('2023-08-05'),
+      updatedAt: new Date('2023-10-15'),
+      version: '1.5',
+      creator: 'Usuário 3'
     },
     {
       id: '4',
-      nome: 'Apresentação.pptx',
-      tipo: 'PowerPoint',
-      dataCriacao: new Date('2023-08-05'),
-      ultimaAlteracao: new Date('2023-10-15'),
-      versao: '1.5'
+      name: 'Apresentação.pptx',
+      type: 'PowerPoint',
+      createdAt: new Date('2023-08-05'),
+      updatedAt: new Date('2023-10-15'),
+      version: '1.5',
+      creator: 'Usuário 4'
     },
     {
       id: '5',
-      nome: 'Apresentação.pptx',
-      tipo: 'PowerPoint',
-      dataCriacao: new Date('2023-08-05'),
-      ultimaAlteracao: new Date('2023-10-15'),
-      versao: '1.5'
+      name: 'Apresentação.pptx',
+      type: 'PowerPoint',
+      createdAt: new Date('2023-08-05'),
+      updatedAt: new Date('2023-10-15'),
+      version: '1.5',
+      creator: 'Usuário 5'
     },
     {
       id: '6',
-      nome: 'Apresentação.pptx',
-      tipo: 'PowerPoint',
-      dataCriacao: new Date('2023-08-05'),
-      ultimaAlteracao: new Date('2023-10-15'),
-      versao: '1.5'
+      name: 'Apresentação.pptx',
+      type: 'PowerPoint',
+      createdAt: new Date('2023-08-05'),
+      updatedAt: new Date('2023-10-15'),
+      version: '1.5',
+      creator: 'Usuário 6'
     },
     {
       id: '7',
-      nome: 'Apresentação.pptx',
-      tipo: 'PowerPoint',
-      dataCriacao: new Date('2023-08-05'),
-      ultimaAlteracao: new Date('2023-10-15'),
-      versao: '1.5'
+      name: 'Apresentação.pptx',
+      type: 'PowerPoint',
+      createdAt: new Date('2023-08-05'),
+      updatedAt: new Date('2023-10-15'),
+      version: '1.5',
+      creator: 'Usuário 7'
     },
     {
       id: '8',
-      nome: 'Documento.pdf',
-      tipo: 'PDF',
-      dataCriacao: new Date('2023-10-15'),
-      ultimaAlteracao: new Date('2023-10-20'),
-      versao: 'Teste'
+      name: 'Documento.pdf',
+      type: 'PDF',
+      createdAt: new Date('2023-10-15'),
+      updatedAt: new Date('2023-10-20'),
+      version: 'Teste',
+      creator: 'Usuário 8'
     },
     {
       id: '9',
-      nome: 'Planilha.xlsx',
-      tipo: 'Excel',
-      dataCriacao: new Date('2023-09-10'),
-      ultimaAlteracao: new Date('2023-10-18'),
-      versao: '2.0'
+      name: 'Planilha.xlsx',
+      type: 'Excel',
+      createdAt: new Date('2023-09-10'),
+      updatedAt: new Date('2023-10-18'),
+      version: '2.0',
+      creator: 'Usuário 9'
     },
     {
       id: '10',
-      nome: 'Apresentação.pptx',
-      tipo: 'PowerPoint',
-      dataCriacao: new Date('2023-08-05'),
-      ultimaAlteracao: new Date('2023-10-15'),
-      versao: '1.5'
+      name: 'Apresentação.pptx',
+      type: 'PowerPoint',
+      createdAt: new Date('2023-08-05'),
+      updatedAt: new Date('2023-10-15'),
+      version: '1.5',
+      creator: 'Usuário 10'
     },
     {
       id: '11',
-      nome: 'Apresentação.pptx',
-      tipo: 'PowerPoint',
-      dataCriacao: new Date('2023-08-05'),
-      ultimaAlteracao: new Date('2023-10-15'),
-      versao: '1.5'
+      name: 'Apresentação.pptx',
+      type: 'PowerPoint',
+      createdAt: new Date('2023-08-05'),
+      updatedAt: new Date('2023-10-15'),
+      version: '1.5',
+      creator: 'Usuário 11'
     },
     {
       id: '12',
-      nome: 'Apresentação.pptx',
-      tipo: 'PowerPoint',
-      dataCriacao: new Date('2023-08-05'),
-      ultimaAlteracao: new Date('2023-10-15'),
-      versao: '1.5'
+      name: 'Apresentação.pptx',
+      type: 'PowerPoint',
+      createdAt: new Date('2023-08-05'),
+      updatedAt: new Date('2023-10-15'),
+      version: '1.5',
+      creator: 'Usuário 12'
     },
     {
       id: '13',
-      nome: 'Apresentação.pptx',
-      tipo: 'PowerPoint',
-      dataCriacao: new Date('2023-08-05'),
-      ultimaAlteracao: new Date('2023-10-15'),
-      versao: '1.5'
+      name: 'Apresentação.pptx',
+      type: 'PowerPoint',
+      createdAt: new Date('2023-08-05'),
+      updatedAt: new Date('2023-10-15'),
+      version: '1.5',
+      creator: 'Usuário 13'
     },
     {
       id: '14',
-      nome: 'Apresentação.pptx',
-      tipo: 'PowerPoint',
-      dataCriacao: new Date('2023-08-05'),
-      ultimaAlteracao: new Date('2023-10-15'),
-      versao: '1.5'
-    }
+      name: 'Apresentação.pptx',
+      type: 'PowerPoint',
+      createdAt: new Date('2023-08-05'),
+      updatedAt: new Date('2023-10-15'),
+      version: '1.5',
+      creator: 'Usuário 14'
+    },
   ];
 
   const formatDate = (date: Date) => {
@@ -162,15 +168,15 @@ const Documents: React.FC = () => {
           }}
         >
           <Box fontWeight="bold" fontSize="0.9rem" mb={1}>
-            {file.nome}
+            {file.name}
           </Box>
           <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
             <Box sx={{ display: 'flex', flexDirection: 'column', }}>
               <Box fontSize="0.8rem" mt={1} sx={{ color: theme.palette.text.primary }}>
-                Tipo: {file.tipo}
+                Tipo: {file.type}
               </Box>
               <Box fontSize="0.8rem" mb={1} sx={{ color: theme.palette.text.primary }}>
-                Versão: {file.versao}
+                Versão: {file.version}
               </Box>
             </Box>
             <Box mt={0.5}>
@@ -193,7 +199,7 @@ const Documents: React.FC = () => {
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Box fontSize="0.75rem" mt={1} sx={{ color: theme.palette.text.primary }}>
-              Alterado em {formatDate(file.ultimaAlteracao)}
+              Alterado em {formatDate(file.updatedAt)}
             </Box>
           </Box>
         </Box>
