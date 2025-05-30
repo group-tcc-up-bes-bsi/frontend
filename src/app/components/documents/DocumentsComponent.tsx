@@ -31,7 +31,7 @@ const DocumentsComponent: React.FC = () => {
     };
 
     useEffect(() => {
-        alterModeViewer(modeViewer)
+        toggleModeViewer(modeViewer)
     },);
 
     const toggleDocumentForm = () => {
