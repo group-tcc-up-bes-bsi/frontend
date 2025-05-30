@@ -3,10 +3,10 @@ import { PieChart, BarChart } from "@mui/x-charts";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import Paper from "@mui/material/Paper";
 import { useDocumentStateStore } from "../state/DocumentState";
 import { Close } from '@mui/icons-material';
 import { useOptionsDashboardStore } from "../state/optionsDashboard";
+import CustomButton from "./CustomButton";
 
 
 const StatsDocument: React.FC = () => {
@@ -21,44 +21,85 @@ const StatsDocument: React.FC = () => {
     { id: 2, value: 30, label: "Adam" },
   ];
 
-  const barData = [
-    { label: "Gregory", value: 15 },
-    { label: "Lucas", value: 25 },
-    { label: "Adam", value: 35 },
-  ];
+  const [monthsCount, setMonthsCount] = React.useState(6);
+
+  const getLastMonths = (numMonths: number) => {
+    const months = [];
+    const now = new Date();
+    for (let i = numMonths - 1; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const label = date.toLocaleDateString("pt-BR", { month: "short", year: "numeric" }).replace(".", "");
+      months.push({ label, value: Math.floor(Math.random() * 40) + 5 });
+    }
+    return months;
+  };
+
+  const barData = getLastMonths(monthsCount);
+
+  const MonthsSelector: React.FC = () => (
+    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+      <Typography variant="body1">Meses:</Typography>
+      <select
+        value={monthsCount}
+        onChange={e => setMonthsCount(Number(e.target.value))}
+        style={{ padding: '4px 8px', borderRadius: 4, border: '1px solid', borderColor: theme.palette.text.primary, }}
+      >
+        {[3, 6, 9, 12].map(n => (
+          <option style={{ background: theme.palette.background.paper, color: theme.palette.text.primary }} key={n} value={n}>{n}</option>
+        ))}
+      </select>
+    </Box>
+  );
 
   return (
-    <Paper elevation={3} sx={{ p: 3, borderRadius: 2 }}>
-      <Typography variant="h5" gutterBottom>
-        {file?.name}
-      </Typography>
-      <Close
-        onClick={() => {alterOption(lastOption);}}
-      sx={{
-        fontSize: 30,
-        color: theme.palette.text.primary,
-        cursor: 'pointer',
-        alignSelf: 'flex-end',
-        '&:hover': {
-          color: theme.palette.error.main,
-        }
-      }}
-      />
-      <Typography variant="h5" gutterBottom>
-        {file?.createdAt?.toLocaleDateString("pt-BR", {})}
-      </Typography>
-      <Typography variant="h5" gutterBottom>
-        {file?.creator}
-      </Typography>
+    <Box sx={{ p: 3, background: theme.palette.background.default, height: '100%' }}>
+      <Box sx={{ display: "flex", flexDirection: "row", justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h4" gutterBottom>
+          {file?.name}
+        </Typography>
 
-      <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 3 }}>
+
+        <Box sx={{ display: "flex", flexDirection: "row", gap: 4, alignItems: 'center' }}>
+          <CustomButton
+            text="Visualizar log"
+            type="button"
+            colorType="primary"
+            hoverColorType="primary"
+            paddingY={1}
+            paddingX={3}
+            fullWidth={false}
+          />
+          <Close
+            onClick={() => { alterOption(lastOption); }}
+            sx={{
+              fontSize: 30,
+              color: theme.palette.text.primary,
+              cursor: 'pointer',
+              '&:hover': {
+                color: theme.palette.error.main,
+              }
+            }}
+          />
+        </Box>
+      </Box>
+      <Box sx={{ display: "flex", flexDirection: "row", justifyContent: 'space-between', mt: 2 }}>
+        <Typography variant="h6" gutterBottom>
+          {"Data criação: " + file?.createdAt?.toLocaleDateString("pt-BR", {})}
+        </Typography>
+        <Typography variant="h6" gutterBottom>
+          {"Criado por " + file?.creator}
+        </Typography>
+      </Box>
+
+      <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 3, mt: 5 }}>
         <Box sx={{ flex: 1 }}>
-          <Typography variant="h6" gutterBottom>
-            Distribution
+          <Typography variant="h6" gutterBottom sx={{ mb: 7 }}>
+            Alterações por usuário
           </Typography>
           <PieChart
             sx={{
-              border: '1px solid #fff',
+              border: '1px dashed',
+              borderColor: theme.palette.text.primary,
             }}
             series={[
               {
@@ -79,29 +120,34 @@ const StatsDocument: React.FC = () => {
           />
         </Box>
 
-        {/* Gráfico de Barras (BarChart) */}
         <Box sx={{ flex: 1 }}>
           <Typography variant="h6" gutterBottom>
-            Performance
+            Alterações por mês
           </Typography>
+          <MonthsSelector />
           <BarChart
+            sx={{
+              border: '1px dashed',
+              borderColor: theme.palette.text.primary,
+            }}
             xAxis={[
               {
                 scaleType: "band",
-                data: barData.map((item) => item.label)
-              }
+                data: (barData || []).map((item) => item?.label || ""),
+              },
             ]}
             series={[
               {
-                data: barData.map((item) => item.value),
+                data: (barData || []).map((item) => item?.value || 0),
                 color: theme.palette.info.main,
               },
             ]}
-            height={300}
+            height={500}
+            margin={{ top: 20, right: 20, bottom: 50, left: 50 }}
           />
         </Box>
       </Box>
-    </Paper>
+    </Box>
   );
 };
 
