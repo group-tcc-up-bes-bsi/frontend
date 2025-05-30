@@ -17,6 +17,7 @@ import DocumentsComponent from '@/app/components/documents/DocumentsComponent';
 import Favorites from '@/app/components/favorites/Favorites';
 import Trash from '@/app/components/trash/Trash';
 import SettingsComponent from '@/app/components/settings/SettingsComponent';
+import StatsDocument from '@/app/components/StatsDocument';
 
 const Dashboard = () => {
     const [open, setOpen] = React.useState(false);
@@ -25,6 +26,7 @@ const Dashboard = () => {
     const alterNotification = useNotificationStore((state) => state.alter);
     const option = useOptionsDashboardStore((state) => state.option);
     const alterOption = useOptionsDashboardStore((state) => state.alter);
+    const [optionMenu, setOptionMenu] = React.useState('');
 
     const toggleDrawer = () => {
         setOpen(!open);
@@ -36,8 +38,41 @@ const Dashboard = () => {
         }
     };
 
+    const optionMenuChoice = () => {
+        switch (option) {
+            case 'Home':
+                setOptionMenu("Inicio");
+                break;
+            case 'Documents':
+                setOptionMenu("Meus Documentos");
+                break;
+            case 'Organizations':
+                setOptionMenu("Organizações");
+                break;
+            case 'Favorites':
+                setOptionMenu("Favoritos");
+                break;
+            case 'Recycle Bin':
+                setOptionMenu("Lixeira");
+                break;
+            case 'Settings':
+                setOptionMenu("Configurações");
+                break;
+            case 'Stats':
+                setOptionMenu("Estatisticas");
+                break;
+            default:
+                setOptionMenu("");
+        }
+    };
+
+    React.useEffect(() => {
+        optionMenuChoice();
+    },);
+
     const toggleOption = (optionText: string) => {
         alterOption(optionText)
+        optionMenuChoice();
     };
 
     const toggleNotification = () => {
@@ -59,6 +94,16 @@ const Dashboard = () => {
                     transition: 'all 0.3s ease',
                 }}
             >
+                <Box className="flex items-center justify-between w-full px-4">
+                    <CustomTypography
+                        text={optionMenu}
+                        component="h5"
+                        variant='h5'
+                        align="center"
+                        className="font-bold"
+                        sx={{ color: theme.palette.text.primary, ml: open ? 30 : 10 }}
+                    />
+                </Box>
                 <Box className="flex items-center justify-end w-full gap-8 p-8">
                     <NotificationsIcon onClick={toggleNotification} sx={{ color: theme.palette.text.primary }} />
 
@@ -207,6 +252,7 @@ const Dashboard = () => {
                 {option == 'Favorites' && (<Favorites />)}
                 {option == 'Recycle Bin' && (<Trash />)}
                 {option == 'Settings' && (<SettingsComponent />)}
+                {option == 'Stats' && (<StatsDocument />)}
 
             </main>
             {openNotification && (
