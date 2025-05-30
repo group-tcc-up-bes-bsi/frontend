@@ -8,16 +8,18 @@ import TableDocuments from '../TableDocuments';
 import Documents from '../Documents';
 import CustomButton from '../CustomButton';
 import CustomTextField from '../CustomTextField';
+import { useDocumentViewerStore } from '@/app/state/DocumentViewerState';
 
 const DocumentsComponent: React.FC = () => {
     const { theme } = useTheme();
-    const [modeViewer, setModeViewer] = useState(1);
+    const [filter, setFilter] = useState('');
+    const modeViewer = useDocumentViewerStore((state) => state.mode);
+    const alterModeViewer = useDocumentViewerStore((state) => state.alter);
     const [colorMode1, setColorMode1] = useState(theme.palette.button.primary);
     const [colorMode2, setColorMode2] = useState(theme.palette.text.primary);
-    const [filter, setFilter] = useState('');
 
     const toggleModeViewer = (mode: number) => {
-        setModeViewer(mode)
+        alterModeViewer(mode)
         if (mode == 1) {
             setColorMode1(theme.palette.button.primary)
             setColorMode2(theme.palette.text.primary)
@@ -29,7 +31,7 @@ const DocumentsComponent: React.FC = () => {
     };
 
     useEffect(() => {
-        toggleModeViewer(modeViewer)
+        alterModeViewer(modeViewer)
     },);
 
     const toggleDocumentForm = () => {

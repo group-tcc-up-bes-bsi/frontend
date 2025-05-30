@@ -7,15 +7,17 @@ import Menu from '@mui/icons-material/Menu';
 import SpaceDashboard from '@mui/icons-material/SpaceDashboard';
 import TableDocuments from '../TableDocuments';
 import Documents from '../Documents';
+import { useDocumentViewerStore } from '@/app/state/DocumentViewerState';
 
 const HomeComponent: React.FC = () => {
     const { theme } = useTheme();
-    const [modeViewer, setModeViewer] = useState(1);
+    const modeViewer = useDocumentViewerStore((state) => state.mode);
+    const alterModeViewer = useDocumentViewerStore((state) => state.alter);
     const [colorMode1, setColorMode1] = useState(theme.palette.button.primary);
     const [colorMode2, setColorMode2] = useState(theme.palette.text.primary);
 
     const toggleModeViewer = (mode: number) => {
-        setModeViewer(mode)
+        alterModeViewer(mode)
         if (mode == 1) {
             setColorMode1(theme.palette.button.primary)
             setColorMode2(theme.palette.text.primary)
