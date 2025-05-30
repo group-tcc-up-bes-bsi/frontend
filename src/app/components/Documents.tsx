@@ -1,14 +1,22 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import {
   Box,
   IconButton,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { FileItem } from '../models/FileItem';
+import { useDocumentStateStore } from '../state/DocumentState';
+import { useOptionsDashboardStore } from '../state/optionsDashboard';
 
 const Documents: React.FC = () => {
   const { theme } = useTheme();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
+  const alterFile = useDocumentStateStore((state) => state.alter);
+  const alterOption = useOptionsDashboardStore((state) => state.alter);
 
   const files: FileItem[] = [
     {
@@ -180,9 +188,25 @@ const Documents: React.FC = () => {
               </Box>
             </Box>
             <Box mt={0.5}>
-              <IconButton aria-label="more">
+              <IconButton
+                aria-label="more"
+                onClick={(event) => {
+                  setAnchorEl(event.currentTarget);
+                  setSelectedFile(file);
+                }}
+              >
                 <MoreVert />
               </IconButton>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl) && selectedFile?.id === file.id}
+                onClose={() => setAnchorEl(null)}
+              >
+                <MenuItem onClick={() => { setAnchorEl(null); }}>Alterar</MenuItem>
+                <MenuItem onClick={() => { setAnchorEl(null); }}>Versões</MenuItem>
+                <MenuItem onClick={() => { alterOption('Stats'); if (selectedFile) alterFile(selectedFile); setAnchorEl(null); }}>Estatísticas</MenuItem>
+                <MenuItem onClick={() => { setAnchorEl(null); }}>Excluir</MenuItem>
+              </Menu>
             </Box>
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
