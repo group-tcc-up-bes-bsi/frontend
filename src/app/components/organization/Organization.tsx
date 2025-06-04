@@ -8,7 +8,7 @@ import CustomButton from '../CustomButton';
 import { OrganizationObj } from '../../models/OrganizationObj';
 import { Star } from '@mui/icons-material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
-import OrganizationForm from './OrganizationForm';
+//import OrganizationForm from './OrganizationForm';
 
 const Organization: React.FC = () => {
     const { theme } = useTheme();
@@ -206,10 +206,10 @@ const Organization: React.FC = () => {
                         </Box>
                     ))}
                 </Box>
-                {organizationForm && (
+                {/*{organizationForm && (
                     <OrganizationForm />
                 )
-                }
+                }*/}
             </Box>
         </Box >
     );
