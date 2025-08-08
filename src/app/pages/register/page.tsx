@@ -43,11 +43,10 @@ const Register: React.FC = () => {
         if (!email.trim()) {
             setMessage(new MessageObj('error', 'Erro', 'O email é obrigatório', 'error'));
             return;
-        } else if (!/\S+@\S+\.\S+/.test(email)) {
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
             setMessage(new MessageObj('error', 'Erro', 'Por favor, insira um email válido', 'error'));
             return;
         }
-
         if (password.length < 4) {
             setMessage(new MessageObj('error', 'Erro', 'A senha deve ter no mínimo 4 caracteres', 'error'));
             return;

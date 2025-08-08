@@ -54,6 +54,9 @@ const CustomTextField = ({
   };
 
   const shouldShowToggle = showPasswordToggle && type === 'password';
+  const inputType = shouldShowToggle
+    ? (showPassword ? 'text' : 'password')
+    : type;
 
   return (
     <TextField
@@ -62,7 +65,7 @@ const CustomTextField = ({
       fullWidth={fullWidth}
       name={name}
       label={label}
-      type={shouldShowToggle ? (showPassword ? 'text' : 'password') : type}
+      type={inputType}
       value={value}
       onChange={onChange}
       autoComplete={autoComplete}
