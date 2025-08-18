@@ -120,6 +120,14 @@ const TableDocuments = () => {
         });
     };
 
+    const handleEstatisticasClick = () => {
+        alterOption('Stats');
+        if (selectedFile) {
+            alterFile(selectedFile);
+        }
+        setAnchorEl(null);
+    };
+
     return (
         <TableContainer>
             <Table sx={{ minWidth: 650 }} aria-label="tabela de Documentos">
@@ -177,7 +185,7 @@ const TableDocuments = () => {
                                 >
                                     <MenuItem onClick={() => { setAnchorEl(null); }}>Alterar</MenuItem>
                                     <MenuItem onClick={() => { setAnchorEl(null); }}>Versões</MenuItem>
-                                    <MenuItem onClick={() => { alterOption('Stats'); if (selectedFile) alterFile(selectedFile); setAnchorEl(null); }}>Estatísticas</MenuItem>
+                                    <MenuItem onClick={handleEstatisticasClick}>Estatísticas</MenuItem>
                                 </Menu>
                             </TableCell>
                         </TableRow>

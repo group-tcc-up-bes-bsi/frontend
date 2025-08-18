@@ -55,16 +55,18 @@ const CustomComboBox = ({
       value={value}
       onChange={onChange}
       autoComplete={autoComplete}
-      SelectProps={{
-        MenuProps: {
-          PaperProps: {
-            sx: {
-              backgroundColor: theme.palette.background.paper,
-              color: theme.palette.text.primary,
+      slotProps={{
+        select: {
+          MenuProps: {
+            PaperProps: {
+              sx: {
+                backgroundColor: theme.palette.background.paper,
+                color: theme.palette.text.primary,
+              }
             }
-          }
-        },
-        ...props.SelectProps
+          },
+          ...(props.slotProps?.select ?? {})
+        }
       }}
       sx={{
         '& .MuiInputLabel-root': {

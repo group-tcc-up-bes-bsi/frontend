@@ -7,6 +7,8 @@ import CustomTextField from '../CustomTextField';
 import CustomComboBox from '../CustomComboBox';
 import CustomButton from '../CustomButton';
 import CustomTypography from '../CustomTypography';
+import { organizationsType, userType } from '../consts/Constants';
+
 
 const OrganizationForm: React.FC = () => {
     const { theme } = useTheme();
@@ -21,20 +23,9 @@ const OrganizationForm: React.FC = () => {
         setSelectedOrganizationType(event.target.value);
     };
 
-    const organizationsType = [
-        { value: 'INDIVIDUAL', label: 'Individual' },
-        { value: 'COLLABORATIVE', label: 'Colaborativo' },
-    ];
-
-
     const handleChangeUserType = (event: React.ChangeEvent<HTMLInputElement>) => {
         setSelectedUserType(event.target.value);
     };
-
-    const userType = [
-        { value: 'READ', label: 'Editor' },
-        { value: 'VIEWER', label: 'Visualizador' },
-    ];
 
     return (
         <Box className="flex items-center justify-center">

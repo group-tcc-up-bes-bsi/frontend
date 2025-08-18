@@ -54,9 +54,8 @@ const CustomTextField = ({
   };
 
   const shouldShowToggle = showPasswordToggle && type === 'password';
-  const inputType = shouldShowToggle
-    ? (showPassword ? 'text' : 'password')
-    : type;
+  const passwordType = showPassword ? 'text' : 'password';
+  const inputType = shouldShowToggle ? passwordType : type;
 
   return (
     <TextField
@@ -69,21 +68,23 @@ const CustomTextField = ({
       value={value}
       onChange={onChange}
       autoComplete={autoComplete}
-      InputProps={{
-        endAdornment: shouldShowToggle ? (
-          <InputAdornment position="end">
-            <IconButton
-              aria-label="toggle password visibility"
-              onClick={handleClickShowPassword}
-              onMouseDown={handleMouseDownPassword}
-              edge="end"
-              sx={{ color: theme.palette.text.primary }}
-            >
-              {showPassword ? <VisibilityOff /> : <Visibility />}
-            </IconButton>
-          </InputAdornment>
-        ) : null,
-        ...props.InputProps
+      slotProps={{
+        input: {
+          endAdornment: shouldShowToggle ? (
+            <InputAdornment position="end">
+              <IconButton
+                aria-label="toggle password visibility"
+                onClick={handleClickShowPassword}
+                onMouseDown={handleMouseDownPassword}
+                edge="end"
+                sx={{ color: theme.palette.text.primary }}
+              >
+                {showPassword ? <VisibilityOff /> : <Visibility />}
+              </IconButton>
+            </InputAdornment>
+          ) : undefined,
+          ...(props.slotProps?.input ?? {}),
+        },
       }}
       multiline={multiline}
       maxRows={maxRows}

@@ -45,7 +45,7 @@ const Login: React.FC = () => {
     }
     try {
       const result = await authLoginUser(email, password);
-      await setMessage(result.message);
+      setMessage(result.message);
 
       await new Promise(resolve => setTimeout(resolve, 1000));
       if (result.message.severity === 'success') {

@@ -1,8 +1,8 @@
-"use client"
-import { createContext, useContext, useState, useMemo, ReactNode, useEffect } from 'react';
-import { ThemeProvider as MuiThemeProvider, createTheme } from '@mui/material/styles';
-import { lightTheme, darkTheme } from './theme';
-import { useThemeStore } from '../state/themeState';
+"use client";
+import { createContext, useContext, useState, useMemo, ReactNode, useEffect } from "react";
+import { ThemeProvider as MuiThemeProvider, createTheme } from "@mui/material/styles";
+import { lightTheme, darkTheme } from "./theme";
+import { useThemeStore } from "../state/themeState";
 
 interface ThemeContextValue {
   theme: ReturnType<typeof createTheme>;
@@ -17,7 +17,6 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const setIsDarkMode = useThemeStore((state) => state.alter);;
   const [mounted, setMounted] = useState(false);
 
-  // Wait until after client-side hydration to show
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -41,9 +40,9 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
           primary: baseTheme.palette.text.primary,
         },
         button: {
-          primary:  baseTheme.palette.button.primary,
-          star:  baseTheme.palette.button.star,
-          delete:  baseTheme.palette.button.delete,
+          primary: baseTheme.palette.button.primary,
+          star: baseTheme.palette.button.star,
+          delete: baseTheme.palette.button.delete,
         }
       },
     });
@@ -51,16 +50,18 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   const toggleTheme = () => setIsDarkMode(!isDarkMode);
 
-  // Don't render until mounted on client
+  const contextValue = useMemo(
+    () => ({ theme, toggleTheme, isDarkMode }),
+    [theme, toggleTheme, isDarkMode]
+  );
+
   if (!mounted) {
     return null;
   }
 
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, isDarkMode }}>
-      <MuiThemeProvider theme={theme}>
-        {children}
-      </MuiThemeProvider>
+    return (
+    <ThemeContext.Provider value={contextValue}>
+      <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>
     </ThemeContext.Provider>
   );
 };

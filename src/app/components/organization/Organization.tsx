@@ -8,7 +8,8 @@ import CustomButton from '../CustomButton';
 import { OrganizationObj } from '../../models/OrganizationObj';
 import { Star } from '@mui/icons-material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
-//import OrganizationForm from './OrganizationForm';
+import OrganizationForm from './OrganizationForm';
+import { organizationsType } from '../consts/Constants';
 
 const Organization: React.FC = () => {
     const { theme } = useTheme();
@@ -25,11 +26,7 @@ const Organization: React.FC = () => {
         alterOrganizationForm(!organizationForm);
     }
 
-    const organizationsType = [
-        { value: 'INDIVIDUAL', label: 'Individual' },
-        { value: 'COLLABORATIVE', label: 'Colaborativo' },
-        { value: 'ALL', label: 'Todos' },
-    ];
+   
 
     const organizations: OrganizationObj[] = [
         {
@@ -206,10 +203,10 @@ const Organization: React.FC = () => {
                         </Box>
                     ))}
                 </Box>
-                {/*{organizationForm && (
+                {organizationForm && (
                     <OrganizationForm />
                 )
-                }*/}
+                }*
             </Box>
         </Box >
     );

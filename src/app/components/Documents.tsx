@@ -155,6 +155,14 @@ const Documents: React.FC = () => {
     });
   };
 
+  const handleEstatisticasClick = () => {
+    alterOption('Stats');
+    if (selectedFile) {
+      alterFile(selectedFile);
+    }
+    setAnchorEl(null);
+  };
+
   return (
     <Box
       display="flex"
@@ -204,7 +212,7 @@ const Documents: React.FC = () => {
               >
                 <MenuItem onClick={() => { setAnchorEl(null); }}>Alterar</MenuItem>
                 <MenuItem onClick={() => { setAnchorEl(null); }}>Versões</MenuItem>
-                <MenuItem onClick={() => { alterOption('Stats'); if (selectedFile) alterFile(selectedFile); setAnchorEl(null); }}>Estatísticas</MenuItem>
+                <MenuItem onClick={handleEstatisticasClick}>Estatísticas</MenuItem>
                 <MenuItem onClick={() => { setAnchorEl(null); }}>Excluir</MenuItem>
               </Menu>
             </Box>

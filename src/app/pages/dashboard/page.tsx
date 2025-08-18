@@ -1,6 +1,6 @@
 "use client"
 import React from 'react';
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box } from '@mui/material';
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box, Backdrop } from '@mui/material';
 import { Settings, Star, Folder, Groups, Home, Delete } from '@mui/icons-material';
 import { useTheme } from '@/app/theme/ThemeContext';
 import CustomTypography from '@/app/components/CustomTypography';
@@ -238,23 +238,30 @@ const Dashboard = () => {
             </Drawer>
 
             <main
-                onClick={toggleDrawerMain}
                 className="flex-1 p-4 overflow-hidden"
                 style={{
-                    marginTop: '70px',
-                    transition: 'margin-left 0.3s ease',
+                    marginTop: "70px",
+                    transition: "margin-left 0.3s ease",
                     backgroundColor: theme.palette.background.paper,
                 }}
             >
-                {option == 'Home' && (<HomeComponent />)}
-                {option == 'Documents' && (<DocumentsComponent />)}
-                {option == 'Organizations' && (<Organization />)}
-                {option == 'Favorites' && (<Favorites />)}
-                {option == 'Recycle Bin' && (<Trash />)}
-                {option == 'Settings' && (<SettingsComponent />)}
-                {option == 'Stats' && (<StatsDocument />)}
-
+                {option === "Home" && <HomeComponent />}
+                {option === "Documents" && <DocumentsComponent />}
+                {option === "Organizations" && <Organization />}
+                {option === "Favorites" && <Favorites />}
+                {option === "Recycle Bin" && <Trash />}
+                {option === "Settings" && <SettingsComponent />}
+                {option === "Stats" && <StatsDocument />}
             </main>
+
+            <Backdrop
+                sx={{
+                    color: "#fff",
+                    zIndex: theme.zIndex.drawer - 1,
+                }}
+                open={open}
+                onClick={toggleDrawerMain}
+            />
             {openNotification && (
                 <Notification />
             )

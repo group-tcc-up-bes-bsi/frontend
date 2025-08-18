@@ -27,6 +27,10 @@ const Register: React.FC = () => {
     const { theme, isDarkMode } = useTheme();
     const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
 
+    const isValidEmail = (email: string) => {
+        return email.includes("@") && email.includes(".") && !email.includes(" ");
+    };
+
     useEffect(() => {
         if (message) {
             setShowMessage(true);
@@ -43,7 +47,7 @@ const Register: React.FC = () => {
         if (!email.trim()) {
             setMessage(new MessageObj('error', 'Erro', 'O email é obrigatório', 'error'));
             return;
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        } else if (!isValidEmail(email)) {
             setMessage(new MessageObj('error', 'Erro', 'Por favor, insira um email válido', 'error'));
             return;
         }

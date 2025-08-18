@@ -15,6 +15,6 @@ export class MessageObj {
     this.severity = severity;
     this.title = title;
     this.description = description;
-    this.colorType = colorType || severity;
+    this.colorType = colorType ?? severity;
   }
 }

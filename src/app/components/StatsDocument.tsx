@@ -7,7 +7,7 @@ import { useDocumentStateStore } from "../state/DocumentState";
 import { Close } from '@mui/icons-material';
 import { useOptionsDashboardStore } from "../state/optionsDashboard";
 import CustomButton from "./CustomButton";
-
+import MonthsSelector from "./MonthsSelector";
 
 const StatsDocument: React.FC = () => {
   const theme = useTheme();
@@ -29,27 +29,12 @@ const StatsDocument: React.FC = () => {
     for (let i = numMonths - 1; i >= 0; i--) {
       const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
       const label = date.toLocaleDateString("pt-BR", { month: "short", year: "numeric" }).replace(".", "");
-      months.push({ label, value: Math.floor(Math.random() * 40) + 5 });
+      months.push({ label, value: 12 });
     }
     return months;
   };
 
   const barData = getLastMonths(monthsCount);
-
-  const MonthsSelector: React.FC = () => (
-    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-      <Typography variant="body1">Meses:</Typography>
-      <select
-        value={monthsCount}
-        onChange={e => setMonthsCount(Number(e.target.value))}
-        style={{ padding: '4px 8px', borderRadius: 4, border: '1px solid', borderColor: theme.palette.text.primary, }}
-      >
-        {[3, 6, 9, 12].map(n => (
-          <option style={{ background: theme.palette.background.paper, color: theme.palette.text.primary }} key={n} value={n}>{n}</option>
-        ))}
-      </select>
-    </Box>
-  );
 
   return (
     <Box sx={{ p: 3, background: theme.palette.background.default, height: '100%' }}>
@@ -124,7 +109,10 @@ const StatsDocument: React.FC = () => {
           <Typography variant="h6" gutterBottom>
             Alterações por mês
           </Typography>
-          <MonthsSelector />
+          <MonthsSelector
+            monthsCount={monthsCount}
+            setMonthsCount={setMonthsCount}
+          />
           <BarChart
             sx={{
               border: '1px dashed',

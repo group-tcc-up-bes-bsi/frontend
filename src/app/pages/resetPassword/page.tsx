@@ -13,9 +13,8 @@ import {
 import CustomTypography from '../../components/CustomTypography';
 import CustomAlert from '../../components/CustomAlert';
 import { MessageObj } from '@/app/models/MessageObj';
-//import { createUser } from '@/app/api/UserRequest';
 
-const Register: React.FC = () => {
+const ResetPassword: React.FC = () => {
     const [email, setEmail] = useState('');
     const [message/*, setMessage*/] = useState<MessageObj>();
     const [showMessage, setShowMessage] = useState(false);
@@ -230,4 +229,4 @@ const Register: React.FC = () => {
     );
 };
 
-export default Register;
+export default ResetPassword;
