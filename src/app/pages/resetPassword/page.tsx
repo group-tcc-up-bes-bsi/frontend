@@ -13,14 +13,18 @@ import {
 import CustomTypography from '../../components/CustomTypography';
 import CustomAlert from '../../components/CustomAlert';
 import { MessageObj } from '@/app/models/MessageObj';
+import AdminPasswordModal from '@/app/components/admin/AdminPasswordModal';
+import { useAdminPassStore } from '@/app/state/adminPassState';
 
 const ResetPassword: React.FC = () => {
-    const [email, setEmail] = useState('');
+    const [user, setUser] = useState('');
+    const [password, setPassword] = useState('');
     const [message/*, setMessage*/] = useState<MessageObj>();
     const [showMessage, setShowMessage] = useState(false);
     const { theme, isDarkMode } = useTheme();
     const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
-    const [showResend, setShowResend] = useState(false);
+    const showAdminRequest = useAdminPassStore((state) => state.showAdminRequest);
+    const alterAdminPass = useAdminPassStore((state) => state.alter);
 
     useEffect(() => {
         if (message) {
@@ -31,10 +35,10 @@ const ResetPassword: React.FC = () => {
 
 
     useEffect(() => {
-        if (showResend) {
-            setShowResend(true);
+        if (showAdminRequest) {
+            alterAdminPass(true);
         }
-    }, [showResend]);
+    }, [showAdminRequest]);
 
 
     return (
@@ -176,29 +180,35 @@ const ResetPassword: React.FC = () => {
 
                     <Box component="form" sx={{ mt: 2 }}>
                         <CustomTextField
-                            name="email"
-                            label="Email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            name="user"
+                            label="Usuario"
+                            type="user"
+                            value={user}
+                            onChange={(e) => setUser(e.target.value)}
                             focusedColor="primary"
                             hoverColor="info"
                         />
-                        {showResend && (
-                            <CustomButton
-                                text="Reenviar email"
-                                type="button"
-                                colorType="primary"
-                                hoverColorType="primary"
-                            />
+
+                        <CustomTextField
+                            name="password"
+                            label="Senha"
+                            type="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            focusedColor="primary"
+                            hoverColor="info"
+                        />
+
+                        {showAdminRequest && (
+                            <AdminPasswordModal />
                         )}
                         <CustomButton
-                            text="Enviar email"
+                            text="Alterar senha"
                             type="button"
                             colorType="primary"
                             hoverColorType="primary"
-                            disabled={showResend}
-                            onClick={() => setShowResend(true)}
+                            disabled={showAdminRequest}
+                            onClick={() => alterAdminPass(true)}
                         />
 
                         {showMessage && message && (

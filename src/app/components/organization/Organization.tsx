@@ -9,7 +9,7 @@ import { OrganizationObj } from '../../models/OrganizationObj';
 import { Star } from '@mui/icons-material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
 import OrganizationForm from './OrganizationForm';
-import { organizationsType } from '../consts/Constants';
+import { organizationsType } from '../../api/ConstantsTypes';
 
 const Organization: React.FC = () => {
     const { theme } = useTheme();

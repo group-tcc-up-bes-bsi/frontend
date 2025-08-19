@@ -17,7 +17,7 @@ import { authLoginUser } from '../../api/UserRequest';
 import { MessageObj } from '@/app/models/MessageObj';
 
 const Login: React.FC = () => {
-  const [email, setEmail] = useState('');
+  const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState<MessageObj>(
     new MessageObj('info', 'Bem-vindo', 'Por favor, faça login', 'info')
@@ -34,8 +34,8 @@ const Login: React.FC = () => {
   }, [message]);
 
   const handleSubmit = async () => {
-    if (!email.trim()) {
-      setMessage(new MessageObj('error', 'Erro', 'O email é obrigatório', 'error'));
+    if (!user.trim()) {
+      setMessage(new MessageObj('error', 'Erro', 'O usuário é obrigatório', 'error'));
       return;
     }
 
@@ -44,7 +44,7 @@ const Login: React.FC = () => {
       return;
     }
     try {
-      const result = await authLoginUser(email, password);
+      const result = await authLoginUser(user, password);
       setMessage(result.message);
 
       await new Promise(resolve => setTimeout(resolve, 1000));
@@ -65,8 +65,6 @@ const Login: React.FC = () => {
       backgroundColor: theme.palette.background.default
     }}>
       <CssBaseline />
-
-      {/* Right side - Image/Title (60%) */}
       {!isMobile && (
         <Box
           sx={{
@@ -93,7 +91,6 @@ const Login: React.FC = () => {
             }}
           />
 
-          {/* Title Overlay */}
           <Box
             sx={{
               position: 'absolute',
@@ -177,11 +174,11 @@ const Login: React.FC = () => {
 
           <Box component="form" sx={{ mt: 2 }}>
             <CustomTextField
-              name="email"
-              label="Email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              name="user"
+              label="Usuário"
+              type="user"
+              value={user}
+              onChange={(e) => setUser(e.target.value)}
               focusedColor="primary"
               hoverColor="info"
             />

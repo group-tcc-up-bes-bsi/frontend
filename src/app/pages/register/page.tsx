@@ -17,7 +17,6 @@ import { createUser } from '@/app/api/UserRequest';
 
 const Register: React.FC = () => {
     const [user, setUser] = useState('');
-    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [message, setMessage] = useState<MessageObj>(
@@ -26,10 +25,6 @@ const Register: React.FC = () => {
     const [showMessage, setShowMessage] = useState(false);
     const { theme, isDarkMode } = useTheme();
     const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
-
-    const isValidEmail = (email: string) => {
-        return email.includes("@") && email.includes(".") && !email.includes(" ");
-    };
 
     useEffect(() => {
         if (message) {
@@ -43,14 +38,6 @@ const Register: React.FC = () => {
             setMessage(new MessageObj('error', 'Erro', 'O nome de usuário é obrigatório', 'error'));
             return;
         }
-
-        if (!email.trim()) {
-            setMessage(new MessageObj('error', 'Erro', 'O email é obrigatório', 'error'));
-            return;
-        } else if (!isValidEmail(email)) {
-            setMessage(new MessageObj('error', 'Erro', 'Por favor, insira um email válido', 'error'));
-            return;
-        }
         if (password.length < 4) {
             setMessage(new MessageObj('error', 'Erro', 'A senha deve ter no mínimo 4 caracteres', 'error'));
             return;
@@ -60,7 +47,7 @@ const Register: React.FC = () => {
             return;
         }
         try {
-            const result = await createUser(user, password, email);
+            const result = await createUser(user, password);
             setMessage(result.message);
 
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -216,16 +203,6 @@ const Register: React.FC = () => {
                             type="text"
                             value={user}
                             onChange={(e) => setUser(e.target.value)}
-                            focusedColor="primary"
-                            hoverColor="info"
-                        />
-
-                        <CustomTextField
-                            name="email"
-                            label="Email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
                             focusedColor="primary"
                             hoverColor="info"
                         />
