@@ -7,7 +7,7 @@ import CustomTextField from '../CustomTextField';
 import CustomComboBox from '../CustomComboBox';
 import CustomButton from '../CustomButton';
 import CustomTypography from '../CustomTypography';
-import { organizationsType, userType } from '../../api/ConstantsTypes';
+import { organizationsType, userType } from '../../services/ConstantsTypes';
 
 
 const OrganizationForm: React.FC = () => {

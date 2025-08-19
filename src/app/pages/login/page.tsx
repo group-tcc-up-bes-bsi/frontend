@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import CustomTypography from '../../components/CustomTypography';
 import CustomAlert from '../../components/CustomAlert';
-import { authLoginUser } from '../../api/UserRequest';
+import { authLoginUser } from '../../services/UserRequest';
 import { MessageObj } from '@/app/models/MessageObj';
 
 const Login: React.FC = () => {

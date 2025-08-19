@@ -15,6 +15,7 @@ import CustomAlert from '../../components/CustomAlert';
 import { MessageObj } from '@/app/models/MessageObj';
 import AdminPasswordModal from '@/app/components/admin/AdminPasswordModal';
 import { useAdminPassStore } from '@/app/state/adminPassState';
+import { isLoginValid } from '@/app/services/ValidForms';
 
 const ResetPassword: React.FC = () => {
     const [user, setUser] = useState('');
@@ -39,7 +40,6 @@ const ResetPassword: React.FC = () => {
             alterAdminPass(true);
         }
     }, [showAdminRequest]);
-
 
     return (
         <Box sx={{
@@ -207,7 +207,7 @@ const ResetPassword: React.FC = () => {
                             type="button"
                             colorType="primary"
                             hoverColorType="primary"
-                            disabled={showAdminRequest}
+                            disabled={!isLoginValid(user, password)}
                             onClick={() => alterAdminPass(true)}
                         />
 

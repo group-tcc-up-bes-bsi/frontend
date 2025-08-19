@@ -13,7 +13,7 @@ import {
 import CustomTypography from '../../components/CustomTypography';
 import CustomAlert from '../../components/CustomAlert';
 import { MessageObj } from '@/app/models/MessageObj';
-import { createUser } from '@/app/api/UserRequest';
+import { createUser } from '@/app/services/UserRequest';
 
 const Register: React.FC = () => {
     const [user, setUser] = useState('');

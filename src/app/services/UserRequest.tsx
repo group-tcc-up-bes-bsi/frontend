@@ -114,11 +114,12 @@ export async function authLoginUser(User: string, Password: string) {
             token: responseData.token,
         };
     } catch (error) {
+        console.error(error);
         return {
             message: new MessageObj(
                 'error',
                 getErrorTitle(500),
-                `Erro: ${error}`,
+                `Erro: Servidor Inoperante`,
                 'error'
             )
         };
