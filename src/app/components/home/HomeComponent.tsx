@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { Box, Divider, } from '@mui/material';
 import CustomTypography from '../CustomTypography';
-import Folder from '@mui/icons-material/Folder';
 import Menu from '@mui/icons-material/Menu';
 import SpaceDashboard from '@mui/icons-material/SpaceDashboard';
 import TableDocuments from '../TableDocuments';
 import Documents from '../Documents';
 import { useDocumentViewerStore } from '@/app/state/DocumentViewerState';
+import { getOrganizationsByUser } from '@/app/services/OrganizationsServices';
 
 const HomeComponent: React.FC = () => {
     const { theme } = useTheme();
@@ -32,32 +32,7 @@ const HomeComponent: React.FC = () => {
         toggleModeViewer(modeViewer)
     },);
 
-    const organizationsRecentes = [
-        {
-            id: '1',
-            title: 'Projeto Inovação',
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.star }} />
-        },
-        {
-            id: '2',
-            title: 'Dev Ops',
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.primary }} />
-        },
-        {
-            id: '3',
-            title: 'Teste',
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.primary }} />
-        },
-        {
-            id: '4',
-            title: 'Objetivos',
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.primary }} />
-        }
-    ];
+    const organizations = getOrganizationsByUser(theme);
 
     return (
         <Box sx={{ maxWidth: '100%' }}>
@@ -129,7 +104,7 @@ const HomeComponent: React.FC = () => {
                         },
                     }}
                 >
-                    {organizationsRecentes.map((org) => (
+                    {organizations.map((org) => (
                         <Box
                             key={org.id}
                             sx={{

@@ -9,10 +9,11 @@ import Documents from '../Documents';
 import CustomButton from '../CustomButton';
 import CustomTextField from '../CustomTextField';
 import { useDocumentViewerStore } from '@/app/state/DocumentViewerState';
+import { useFilterStore } from '@/app/state/filterState';
 
 const DocumentsComponent: React.FC = () => {
     const { theme } = useTheme();
-    const [filter, setFilter] = useState('');
+    const { filter, setFilter } = useFilterStore();
     const modeViewer = useDocumentViewerStore((state) => state.mode);
     const alterModeViewer = useDocumentViewerStore((state) => state.alter);
     const [colorMode1, setColorMode1] = useState(theme.palette.button.primary);

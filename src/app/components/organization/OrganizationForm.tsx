@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { Box, List, ListItem, ListItemText } from '@mui/material';
+import { Box, List, ListItem, ListItemText, Backdrop } from '@mui/material'; // Adicione Backdrop aqui
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
 import { Close } from '@mui/icons-material';
 import CustomTextField from '../CustomTextField';
 import CustomComboBox from '../CustomComboBox';
 import CustomButton from '../CustomButton';
 import CustomTypography from '../CustomTypography';
+import { organizationsTypeOptions, userTypeOptions } from '../../services/ConstantsTypes';
 
 const OrganizationForm: React.FC = () => {
     const { theme } = useTheme();
@@ -17,39 +18,29 @@ const OrganizationForm: React.FC = () => {
     const [email, setEmail] = useState('');
     const [description, setDescription] = useState('');
 
-    const handleChangeOrganizationType = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSelectedOrganizationType(event.target.value);
+    const handleChangeOrganizationType = (event: React.ChangeEvent<{ value: unknown }>) => {
+        setSelectedOrganizationType(event.target.value as string);
     };
 
-    const organizationsType = [
-        { value: 'INDIVIDUAL', label: 'Individual' },
-        { value: 'COLLABORATIVE', label: 'Colaborativo' },
-    ];
-
-
-    const handleChangeUserType = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSelectedUserType(event.target.value);
+    const handleChangeUserType = (event: React.ChangeEvent<{ value: unknown }>) => {
+        setSelectedUserType(event.target.value as string);
     };
-
-    const userType = [
-        { value: 'READ', label: 'Editor' },
-        { value: 'VIEWER', label: 'Visualizador' },
-    ];
 
     return (
-        <Box className="flex items-center justify-center">
-            <Box
-                className="fixed inset-0 z-[1320]"
+        <>
+            <Backdrop
+                open={true}
+                onClick={() => alterOrganizationForm(false)}
                 sx={{
-                    backgroundColor: theme.palette.background.default,
-                    opacity: 0.5,
-                    transition: 'all 0.3s ease',
+                    zIndex: 1320,
+                    color: '#fff',
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
                 }}
             />
             <Box
                 className="fixed z-[1330] flex flex-col"
                 sx={{
-                    backgroundColor: theme.palette.background.paper,
+                    backgroundColor: theme.palette.background.default,
                     width: '1200px',
                     height: '750px',
                     borderRadius: '4px',
@@ -60,7 +51,7 @@ const OrganizationForm: React.FC = () => {
                     p: 4
                 }}
             >
-                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between'}}>
+                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
                     <CustomTypography
                         text="Organizações"
                         component="h2"
@@ -70,19 +61,6 @@ const OrganizationForm: React.FC = () => {
                             mb: 2,
                             mt: 1,
                             fontWeight: 'bold'
-                        }}
-                    />
-                    <Close
-                        onClick={() => alterOrganizationForm(false)}
-                        sx={{
-                            marginBottom: 2,
-                            fontSize: 30,
-                            color: theme.palette.text.primary,
-                            cursor: 'pointer',
-                            alignSelf: 'flex-end',
-                            '&:hover': {
-                                color: theme.palette.error.main,
-                            }
                         }}
                     />
                 </Box>
@@ -129,7 +107,7 @@ const OrganizationForm: React.FC = () => {
                             label="Tipo"
                             value={selectedOrganizationType}
                             onChange={handleChangeOrganizationType}
-                            options={organizationsType}
+                            options={organizationsTypeOptions}
                             focusedColor="primary"
                             hoverColor="info"
                             marginBottom={2}
@@ -140,7 +118,7 @@ const OrganizationForm: React.FC = () => {
                             label="Permissões"
                             value={selectedUserType}
                             onChange={handleChangeUserType}
-                            options={userType}
+                            options={userTypeOptions}
                             focusedColor="primary"
                             hoverColor="info"
                             marginBottom={2}
@@ -253,7 +231,7 @@ const OrganizationForm: React.FC = () => {
                     </Box>
                 </Box>
             </Box>
-        </Box>
+        </>
     );
 };
 

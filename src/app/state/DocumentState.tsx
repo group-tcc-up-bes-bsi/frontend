@@ -1,9 +1,9 @@
 import { create } from "zustand";
-import { FileItem } from "../models/FileItem";
+import { DocumentObj } from "../models/DocumentObj";
 
 interface DocumentState {
-  document: FileItem | undefined;
-  alter: (by: FileItem) => void;
+  document: DocumentObj | undefined;
+  alter: (by: DocumentObj) => void;
 }
 
 export const useDocumentStateStore = create<DocumentState>()((set) => ({

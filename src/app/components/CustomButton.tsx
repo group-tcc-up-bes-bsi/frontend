@@ -34,7 +34,7 @@ const CustomButton = ({
 }: CustomButtonProps) => {
   const { theme } = useTheme();
   
-  const hoverColor = hoverColorType || colorType;
+  const hoverColor = hoverColorType ?? colorType;
 
   return (
     <Button

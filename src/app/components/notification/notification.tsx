@@ -1,6 +1,6 @@
 import React from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { Box, List, ListItem, ListItemText } from '@mui/material';
+import { Box, List, ListItem, ListItemText, Backdrop } from '@mui/material';
 import { useNotificationStore } from '@/app/state/notificationState';
 import { Close } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
@@ -11,12 +11,13 @@ const Notification: React.FC = () => {
 
     return (
         <Box className="flex items-center justify-center">
-            <Box
-                className="fixed inset-0 z-[1320]"
+            <Backdrop
+                open={true}
+                onClick={() => alterNotification(false)}
                 sx={{
-                    backgroundColor: theme.palette.background.default,
-                    opacity: 0.5,
-                    transition: 'all 0.3s ease',
+                    zIndex: 1320,
+                    color: '#fff',
+                    backgroundColor: 'rgba(0, 0, 0, 0.5)',
                 }}
             />
             <Box
@@ -33,18 +34,6 @@ const Notification: React.FC = () => {
                     p: 1.5
                 }}
             >
-                <Close
-                    onClick={() => alterNotification(false)}
-                    sx={{
-                        fontSize: 30,
-                        color: theme.palette.text.primary,
-                        cursor: 'pointer',
-                        alignSelf: 'flex-end',
-                        '&:hover': {
-                            color: theme.palette.error.main,
-                        }
-                    }}
-                />
                 <Box
                     sx={{
                         flex: 1,

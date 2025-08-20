@@ -1,12 +1,11 @@
 import { MessageObj } from "../models/MessageObj";
 import { getErrorTitle } from "./ErrorTitle";
 
-export async function createUser(UserName: string, Password: string, Email: string) {
+export async function createUser(UserName: string, Password: string) {
     const url = `http://localhost:3000/users`;
     const userData = {
         username: UserName,
         password: Password,
-        email: Email
     };
 
     try {
@@ -26,7 +25,7 @@ export async function createUser(UserName: string, Password: string, Email: stri
                     message: new MessageObj(
                         'error',
                         getErrorTitle(responseData.statusCode),
-                        'Email ja cadastrado',
+                        'Usuário ja cadastrado',
                         'error')
                 }
             }
@@ -60,10 +59,10 @@ export async function createUser(UserName: string, Password: string, Email: stri
     }
 }
 
-export async function authLoginUser(Email: string, Password: string) {
+export async function authLoginUser(User: string, Password: string) {
     const url = `http://localhost:3000/auth/login`;
     const userData = {
-        email: Email,
+        user: User,
         password: Password
     };
 
@@ -79,7 +78,7 @@ export async function authLoginUser(Email: string, Password: string) {
         const responseData = await response.json().catch(() => null);
 
         if (!response.ok) {
-            if (responseData.message == 'Invalid email') {
+            if (responseData.message == 'Invalid user') {
                 return {
                     message: new MessageObj(
                         'error',
@@ -115,11 +114,12 @@ export async function authLoginUser(Email: string, Password: string) {
             token: responseData.token,
         };
     } catch (error) {
+        console.error(error);
         return {
             message: new MessageObj(
                 'error',
                 getErrorTitle(500),
-                `Erro: ${error}`,
+                `Erro: Servidor Inoperante`,
                 'error'
             )
         };

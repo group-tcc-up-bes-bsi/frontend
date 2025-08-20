@@ -1,0 +1,6 @@
+projectKey=project_tcc_frontend
+serverUrl=http://localhost:9000
+serverVersion=10.6.0.92116
+dashboardUrl=http://localhost:9000/dashboard?id=project_tcc_frontend
+ceTaskId=aec3d95c-9fa3-4b9c-a09a-732583c0c434
+ceTaskUrl=http://localhost:9000/api/ce/task?id=aec3d95c-9fa3-4b9c-a09a-732583c0c434

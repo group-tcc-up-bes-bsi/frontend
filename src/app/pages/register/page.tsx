@@ -13,11 +13,10 @@ import {
 import CustomTypography from '../../components/CustomTypography';
 import CustomAlert from '../../components/CustomAlert';
 import { MessageObj } from '@/app/models/MessageObj';
-import { createUser } from '@/app/api/UserRequest';
+import { createUser } from '@/app/services/UserRequest';
 
 const Register: React.FC = () => {
     const [user, setUser] = useState('');
-    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [message, setMessage] = useState<MessageObj>(
@@ -39,15 +38,6 @@ const Register: React.FC = () => {
             setMessage(new MessageObj('error', 'Erro', 'O nome de usuário é obrigatório', 'error'));
             return;
         }
-
-        if (!email.trim()) {
-            setMessage(new MessageObj('error', 'Erro', 'O email é obrigatório', 'error'));
-            return;
-        } else if (!/\S+@\S+\.\S+/.test(email)) {
-            setMessage(new MessageObj('error', 'Erro', 'Por favor, insira um email válido', 'error'));
-            return;
-        }
-
         if (password.length < 4) {
             setMessage(new MessageObj('error', 'Erro', 'A senha deve ter no mínimo 4 caracteres', 'error'));
             return;
@@ -57,7 +47,7 @@ const Register: React.FC = () => {
             return;
         }
         try {
-            const result = await createUser(user, password, email);
+            const result = await createUser(user, password);
             setMessage(result.message);
 
             await new Promise(resolve => setTimeout(resolve, 1000));
@@ -213,16 +203,6 @@ const Register: React.FC = () => {
                             type="text"
                             value={user}
                             onChange={(e) => setUser(e.target.value)}
-                            focusedColor="primary"
-                            hoverColor="info"
-                        />
-
-                        <CustomTextField
-                            name="email"
-                            label="Email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
                             focusedColor="primary"
                             hoverColor="info"
                         />

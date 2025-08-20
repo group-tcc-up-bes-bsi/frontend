@@ -14,17 +14,17 @@ const Favorites: React.FC = () => {
     const [filter, setFilter] = useState('');
 
     const [documents, setDocuments] = useState([
-        { favorite: true, name: 'Requisitos', organization: 'TCC' },
-        { favorite: true, name: 'Contrato de compra', organization: 'Compras' },
-        { favorite: false, name: 'index', organization: 'Não Definido' },
-        { favorite: false, name: 'Livro', organization: 'Não Definido' },
-        { favorite: false, name: 'Nota fornecedor 100', organization: 'Compras' },
-        { favorite: false, name: 'História de usuário', organization: 'TCC' },
+        {id:1, favorite: true, name: 'Requisitos', organization: 'TCC' },
+        {id:2, favorite: true, name: 'Contrato de compra', organization: 'Compras' },
+        {id:3, favorite: false, name: 'index', organization: 'Não Definido' },
+        {id:4, favorite: false, name: 'Livro', organization: 'Não Definido' },
+        {id:5, favorite: false, name: 'Nota fornecedor 100', organization: 'Compras' },
+        {id:6, favorite: false, name: 'História de usuário', organization: 'TCC' },
     ]);
 
     const [organizations, setOrganizations] = useState([
-        { favorite: true, name: 'TCC', total: 10 },
-        { favorite: false, name: 'Compras', total: 2 },
+        {id:1, favorite: true, name: 'TCC', total: 10 },
+        {id:2, favorite: false, name: 'Compras', total: 2 },
     ]);
 
     const handleFavoriteToggle = (doc: typeof documents[number]) => {
@@ -95,8 +95,8 @@ const Favorites: React.FC = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {documents.map((doc, idx) => (
-                                            <TableRow key={idx}>
+                                        {documents.map((doc) => (
+                                            <TableRow key={doc.id}>
                                                 <TableCell>
                                                     <IconButton aria-label="star">
                                                         <Star onClick={() => handleFavoriteToggle(doc)} sx={{ color: doc.favorite ? theme.palette.button.star : theme.palette.text.primary }} />
@@ -163,8 +163,8 @@ const Favorites: React.FC = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {organizations.map((org, idx) => (
-                                            <TableRow key={idx}>
+                                        {organizations.map((org) => (
+                                            <TableRow key={org.id}>
                                                 <TableCell>
                                                     <IconButton aria-label="star">
                                                         <Star onClick={() => handleFavoriteOrganizationToggle(org)} sx={{ color: org.favorite ? theme.palette.button.star : theme.palette.text.primary }} />
