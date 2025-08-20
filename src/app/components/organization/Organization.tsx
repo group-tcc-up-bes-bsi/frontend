@@ -1,83 +1,54 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { Box, Divider } from '@mui/material';
 import CustomTypography from '../CustomTypography';
 import CustomComboBox from '../CustomComboBox';
 import CustomTextField from '../CustomTextField';
 import CustomButton from '../CustomButton';
-import { OrganizationObj } from '../../models/OrganizationObj';
 import { Star } from '@mui/icons-material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
 import OrganizationForm from './OrganizationForm';
-import { organizationsType } from '../../services/ConstantsTypes';
+import { organizationsType, organizationsTypeOptions } from '../../services/ConstantsTypes';
+import { getOrganizationsByUser } from '@/app/services/OrganizationsServices';
+import { useFilterStore } from '@/app/state/filterState';
 
 const Organization: React.FC = () => {
     const { theme } = useTheme();
     const [selectedOrganizationType, setSelectedOrganizationType] = useState('');
-    const [filter, setFilter] = useState('');
+    const { filter, setFilter } = useFilterStore();
     const organizationForm = useOrganizationFormStore((state) => state.organizationForm);
     const alterOrganizationForm = useOrganizationFormStore((state) => state.alter);
 
-    const handleChangeOrganizationType = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setSelectedOrganizationType(event.target.value);
+    const handleChangeOrganizationType = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setSelectedOrganizationType(event.target.value.trim());
     };
 
     const toggleOrganizationForm = () => {
         alterOrganizationForm(!organizationForm);
     }
 
-   
+    const organizations = getOrganizationsByUser(theme);
 
-    const organizations: OrganizationObj[] = [
-        {
-            id: '1',
-            title: 'Tcc',
-            description: 'Organização criada com o intuito de ter um local para salvamento dos dados do nosso tcc para apoio mutuo e versionamento',
-            createdBy: 'Criado por Lucas@gmail.com',
-            borderColor: theme.palette.text.primary
-        },
-        {
-            id: '2',
-            title: 'Compras',
-            description: 'Organização pessoal para salvar documentos de compras realizadas pela minha empresa.',
-            createdBy: 'Criado por Lucas@gmail.com',
-            borderColor: theme.palette.text.primary
-        },
-        {
-            id: '3',
-            title: 'Compras',
-            description: 'Organização pessoal para salvar documentos de compras realizadas pela minha empresa.',
-            createdBy: 'Criado por Lucas@gmail.com',
-            borderColor: theme.palette.text.primary
-        },
-        {
-            id: '4',
-            title: 'Compras',
-            description: 'Organização pessoal para salvar documentos de compras realizadas pela minha empresa.',
-            createdBy: 'Criado por Lucas@gmail.com',
-            borderColor: theme.palette.text.primary
-        },
-        {
-            id: '5',
-            title: 'Compras',
-            description: 'Organização pessoal para salvar documentos de compras realizadas pela minha empresa.',
-            createdBy: 'Criado por Lucas@gmail.com',
-            borderColor: theme.palette.text.primary
-        }, {
-            id: '6',
-            title: 'Compras',
-            description: 'Organização pessoal para salvar documentos de compras realizadas pela minha empresa.',
-            createdBy: 'Criado por Lucas@gmail.com',
-            borderColor: theme.palette.text.primary
-        },
-        {
-            id: '7',
-            title: 'Compras',
-            description: 'Organização pessoal para salvar documentos de compras realizadas pela minha empresa.',
-            createdBy: 'Criado por Lucas@gmail.com',
-            borderColor: theme.palette.text.primary
+    const filteredOrganizations = useMemo(() => {
+        let filtered = organizations;
+
+        if (selectedOrganizationType == 'COLLABORATIVE') {
+            filtered = filtered.filter((org) => org.type === organizationsType.COLLABORATIVE);
+        } else if (selectedOrganizationType == 'INDIVIDUAL') {
+            filtered = filtered.filter((org) => org.type === organizationsType.INDIVIDUAL);
         }
-    ];
+
+        if (!filter.trim()) {
+            return filtered;
+        }
+
+        const searchTerm = filter.toLowerCase().trim();
+        return filtered.filter((org) =>
+            org.title.toLowerCase().includes(searchTerm) ||
+            org.description.toLowerCase().includes(searchTerm) ||
+            org.createdBy.toLowerCase().includes(searchTerm)
+        );
+    }, [organizations, filter]);
 
     return (
         <Box sx={{ maxWidth: '100%' }}>
@@ -112,7 +83,7 @@ const Organization: React.FC = () => {
                             label="Tipo"
                             value={selectedOrganizationType}
                             onChange={handleChangeOrganizationType}
-                            options={organizationsType}
+                            options={organizationsTypeOptions}
                             focusedColor="primary"
                             hoverColor="info"
                         />
@@ -153,14 +124,13 @@ const Organization: React.FC = () => {
                         },
                     }}
                 >
-                    {organizations.map((org) => (
+                    {filteredOrganizations.map((org) => (
                         <Box
                             key={org.id}
                             sx={{
-                                mb: 4,
+                                mb: 2,
                                 p: 2,
                                 border: `1px solid ${org.borderColor}`,
-                                borderRadius: 1
                             }}
                         >
                             <Box sx={{ display: 'flex', gap: 4, justifyContent: 'space-between', alignItems: 'center' }}>
@@ -169,19 +139,18 @@ const Organization: React.FC = () => {
                                     <CustomTypography
                                         text={org.title}
                                         component="h2"
-                                        variant="h6"
+                                        variant="h5"
                                         sx={{
                                             color: theme.palette.text.primary,
                                             fontWeight: 'bold',
-                                            mb: 1
                                         }}
                                     />
                                 </Box>
                                 <CustomTypography
-                                    text={org.createdBy}
+                                    text={org.type}
                                     component="p"
                                     variant="h6"
-                                    sx={{ color: theme.palette.text.primary, display: 'block', mb: 1 }}
+                                    sx={{ color: theme.palette.text.secondary, display: 'block' }}
                                 />
                             </Box>
                             <Box sx={{ display: 'flex', gap: 4, justifyContent: 'space-between', alignItems: 'center' }}>
@@ -189,7 +158,7 @@ const Organization: React.FC = () => {
                                     text={org.description}
                                     component="p"
                                     variant="h6"
-                                    sx={{ color: theme.palette.text.primary, mb: 2 }}
+                                    sx={{ color: theme.palette.text.secondary, mb: 1 }}
                                 />
                                 <CustomButton
                                     text="Alterar"
@@ -206,7 +175,7 @@ const Organization: React.FC = () => {
                 {organizationForm && (
                     <OrganizationForm />
                 )
-                }*
+                }
             </Box>
         </Box >
     );

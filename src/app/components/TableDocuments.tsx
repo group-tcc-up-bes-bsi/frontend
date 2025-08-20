@@ -9,121 +9,49 @@ import {
     Box,
     IconButton,
     Menu,
-    MenuItem
+    MenuItem,
+    Typography // Adicione esta importação
 } from '@mui/material';
 import { Delete, MoreVert } from '@mui/icons-material';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { FileItem } from '../models/FileItem';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react'; // Adicione useMemo
 import { useDocumentStateStore } from '../state/DocumentState';
 import { useOptionsDashboardStore } from '../state/optionsDashboard';
+import { formatDate, getDocuments } from '../services/DocumentsServices';
+import { DocumentObj } from '../models/DocumentObj';
+import { useFilterStore } from '../state/filterState';
 
 const TableDocuments = () => {
     const { theme } = useTheme();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const [selectedFile, setSelectedFile] = useState<FileItem | null>(null);
-    const alterFile = useDocumentStateStore((state) => state.alter);
+    const [selectedDoc, setSelectedDoc] = useState<DocumentObj | null>(null);
+    const alterDoc = useDocumentStateStore((state) => state.alter);
     const alterOption = useOptionsDashboardStore((state) => state.alter);
+    const { filter } = useFilterStore();
+    
+    const allDocuments = getDocuments();
 
-    const files: FileItem[] = [
-        {
-            id: '1',
-            name: 'Document.pdf',
-            type: 'PDF',
-            createdAt: new Date('2023-10-15'),
-            updatedAt: new Date('2023-10-20'),
-            version: 'Test',
-            creator: 'User A'
-        },
-        {
-            id: '2',
-            name: 'Spreadsheet.xlsx',
-            type: 'Excel',
-            createdAt: new Date('2023-09-10'),
-            updatedAt: new Date('2023-10-18'),
-            version: '2.0',
-            creator: 'User B'
-        },
-        {
-            id: '3',
-            name: 'Presentation.pptx',
-            type: 'PowerPoint',
-            createdAt: new Date('2023-08-05'),
-            updatedAt: new Date('2023-10-15'),
-            version: '1.5',
-            creator: 'User C'
-        },
-        {
-            id: '4',
-            name: 'Presentation.pptx',
-            type: 'PowerPoint',
-            createdAt: new Date('2023-08-05'),
-            updatedAt: new Date('2023-10-15'),
-            version: '1.5',
-            creator: 'User D'
-        },
-        {
-            id: '5',
-            name: 'Presentation.pptx',
-            type: 'PowerPoint',
-            createdAt: new Date('2023-08-05'),
-            updatedAt: new Date('2023-10-15'),
-            version: '1.5',
-            creator: 'User E'
-        },
-        {
-            id: '6',
-            name: 'Presentation.pptx',
-            type: 'PowerPoint',
-            createdAt: new Date('2023-08-05'),
-            updatedAt: new Date('2023-10-15'),
-            version: '1.5',
-            creator: 'User F'
-        },
-        {
-            id: '7',
-            name: 'Presentation.pptx',
-            type: 'PowerPoint',
-            createdAt: new Date('2023-08-05'),
-            updatedAt: new Date('2023-10-15'),
-            version: '1.5',
-            creator: 'User G'
-        },
-        {
-            id: '8',
-            name: 'Presentation.pptx',
-            type: 'PowerPoint',
-            createdAt: new Date('2023-08-05'),
-            updatedAt: new Date('2023-10-15'),
-            version: '1.5',
-            creator: 'User H'
-        },
-        {
-            id: '9',
-            name: 'Presentation.pptx',
-            type: 'PowerPoint',
-            createdAt: new Date('2023-08-05'),
-            updatedAt: new Date('2023-10-15'),
-            version: '1.5',
-            creator: 'User I'
+    const filteredDocuments = useMemo(() => {
+        if (!filter.trim()) {
+            return allDocuments;
         }
-    ];
 
-    const formatDate = (date: Date) => {
-        return date.toLocaleDateString('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
+        const searchTerm = filter.toLowerCase().trim();
+        
+        return allDocuments.filter((doc) => 
+            doc.name.toLowerCase().includes(searchTerm) ||
+            doc.type.toLowerCase().includes(searchTerm) ||
+            formatDate(doc.createdAt).toLowerCase().includes(searchTerm) ||
+            formatDate(doc.updatedAt).toLowerCase().includes(searchTerm) ||
+            doc.version.toLowerCase().includes(searchTerm)
+        );
+    }, [allDocuments, filter]);
 
     const handleEstatisticasClick = () => {
         alterOption('Stats');
-        if (selectedFile) {
-            alterFile(selectedFile);
+        if (selectedDoc) {
+            alterDoc(selectedDoc);
         }
         setAnchorEl(null);
     };
@@ -133,63 +61,84 @@ const TableDocuments = () => {
             <Table sx={{ minWidth: 650 }} aria-label="tabela de Documentos">
                 <TableHead>
                     <TableRow sx={{ backgroundColor: theme.palette.background.default }}>
-                        <TableCell>Documento</TableCell>
-                        <TableCell>Tipo</TableCell>
-                        <TableCell>
+                        <TableCell sx={{textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem'}}>Documento</TableCell>
+                        <TableCell sx={{textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem'}}>Tipo</TableCell>
+                        <TableCell sx={{textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem'}}>
                             <TableSortLabel>Data de Criação</TableSortLabel>
                         </TableCell>
-                        <TableCell>
+                        <TableCell sx={{textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem'}}>
                             <TableSortLabel>Última Alteração</TableSortLabel>
                         </TableCell>
-                        <TableCell>Versão</TableCell>
-                        <TableCell>Ações</TableCell>
+                        <TableCell sx={{textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem'}}>Versão</TableCell>
+                        <TableCell sx={{textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem'}}>Ações</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {files.map((file) => (
-                        <TableRow key={file.id}>
-                            <TableCell sx={{ background: theme.palette.background.default }}>{file.name}</TableCell>
-                            <TableCell sx={{ background: theme.palette.background.default }}>{file.type}</TableCell>
-                            <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(file.createdAt)}</TableCell>
-                            <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(file.updatedAt)}</TableCell>
-                            <TableCell sx={{ background: theme.palette.background.default }}>
-                                <Box
-                                    sx={{
-                                        backgroundColor: theme.palette.background.paper,
-                                        color: theme.palette.text.primary,
-                                        px: 1,
-                                        borderRadius: 1,
-                                        display: 'inline-block'
-                                    }}
-                                >
-                                    {file.version}
-                                </Box>
-                            </TableCell>
-                            <TableCell sx={{ background: theme.palette.background.default }}>
-                                <IconButton aria-label="delete">
-                                    <Delete color="error" />
-                                </IconButton>
-                                <IconButton
-                                    aria-label="more"
-                                    onClick={(event) => {
-                                        setAnchorEl(event.currentTarget);
-                                        setSelectedFile(file);
-                                    }}
-                                >
-                                    <MoreVert />
-                                </IconButton>
-                                <Menu
-                                    anchorEl={anchorEl}
-                                    open={Boolean(anchorEl) && selectedFile?.id === file.id}
-                                    onClose={() => setAnchorEl(null)}
-                                >
-                                    <MenuItem onClick={() => { setAnchorEl(null); }}>Alterar</MenuItem>
-                                    <MenuItem onClick={() => { setAnchorEl(null); }}>Versões</MenuItem>
-                                    <MenuItem onClick={handleEstatisticasClick}>Estatísticas</MenuItem>
-                                </Menu>
+                    {filteredDocuments.length === 0 ? (
+                        <TableRow>
+                            <TableCell colSpan={6} align="center" sx={{ 
+                                backgroundColor: theme.palette.background.default,
+                                py: 4 
+                            }}>
+                                <Typography variant="h6" color={theme.palette.text.primary}>
+                                    {filter ? 'Nenhum documento encontrado para o filtro informado' : 'Nenhum documento disponível'}
+                                </Typography>
                             </TableCell>
                         </TableRow>
-                    ))}
+                    ) : (
+                        filteredDocuments.map((Doc) => (
+                            <TableRow key={Doc.id}>
+                                <TableCell sx={{ background: theme.palette.background.default }}>
+                                    {Doc.name}
+                                </TableCell>
+                                <TableCell sx={{ background: theme.palette.background.default }}>
+                                    {Doc.type}
+                                </TableCell>
+                                <TableCell sx={{ background: theme.palette.background.default }}>
+                                    {formatDate(Doc.createdAt)}
+                                </TableCell>
+                                <TableCell sx={{ background: theme.palette.background.default }}>
+                                    {formatDate(Doc.updatedAt)}
+                                </TableCell>
+                                <TableCell sx={{ background: theme.palette.background.default }}>
+                                    <Box
+                                        sx={{
+                                            backgroundColor: theme.palette.background.paper,
+                                            color: theme.palette.text.primary,
+                                            px: 1,
+                                            borderRadius: 1,
+                                            display: 'inline-block'
+                                        }}
+                                    >
+                                        {Doc.version}
+                                    </Box>
+                                </TableCell>
+                                <TableCell sx={{ background: theme.palette.background.default }}>
+                                    <IconButton aria-label="delete">
+                                        <Delete color="error" />
+                                    </IconButton>
+                                    <IconButton
+                                        aria-label="more"
+                                        onClick={(event) => {
+                                            setAnchorEl(event.currentTarget);
+                                            setSelectedDoc(Doc);
+                                        }}
+                                    >
+                                        <MoreVert />
+                                    </IconButton>
+                                    <Menu
+                                        anchorEl={anchorEl}
+                                        open={Boolean(anchorEl) && selectedDoc?.id === Doc.id}
+                                        onClose={() => setAnchorEl(null)}
+                                    >
+                                        <MenuItem onClick={() => { setAnchorEl(null); }}>Alterar</MenuItem>
+                                        <MenuItem onClick={() => { setAnchorEl(null); }}>Versões</MenuItem>
+                                        <MenuItem onClick={handleEstatisticasClick}>Estatísticas</MenuItem>
+                                    </Menu>
+                                </TableCell>
+                            </TableRow>
+                        ))
+                    )}
                 </TableBody>
             </Table>
         </TableContainer>

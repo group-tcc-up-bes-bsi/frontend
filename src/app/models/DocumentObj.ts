@@ -1,4 +1,4 @@
-export interface FileItem {
+export interface DocumentObj {
   id: string;
   name: string;
   type: string;
@@ -6,4 +6,5 @@ export interface FileItem {
   updatedAt: Date;
   version: string;
   creator: string;
+  imagemSrc: string;
 }

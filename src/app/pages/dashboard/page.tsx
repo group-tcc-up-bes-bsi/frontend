@@ -18,6 +18,7 @@ import Favorites from '@/app/components/favorites/Favorites';
 import Trash from '@/app/components/trash/Trash';
 import SettingsComponent from '@/app/components/settings/SettingsComponent';
 import StatsDocument from '@/app/components/StatsDocument';
+import { useFilterStore } from '@/app/state/filterState';
 
 const Dashboard = () => {
     const [open, setOpen] = React.useState(false);
@@ -27,6 +28,7 @@ const Dashboard = () => {
     const option = useOptionsDashboardStore((state) => state.option);
     const alterOption = useOptionsDashboardStore((state) => state.alter);
     const [optionMenu, setOptionMenu] = React.useState('');
+     const { setFilter } = useFilterStore();
 
     const toggleDrawer = () => {
         setOpen(!open);
@@ -73,6 +75,7 @@ const Dashboard = () => {
     const toggleOption = (optionText: string) => {
         alterOption(optionText)
         optionMenuChoice();
+        setFilter('');
     };
 
     const toggleNotification = () => {
