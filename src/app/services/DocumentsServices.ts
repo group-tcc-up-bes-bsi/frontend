@@ -1,96 +1,96 @@
-import { DocumentObj } from "../models/DocumentObj";
+import { DocumentFavorite, DocumentObj } from "../models/DocumentObj";
 
 export function getDocuments(): DocumentObj[] {
   return [
     {
-      id: "1",
+      id: 1,
       name: "Document.pdf",
       type: "PDF",
       createdAt: new Date("2023-10-15"),
       updatedAt: new Date("2023-10-20"),
       version: "Test",
       creator: "User A",
-      imagemSrc: "/login/img_fundo_1.png"
+      imagemSrc: "/login/img_fundo_1.png",
     },
     {
-      id: "2",
+      id: 2,
       name: "Spreadsheet.xlsx",
       type: "Excel",
       createdAt: new Date("2023-09-10"),
       updatedAt: new Date("2023-10-18"),
       version: "2.0",
       creator: "User B",
-      imagemSrc: "/login/img_fundo_1.png"
+      imagemSrc: "/login/img_fundo_1.png",
     },
     {
-      id: "3",
+      id: 3,
       name: "Presentation.pptx",
       type: "PowerPoint",
       createdAt: new Date("2023-08-05"),
       updatedAt: new Date("2023-10-15"),
       version: "1.5",
       creator: "User C",
-      imagemSrc: "/login/img_fundo_1.png"
+      imagemSrc: "/login/img_fundo_1.png",
     },
     {
-      id: "4",
+      id: 4,
       name: "Presentation.pptx",
       type: "PowerPoint",
       createdAt: new Date("2023-08-05"),
       updatedAt: new Date("2023-10-15"),
       version: "1.5",
       creator: "User D",
-      imagemSrc: "/login/img_fundo_1.png"
+      imagemSrc: "/login/img_fundo_1.png",
     },
     {
-      id: "5",
+      id: 5,
       name: "Presentation.pptx",
       type: "PowerPoint",
       createdAt: new Date("2023-08-05"),
       updatedAt: new Date("2023-10-15"),
       version: "1.5",
       creator: "User E",
-      imagemSrc: "/login/img_fundo_1.png"
+      imagemSrc: "/login/img_fundo_1.png",
     },
     {
-      id: "6",
+      id: 6,
       name: "Presentation.pptx",
       type: "PowerPoint",
       createdAt: new Date("2023-08-05"),
       updatedAt: new Date("2023-10-15"),
       version: "1.5",
       creator: "User F",
-      imagemSrc: "/login/img_fundo_1.png"
+      imagemSrc: "/login/img_fundo_1.png",
     },
     {
-      id: "7",
+      id: 7,
       name: "Presentation.pptx",
       type: "PowerPoint",
       createdAt: new Date("2023-08-05"),
       updatedAt: new Date("2023-10-15"),
       version: "1.5",
       creator: "User G",
-      imagemSrc: "/login/img_fundo_1.png"
+      imagemSrc: "/login/img_fundo_1.png",
     },
     {
-      id: "8",
+      id: 8,
       name: "Presentation.pptx",
       type: "PowerPoint",
       createdAt: new Date("2023-08-05"),
       updatedAt: new Date("2023-10-15"),
       version: "1.5",
       creator: "User H",
-      imagemSrc: "/login/img_fundo_1.png"
+      imagemSrc: "/login/img_fundo_1.png",
     },
     {
-      id: "9",
+      id: 9,
       name: "Presentation.pptx",
       type: "PowerPoint",
       createdAt: new Date("2023-08-05"),
       updatedAt: new Date("2023-10-15"),
       version: "1.5",
       creator: "User I",
-      imagemSrc: "/login/img_fundo_1.png"
+      imagemSrc: "/login/img_fundo_1.png",
     },
   ];
 }
@@ -104,3 +104,139 @@ export const formatDate = (date: Date) => {
     minute: "2-digit",
   });
 };
+
+export function getDocumentsFavorites(): DocumentFavorite[] {
+  return [
+    {
+      id: 1,
+      favorite: true,
+      name: "Requisitos",
+      organization: { id: 1, title: "TCC" },
+    },
+    {
+      id: 2,
+      favorite: true,
+      name: "Contrato de compra",
+      organization: { id: 2, title: "Compras" },
+    },
+    {
+      id: 3,
+      favorite: false,
+      name: "index",
+      organization: { id: 3, title: "Não Definido" },
+    },
+    {
+      id: 4,
+      favorite: false,
+      name: "Livro",
+      organization: { id: 4, title: "Não Definido" },
+    },
+    {
+      id: 5,
+      favorite: false,
+      name: "Nota fornecedor 100",
+      organization: { id: 5, title: "Compras" },
+    },
+    {
+      id: 6,
+      favorite: false,
+      name: "História de usuário",
+      organization: { id: 6, title: "TCC" },
+    },
+  ];
+}
+
+export function getDocumentsTrash(): DocumentObj[] {
+  return [
+    {
+      id: 1,
+      name: "Document.pdf",
+      type: "PDF",
+      createdAt: new Date("2023-10-15"),
+      updatedAt: new Date("2023-10-20"),
+      version: "Test",
+      creator: "User A",
+      imagemSrc: "/login/img_fundo_1.png",
+    },
+    {
+      id: 2,
+      name: "Spreadsheet.xlsx",
+      type: "Excel",
+      createdAt: new Date("2023-09-10"),
+      updatedAt: new Date("2023-10-18"),
+      version: "2.0",
+      creator: "User B",
+      imagemSrc: "/login/img_fundo_1.png",
+    },
+    {
+      id: 3,
+      name: "Presentation.pptx",
+      type: "PowerPoint",
+      createdAt: new Date("2023-08-05"),
+      updatedAt: new Date("2023-10-15"),
+      version: "1.5",
+      creator: "User C",
+      imagemSrc: "/login/img_fundo_1.png",
+    },
+    {
+      id: 4,
+      name: "Presentation.pptx",
+      type: "PowerPoint",
+      createdAt: new Date("2023-08-05"),
+      updatedAt: new Date("2023-10-15"),
+      version: "1.5",
+      creator: "User D",
+      imagemSrc: "/login/img_fundo_1.png",
+    },
+    {
+      id: 5,
+      name: "Presentation.pptx",
+      type: "PowerPoint",
+      createdAt: new Date("2023-08-05"),
+      updatedAt: new Date("2023-10-15"),
+      version: "1.5",
+      creator: "User E",
+      imagemSrc: "/login/img_fundo_1.png",
+    },
+    {
+      id: 6,
+      name: "Presentation.pptx",
+      type: "PowerPoint",
+      createdAt: new Date("2023-08-05"),
+      updatedAt: new Date("2023-10-15"),
+      version: "1.5",
+      creator: "User F",
+      imagemSrc: "/login/img_fundo_1.png",
+    },
+    {
+      id: 7,
+      name: "Presentation.pptx",
+      type: "PowerPoint",
+      createdAt: new Date("2023-08-05"),
+      updatedAt: new Date("2023-10-15"),
+      version: "1.5",
+      creator: "User G",
+      imagemSrc: "/login/img_fundo_1.png",
+    },
+    {
+      id: 8,
+      name: "Presentation.pptx",
+      type: "PowerPoint",
+      createdAt: new Date("2023-08-05"),
+      updatedAt: new Date("2023-10-15"),
+      version: "1.5",
+      creator: "User H",
+      imagemSrc: "/login/img_fundo_1.png",
+    },
+    {
+      id: 9,
+      name: "Presentation.pptx",
+      type: "PowerPoint",
+      createdAt: new Date("2023-08-05"),
+      updatedAt: new Date("2023-10-15"),
+      version: "1.5",
+      creator: "User I",
+      imagemSrc: "/login/img_fundo_1.png",
+    },
+  ];
+}

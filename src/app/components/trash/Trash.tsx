@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import {
     Box, Table, TableBody, TableCell, TableContainer,
@@ -10,99 +10,31 @@ import CustomTypography from '../CustomTypography';
 import CustomTextField from '../CustomTextField';
 import { CachedRounded, Delete } from '@mui/icons-material';
 import CustomButton from '../CustomButton';
-interface FileItem {
-    id: string;
-    nome: string;
-    tipo: string;
-    dataCriacao: Date;
-    ultimaAlteracao: Date;
-    versao: string;
-}
+import { DocumentObj } from '@/app/models/DocumentObj';
+import { formatDate, getDocumentsTrash } from '@/app/services/DocumentsServices';
+import { useFilterStore } from '@/app/state/filterState';
 
 const Trash: React.FC = () => {
     const { theme } = useTheme();
-    const [filter, setFilter] = useState('');
+    const { filter, setFilter } = useFilterStore();
 
-    const files: FileItem[] = [
-        {
-            id: '1',
-            nome: 'Documento.pdf',
-            tipo: 'PDF',
-            dataCriacao: new Date('2023-10-15'),
-            ultimaAlteracao: new Date('2023-10-20'),
-            versao: 'Teste'
-        },
-        {
-            id: '2',
-            nome: 'Planilha.xlsx',
-            tipo: 'Excel',
-            dataCriacao: new Date('2023-09-10'),
-            ultimaAlteracao: new Date('2023-10-18'),
-            versao: '2.0'
-        },
-        {
-            id: '3',
-            nome: 'Apresentação.pptx',
-            tipo: 'PowerPoint',
-            dataCriacao: new Date('2023-08-05'),
-            ultimaAlteracao: new Date('2023-10-15'),
-            versao: '1.5'
-        },
-        {
-            id: '4',
-            nome: 'Apresentação.pptx',
-            tipo: 'PowerPoint',
-            dataCriacao: new Date('2023-08-05'),
-            ultimaAlteracao: new Date('2023-10-15'),
-            versao: '1.5'
-        },
-        {
-            id: '5',
-            nome: 'Apresentação.pptx',
-            tipo: 'PowerPoint',
-            dataCriacao: new Date('2023-08-05'),
-            ultimaAlteracao: new Date('2023-10-15'),
-            versao: '1.5'
-        }, {
-            id: '6',
-            nome: 'Apresentação.pptx',
-            tipo: 'PowerPoint',
-            dataCriacao: new Date('2023-08-05'),
-            ultimaAlteracao: new Date('2023-10-15'),
-            versao: '1.5'
-        }, {
-            id: '7',
-            nome: 'Apresentação.pptx',
-            tipo: 'PowerPoint',
-            dataCriacao: new Date('2023-08-05'),
-            ultimaAlteracao: new Date('2023-10-15'),
-            versao: '1.5'
-        }, {
-            id: '8',
-            nome: 'Apresentação.pptx',
-            tipo: 'PowerPoint',
-            dataCriacao: new Date('2023-08-05'),
-            ultimaAlteracao: new Date('2023-10-15'),
-            versao: '1.5'
-        }, {
-            id: '9',
-            nome: 'Apresentação.pptx',
-            tipo: 'PowerPoint',
-            dataCriacao: new Date('2023-08-05'),
-            ultimaAlteracao: new Date('2023-10-15'),
-            versao: '1.5'
+    const documents: DocumentObj[] = getDocumentsTrash();
+
+    const filteredDocuments = useMemo(() => {
+        if (!filter.trim()) {
+            return documents;
         }
-    ];
 
-    const formatDate = (date: Date) => {
-        return date.toLocaleDateString('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
+        const searchTerm = filter.toLowerCase().trim();
+
+        return documents.filter((doc) =>
+            doc.name.toLowerCase().includes(searchTerm) ||
+            doc.type.toLowerCase().includes(searchTerm) ||
+            formatDate(doc.createdAt).toLowerCase().includes(searchTerm) ||
+            formatDate(doc.updatedAt).toLowerCase().includes(searchTerm) ||
+            doc.version.toLowerCase().includes(searchTerm)
+        );
+    }, [documents, filter]);
 
     return (
         <Box sx={{ maxWidth: '100%' }}>
@@ -137,7 +69,7 @@ const Trash: React.FC = () => {
                     <Box sx={{ width: '100%' }}>
                         <CustomTypography
                             width={100}
-                            text="Documents"
+                            text="Documentos"
                             component="h2"
                             variant="h5"
                             sx={{
@@ -168,25 +100,25 @@ const Trash: React.FC = () => {
                                 <Table sx={{ minWidth: 650 }} aria-label="tabela de Documentos">
                                     <TableHead>
                                         <TableRow sx={{ backgroundColor: theme.palette.background.default }}>
-                                            <TableCell>Documento</TableCell>
-                                            <TableCell>Tipo</TableCell>
-                                            <TableCell>
-                                                <TableSortLabel>Data de Criação</TableSortLabel>
+                                            <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Documento</TableCell>
+                                            <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Tipo</TableCell>
+                                            <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>
+                                                <TableSortLabel sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Data de Criação</TableSortLabel>
                                             </TableCell>
                                             <TableCell>
-                                                <TableSortLabel>Última Alteração</TableSortLabel>
+                                                <TableSortLabel sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Última Alteração</TableSortLabel>
                                             </TableCell>
-                                            <TableCell>Versão</TableCell>
-                                            <TableCell>Ações</TableCell>
+                                            <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Versão</TableCell>
+                                            <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Ações</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {files.map((file) => (
-                                            <TableRow key={file.id}>
-                                                <TableCell sx={{ background: theme.palette.background.default }}>{file.nome}</TableCell>
-                                                <TableCell sx={{ background: theme.palette.background.default }}>{file.tipo}</TableCell>
-                                                <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(file.dataCriacao)}</TableCell>
-                                                <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(file.ultimaAlteracao)}</TableCell>
+                                        {filteredDocuments.map((doc) => (
+                                            <TableRow key={doc.id}>
+                                                <TableCell sx={{ background: theme.palette.background.default }}>{doc.name}</TableCell>
+                                                <TableCell sx={{ background: theme.palette.background.default }}>{doc.type}</TableCell>
+                                                <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(doc.createdAt)}</TableCell>
+                                                <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(doc.updatedAt)}</TableCell>
                                                 <TableCell sx={{ background: theme.palette.background.default }}>
                                                     <Box
                                                         sx={{
@@ -197,7 +129,7 @@ const Trash: React.FC = () => {
                                                             display: 'inline-block'
                                                         }}
                                                     >
-                                                        {file.versao}
+                                                        {doc.version}
                                                     </Box>
                                                 </TableCell>
                                                 <TableCell sx={{ background: theme.palette.background.default }}>

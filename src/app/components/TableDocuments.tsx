@@ -10,12 +10,12 @@ import {
     IconButton,
     Menu,
     MenuItem,
-    Typography // Adicione esta importação
+    Typography
 } from '@mui/material';
 import { Delete, MoreVert } from '@mui/icons-material';
 import { useTheme } from '@/app/theme/ThemeContext';
 
-import React, { useState, useMemo } from 'react'; // Adicione useMemo
+import React, { useState, useMemo } from 'react';
 import { useDocumentStateStore } from '../state/DocumentState';
 import { useOptionsDashboardStore } from '../state/optionsDashboard';
 import { formatDate, getDocuments } from '../services/DocumentsServices';

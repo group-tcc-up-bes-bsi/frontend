@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import {
     Box, Divider, Table, TableBody, TableCell, TableContainer,
@@ -8,24 +8,42 @@ import {
 import CustomTypography from '../CustomTypography';
 import CustomTextField from '../CustomTextField';
 import { Star } from '@mui/icons-material';
+import { getOrganizationsFavorites } from '@/app/services/OrganizationsServices';
+import { getDocumentsFavorites } from '@/app/services/DocumentsServices';
+import { useFilterStore } from '@/app/state/filterState';
 
 const Favorites: React.FC = () => {
     const { theme } = useTheme();
-    const [filter, setFilter] = useState('');
+    const { filter, setFilter } = useFilterStore();
 
-    const [documents, setDocuments] = useState([
-        {id:1, favorite: true, name: 'Requisitos', organization: 'TCC' },
-        {id:2, favorite: true, name: 'Contrato de compra', organization: 'Compras' },
-        {id:3, favorite: false, name: 'index', organization: 'Não Definido' },
-        {id:4, favorite: false, name: 'Livro', organization: 'Não Definido' },
-        {id:5, favorite: false, name: 'Nota fornecedor 100', organization: 'Compras' },
-        {id:6, favorite: false, name: 'História de usuário', organization: 'TCC' },
-    ]);
+    const [documents, setDocuments] = useState(getDocumentsFavorites());
 
-    const [organizations, setOrganizations] = useState([
-        {id:1, favorite: true, name: 'TCC', total: 10 },
-        {id:2, favorite: false, name: 'Compras', total: 2 },
-    ]);
+    const filteredDocuments = useMemo(() => {
+        if (!filter.trim()) {
+            return documents;
+        }
+
+        const searchTerm = filter.toLowerCase().trim();
+
+        return documents.filter((doc) =>
+            doc.name.toLowerCase().includes(searchTerm) ||
+            doc.organization.title.toLowerCase().includes(searchTerm)
+        );
+    }, [documents, filter]);
+
+    const [organizations, setOrganizations] = useState(getOrganizationsFavorites());
+
+    const filteredOrganizations = useMemo(() => {
+        if (!filter.trim()) {
+            return organizations;
+        }
+
+        const searchTerm = filter.toLowerCase().trim();
+        return organizations.filter((org) =>
+            org.title.toLowerCase().includes(searchTerm) ||
+            org.totDocuments.toString().includes(searchTerm)
+        );
+    }, [organizations, filter]);
 
     const handleFavoriteToggle = (doc: typeof documents[number]) => {
         doc.favorite = !doc.favorite;
@@ -40,8 +58,8 @@ const Favorites: React.FC = () => {
     return (
         <Box sx={{ maxWidth: '100%' }}>
             <Box>
-                <Box sx={{ display: 'flex', justifyContent: 'left' }}>
-                    <Box sx={{ width: '50%' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                    <Box sx={{ width: '100%' }}>
                         <CustomTextField
                             name="filter"
                             label="Informe algo"
@@ -58,7 +76,7 @@ const Favorites: React.FC = () => {
                 <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'start', width: '50%' }}>
                         <CustomTypography
-                            text="Documents"
+                            text="Documentos"
                             component="h2"
                             variant="h5"
                             sx={{
@@ -90,20 +108,26 @@ const Favorites: React.FC = () => {
                                     <TableHead>
                                         <TableRow>
                                             <TableCell />
-                                            <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>File</TableCell>
-                                            <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Organization</TableCell>
+                                            <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Documento</TableCell>
+                                            <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Organização</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {documents.map((doc) => (
+                                        {filteredDocuments.map((doc) => (
                                             <TableRow key={doc.id}>
                                                 <TableCell>
-                                                    <IconButton aria-label="star">
-                                                        <Star onClick={() => handleFavoriteToggle(doc)} sx={{ color: doc.favorite ? theme.palette.button.star : theme.palette.text.primary }} />
+                                                    <IconButton aria-label="star" onClick={() => handleFavoriteToggle(doc)}>
+                                                        <Star sx={{
+                                                            color: doc.favorite ? theme.palette.button.star : theme.palette.text.primary,
+                                                            transition: 'color 0.2s ease-in-out',
+                                                            '&:hover': {
+                                                                transform: 'scale(1.1)'
+                                                            }
+                                                        }} />
                                                     </IconButton>
                                                 </TableCell>
                                                 <TableCell sx={{ color: theme.palette.text.primary }}>{doc.name}</TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>{doc.organization}</TableCell>
+                                                <TableCell sx={{ color: theme.palette.text.primary }}>{doc.organization.title}</TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -119,12 +143,12 @@ const Favorites: React.FC = () => {
                             margin: '0 10px',
                             marginLeft: 2,
                             marginRight: 2,
-                            padding: 0.2,
+                            padding: 0.05,
                             borderRadius: '20%'
                         }} />
                     <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'start', width: '50%' }}>
                         <CustomTypography
-                            text="Organizations"
+                            text="Organizações"
                             component="h2"
                             variant="h5"
                             sx={{
@@ -158,20 +182,26 @@ const Favorites: React.FC = () => {
                                     <TableHead>
                                         <TableRow>
                                             <TableCell />
-                                            <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Organization</TableCell>
-                                            <TableCell sx={{ color: theme.palette.text.primary, fontWeight: 'bold' }}>Total Files</TableCell>
+                                            <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Organização</TableCell>
+                                            <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Total de Arquivos</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {organizations.map((org) => (
+                                        {filteredOrganizations.map((org) => (
                                             <TableRow key={org.id}>
                                                 <TableCell>
-                                                    <IconButton aria-label="star">
-                                                        <Star onClick={() => handleFavoriteOrganizationToggle(org)} sx={{ color: org.favorite ? theme.palette.button.star : theme.palette.text.primary }} />
+                                                    <IconButton aria-label="star" onClick={() => handleFavoriteOrganizationToggle(org)}>
+                                                        <Star sx={{
+                                                            color: org.favorite ? theme.palette.button.star : theme.palette.text.primary,
+                                                            transition: 'color 0.2s ease-in-out',
+                                                            '&:hover': {
+                                                                transform: 'scale(1.1)'
+                                                            }
+                                                        }} />
                                                     </IconButton>
                                                 </TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>{org.name}</TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>{org.total}</TableCell>
+                                                <TableCell sx={{ color: theme.palette.text.primary }}>{org.title}</TableCell>
+                                                <TableCell sx={{ color: theme.palette.text.primary }}>{org.totDocuments}</TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>

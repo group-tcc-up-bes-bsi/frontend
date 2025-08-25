@@ -2,7 +2,7 @@ import { MessageObj } from "../models/MessageObj";
 import { getErrorTitle } from "./ErrorTitle";
 
 export async function createUser(UserName: string, Password: string) {
-    const url = `http://localhost:3000/users`;
+    const url = `${process.env.BACKEND}/users`;
     const userData = {
         username: UserName,
         password: Password,
@@ -60,7 +60,7 @@ export async function createUser(UserName: string, Password: string) {
 }
 
 export async function authLoginUser(User: string, Password: string) {
-    const url = `http://localhost:3000/auth/login`;
+    const url = `${process.env.BACKEND}/auth/login`;
     const userData = {
         user: User,
         password: Password

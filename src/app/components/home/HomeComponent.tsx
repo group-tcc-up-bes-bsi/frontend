@@ -88,19 +88,19 @@ const HomeComponent: React.FC = () => {
                 <Box
                     sx={{
                         display: 'flex',
-                        gap: 2,
+                        gap: 3,
                         maxHeight: 'calc(85vh - 150px)',
                         overflowX: 'auto',
                         pr: 2,
                         '&::-webkit-scrollbar': {
-                            width: '6px',
+                            width: '2px',
                         },
                         '&::-webkit-scrollbar-track': {
                             background: theme.palette.background.default,
                         },
                         '&::-webkit-scrollbar-thumb': {
                             backgroundColor: theme.palette.primary.main,
-                            borderRadius: '3px',
+                            borderRadius: '6px',
                         },
                     }}
                 >
@@ -110,6 +110,7 @@ const HomeComponent: React.FC = () => {
                             sx={{
                                 mb: 0,
                                 p: 1,
+                                display: 'flex',
                             }}
                         >
                             <Box sx={{ display: 'flex', gap: 4, justifyContent: 'space-between', alignItems: 'center' }}>
@@ -122,7 +123,8 @@ const HomeComponent: React.FC = () => {
                                         sx={{
                                             color: theme.palette.text.primary,
                                             fontWeight: 'bold',
-                                            mb: 0
+                                            mb: 0,
+                                            whiteSpace: 'nowrap',
                                         }}
                                     />
 
