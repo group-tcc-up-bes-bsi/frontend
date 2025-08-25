@@ -63,7 +63,7 @@ export async function createUser(UserName: string, Password: string) {
 export async function authLoginUser(User: string, Password: string) {
     const url = `http://localhost:3000/auth/login`;
     const userData = {
-        user: User,
+        username: User,
         password: Password
     };
 
@@ -77,7 +77,7 @@ export async function authLoginUser(User: string, Password: string) {
         });
 
         const responseData = await response.json().catch(() => null);
-
+        console.log(responseData)
         if (!response.ok) {
             if (responseData.message == 'Invalid user') {
                 return {
