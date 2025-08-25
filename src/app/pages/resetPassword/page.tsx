@@ -16,11 +16,15 @@ import { MessageObj } from '@/app/models/MessageObj';
 import AdminPasswordModal from '@/app/components/admin/AdminPasswordModal';
 import { useAdminPassStore } from '@/app/state/adminPassState';
 import { isLoginValid } from '@/app/services/User/ValidForms';
+import { getByUserName } from '@/app/services/User/getByUserName';
+import { updateUser } from '@/app/services/User/updateUser';
 
 const ResetPassword: React.FC = () => {
     const [user, setUser] = useState('');
     const [password, setPassword] = useState('');
-    const [message/*, setMessage*/] = useState<MessageObj>();
+     const [message, setMessage] = useState<MessageObj>(
+        new MessageObj('info', 'Alteração de senha', 'Informe seus dados', 'info')
+      );
     const [showMessage, setShowMessage] = useState(false);
     const { theme, isDarkMode } = useTheme();
     const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
@@ -40,6 +44,21 @@ const ResetPassword: React.FC = () => {
             alterAdminPass(true);
         }
     }, [showAdminRequest]);
+
+    const handleSubmit = async () => {
+        try {
+            const result = await getByUserName(user);
+            setMessage(result.message);
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (result.message.severity === 'success') {
+                alterAdminPass(true);
+                await updateUser(result.user.userId, user, password);
+            }
+        } catch (error) {
+            setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
+        }
+    }
 
     return (
         <Box sx={{
@@ -208,7 +227,7 @@ const ResetPassword: React.FC = () => {
                             colorType="primary"
                             hoverColorType="primary"
                             disabled={!isLoginValid(user, password)}
-                            onClick={() => alterAdminPass(true)}
+                            onClick={() => handleSubmit()}
                         />
 
                         {showMessage && message && (
