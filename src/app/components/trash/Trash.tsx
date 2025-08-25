@@ -11,7 +11,7 @@ import CustomTextField from '../CustomTextField';
 import { CachedRounded, Delete } from '@mui/icons-material';
 import CustomButton from '../CustomButton';
 import { DocumentObj } from '@/app/models/DocumentObj';
-import { formatDate, getDocumentsTrash } from '@/app/services/DocumentsServices';
+import { formatDate, getDocumentsTrash } from '@/app/services/Documents/DocumentsServices';
 import { useFilterStore } from '@/app/state/filterState';
 
 const Trash: React.FC = () => {

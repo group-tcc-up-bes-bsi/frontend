@@ -15,7 +15,7 @@ import CustomAlert from '../../components/CustomAlert';
 import { MessageObj } from '@/app/models/MessageObj';
 import AdminPasswordModal from '@/app/components/admin/AdminPasswordModal';
 import { useAdminPassStore } from '@/app/state/adminPassState';
-import { isLoginValid } from '@/app/services/ValidForms';
+import { isLoginValid } from '@/app/services/User/ValidForms';
 
 const ResetPassword: React.FC = () => {
     const [user, setUser] = useState('');

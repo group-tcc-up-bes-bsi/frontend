@@ -8,8 +8,8 @@ import {
 import CustomTypography from '../CustomTypography';
 import CustomTextField from '../CustomTextField';
 import { Star } from '@mui/icons-material';
-import { getOrganizationsFavorites } from '@/app/services/OrganizationsServices';
-import { getDocumentsFavorites } from '@/app/services/DocumentsServices';
+import { getOrganizationsFavorites } from '@/app/services/Organizations/OrganizationsServices';
+import { getDocumentsFavorites } from '@/app/services/Documents/DocumentsServices';
 import { useFilterStore } from '@/app/state/filterState';
 
 const Favorites: React.FC = () => {

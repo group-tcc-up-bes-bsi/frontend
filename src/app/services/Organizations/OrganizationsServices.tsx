@@ -1,7 +1,7 @@
 import { Folder } from "@mui/icons-material";
-import { OrganizationFavorite, OrganizationObjWithIcon } from "../models/OrganizationObj";
+import { OrganizationFavorite, OrganizationObjWithIcon } from "../../models/OrganizationObj";
 import { Theme } from "@mui/material";
-import { organizationsType } from "./ConstantsTypes";
+import { organizationsType } from "../ConstantsTypes";
 
 export function getOrganizationsByUser(theme: Theme): OrganizationObjWithIcon[] {
     return [

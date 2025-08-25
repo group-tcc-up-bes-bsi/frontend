@@ -1,4 +1,4 @@
-import { DocumentFavorite, DocumentObj } from "../models/DocumentObj";
+import { DocumentFavorite, DocumentObj } from "../../models/DocumentObj";
 
 export function getDocuments(): DocumentObj[] {
   return [

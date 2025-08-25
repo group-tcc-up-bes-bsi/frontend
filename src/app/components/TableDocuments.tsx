@@ -18,7 +18,7 @@ import { useTheme } from '@/app/theme/ThemeContext';
 import React, { useState, useMemo } from 'react';
 import { useDocumentStateStore } from '../state/DocumentState';
 import { useOptionsDashboardStore } from '../state/optionsDashboard';
-import { formatDate, getDocuments } from '../services/DocumentsServices';
+import { formatDate, getDocuments } from '../services/Documents/DocumentsServices';
 import { DocumentObj } from '../models/DocumentObj';
 import { useFilterStore } from '../state/filterState';
 
