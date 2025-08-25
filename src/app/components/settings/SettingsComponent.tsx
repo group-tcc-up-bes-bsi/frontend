@@ -55,7 +55,7 @@ const SettingsComponent: React.FC = () => {
                         />
                     </Box>
                     <CustomTypography
-                        text='email_teste@gmail.com'
+                        text='Usuário'
                         component="h5"
                         variant='h5'
                         align="center"
