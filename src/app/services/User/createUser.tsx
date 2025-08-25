@@ -2,7 +2,7 @@ import { MessageObj } from "@/app/models/MessageObj";
 import { getErrorTitle } from "../ErrorTitle";
 
 export async function createUser(UserName: string, Password: string) {
-    const url = `http://localhost:3000/users`;
+    const url = `${process.env.NEXT_PUBLIC_BACKEND}/users`;
     console.log(url)
     const userData = {
         username: UserName,

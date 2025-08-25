@@ -2,7 +2,7 @@ import { MessageObj } from "../../models/MessageObj";
 import { getErrorTitle } from "../ErrorTitle";
 
 export async function authLoginUser(User: string, Password: string) {
-    const url = `http://localhost:3000/auth/login`;
+    const url = `${process.env.NEXT_PUBLIC_BACKEND}/auth/login`;
     const userData = {
         username: User,
         password: Password
