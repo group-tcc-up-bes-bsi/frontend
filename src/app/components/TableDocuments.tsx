@@ -16,7 +16,7 @@ import { Delete, MoreVert } from '@mui/icons-material';
 import { useTheme } from '@/app/theme/ThemeContext';
 
 import React, { useState, useMemo } from 'react';
-import { useDocumentStateStore } from '../state/DocumentState';
+import { useDocumentStateStore } from '../state/documentState';
 import { useOptionsDashboardStore } from '../state/optionsDashboard';
 import { formatDate, getDocuments } from '../services/Documents/DocumentsServices';
 import { DocumentObj } from '../models/DocumentObj';

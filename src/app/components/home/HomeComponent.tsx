@@ -6,7 +6,7 @@ import Menu from '@mui/icons-material/Menu';
 import SpaceDashboard from '@mui/icons-material/SpaceDashboard';
 import TableDocuments from '../TableDocuments';
 import Documents from '../Documents';
-import { useDocumentViewerStore } from '@/app/state/DocumentViewerState';
+import { useDocumentViewerStore } from '@/app/state/documentViewerState';
 import { getOrganizationsByUser } from '@/app/services/Organizations/OrganizationsServices';
 
 const HomeComponent: React.FC = () => {

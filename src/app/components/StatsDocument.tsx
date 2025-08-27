@@ -3,7 +3,7 @@ import { PieChart, BarChart } from "@mui/x-charts";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { useDocumentStateStore } from "../state/DocumentState";
+import { useDocumentStateStore } from "../state/documentState";
 import { Close } from '@mui/icons-material';
 import { useOptionsDashboardStore } from "../state/optionsDashboard";
 import CustomButton from "./CustomButton";
