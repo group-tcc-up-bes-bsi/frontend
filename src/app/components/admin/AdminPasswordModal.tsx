@@ -1,20 +1,44 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { Box, Backdrop, Button } from '@mui/material';
 import { Close } from '@mui/icons-material';
 import CustomTextField from '../CustomTextField';
 import { useAdminPassStore } from '@/app/state/adminPassState';
+import { updatePasswordUser } from '@/app/services/User/updateUser';
+import { MessageObj } from '@/app/models/MessageObj';
+import CustomAlert from '../CustomAlert';
 
 const AdminPasswordModal: React.FC = () => {
     const { theme } = useTheme();
     const alterAdminPass = useAdminPassStore((state) => state.alter);
-    const [password, setPassword] = useState('');
-
+    const admin = useAdminPassStore((state) => state.Admin);
+    const [adminPass, setAdminPass] = useState('');
+    const [message, setMessage] = useState<MessageObj>(
+        new MessageObj('info', 'Administrador', 'Informe senha do adminstrador', 'info')
+    );
+    const [showMessage, setShowMessage] = useState(false);
     const handleClose = () => alterAdminPass(false);
-    const handleConfirm = () => {
-        console.log('Senha digitada:', password);
+
+    const handleConfirm = async () => {
+        try {
+            if(admin) {
+                const result = await updatePasswordUser(admin.userId, admin.UserName, admin.Password, adminPass);
+                setMessage(result.message);
+
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+        } catch (error) {
+            console.error('Erro ao atualizar usuário:', error);
+        }
         handleClose();
     };
+
+    useEffect(() => {
+        if (message) {
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 5000);
+        }
+    }, [message]);
 
     return (
         <Box className="flex items-center justify-center">
@@ -65,8 +89,8 @@ const AdminPasswordModal: React.FC = () => {
                     name="password"
                     label="Digite a senha"
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={adminPass}
+                    onChange={(e) => setAdminPass(e.target.value)}
                     focusedColor="primary"
                     hoverColor="info"
                 />
@@ -86,6 +110,27 @@ const AdminPasswordModal: React.FC = () => {
                 >
                     Confirmar
                 </Button>
+                {showMessage && message && (
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            bottom: '10%',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            gap: 2,
+                            textAlign: 'left',
+                        }}>
+                        <CustomAlert
+                            severity={message.severity}
+                            colorType={message.colorType}
+                            title={message.title}
+                            description={message.description}
+                        />
+                    </Box>
+                )}
             </Box>
         </Box>
     );

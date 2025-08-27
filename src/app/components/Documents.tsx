@@ -7,10 +7,10 @@ import {
   MenuItem,
 } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { useDocumentStateStore } from '../state/DocumentState';
+import { useDocumentStateStore } from '../state/documentState';
 import { useOptionsDashboardStore } from '../state/optionsDashboard';
 import { DocumentObj } from '../models/DocumentObj';
-import { formatDate, getDocuments } from '../services/DocumentsServices';
+import { formatDate, getDocuments } from '../services/Documents/DocumentsServices';
 import { useFilterStore } from '../state/filterState';
 import CustomTypography from './CustomTypography';
 

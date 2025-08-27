@@ -15,7 +15,7 @@ const OrganizationForm: React.FC = () => {
     const [selectedOrganizationType, setSelectedOrganizationType] = useState('');
     const [selectedUserType, setSelectedUserType] = useState('');
     const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [description, setDescription] = useState('');
 
     const handleChangeOrganizationType = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -78,11 +78,11 @@ const OrganizationForm: React.FC = () => {
                             marginBottom={2}
                         />
                         <CustomTextField
-                            name="Email"
-                            label="Email"
-                            type="Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            name="username"
+                            label="Usuário"
+                            type="username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             focusedColor="primary"
                             hoverColor="info"
                             marginBottom={2}

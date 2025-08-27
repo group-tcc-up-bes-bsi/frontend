@@ -9,7 +9,7 @@ import { Star } from '@mui/icons-material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
 import OrganizationForm from './OrganizationForm';
 import { organizationsType, organizationsTypeOptions } from '../../services/ConstantsTypes';
-import { getOrganizationsByUser } from '@/app/services/OrganizationsServices';
+import { getOrganizationsByUser } from '@/app/services/Organizations/OrganizationsServices';
 import { useFilterStore } from '@/app/state/filterState';
 
 const Organization: React.FC = () => {

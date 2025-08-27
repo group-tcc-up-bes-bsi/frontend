@@ -8,7 +8,7 @@ import TableDocuments from '../TableDocuments';
 import Documents from '../Documents';
 import CustomButton from '../CustomButton';
 import CustomTextField from '../CustomTextField';
-import { useDocumentViewerStore } from '@/app/state/DocumentViewerState';
+import { useDocumentViewerStore } from '@/app/state/documentViewerState';
 import { useFilterStore } from '@/app/state/filterState';
 
 const DocumentsComponent: React.FC = () => {
