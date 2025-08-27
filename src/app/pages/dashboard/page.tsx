@@ -1,5 +1,5 @@
 "use client"
-import React from 'react';
+import React, { /*useEffect*/ } from 'react';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box, Backdrop } from '@mui/material';
 import { Settings, Star, Folder, Groups, Home, Delete } from '@mui/icons-material';
 import { useTheme } from '@/app/theme/ThemeContext';
@@ -19,6 +19,7 @@ import Trash from '@/app/components/trash/Trash';
 import SettingsComponent from '@/app/components/settings/SettingsComponent';
 import StatsDocument from '@/app/components/StatsDocument';
 import { useFilterStore } from '@/app/state/filterState';
+//import { getAuthToken } from '@/app/services/User/GetAuthToken';
 
 const Dashboard = () => {
     const [open, setOpen] = React.useState(false);
@@ -28,7 +29,14 @@ const Dashboard = () => {
     const option = useOptionsDashboardStore((state) => state.option);
     const alterOption = useOptionsDashboardStore((state) => state.alter);
     const [optionMenu, setOptionMenu] = React.useState('');
-     const { setFilter } = useFilterStore();
+    const { setFilter } = useFilterStore();
+
+    /*useEffect(() => {
+        const token = getAuthToken();
+        if(token == 'Usuário não autenticado'){
+            logoutUser();
+        }
+    }, []);*/
 
     const toggleDrawer = () => {
         setOpen(!open);
