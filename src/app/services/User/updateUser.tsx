@@ -1,11 +1,14 @@
 import { MessageObj } from "@/app/models/MessageObj";
 import { getErrorTitle } from "../ErrorTitle";
 
-export async function updateUser(userId: number, UserName: string, Password: string) {
-    const url = `${process.env.NEXT_PUBLIC_BACKEND}/users/${userId}`;
+export async function updatePasswordUser(userId: number, UserName: string, Password: string, AdminPass: string) {
+    const url = `${process.env.NEXT_PUBLIC_BACKEND}/users/update-password/${userId}`;
     const userData = {
-        username: UserName,
-        password: Password,
+        dto: {
+            username: UserName,
+            password: Password,
+        },
+        adminPass: AdminPass
     };
 
     try {
@@ -19,6 +22,7 @@ export async function updateUser(userId: number, UserName: string, Password: str
 
         const responseData = await response.json().catch(() => null);
         console.log(responseData);
+        console.log(userData);
         if (!response.ok) {
             if (responseData.message == `No user found with ID ${userId} to update`) {
                 return {
@@ -29,12 +33,30 @@ export async function updateUser(userId: number, UserName: string, Password: str
                         'error')
                 }
             }
-            if(responseData.message == `No data provided for update userId ${userId}`){
+            if (responseData.message == `No data provided for update userId ${userId}`) {
                 return {
                     message: new MessageObj(
                         'error',
                         getErrorTitle(responseData.statusCode),
                         'Senha não fornecida para atualização',
+                        'error')
+                }
+            }
+            if (responseData.message == 'No AdminPass provided for update') {
+                return {
+                    message: new MessageObj(
+                        'error',
+                        getErrorTitle(responseData.statusCode),
+                        'Senha de administrador incorreta',
+                        'error')
+                }
+            }
+            if (responseData.message == 'Invalid AdminPass') {
+                return {
+                    message: new MessageObj(
+                        'error',
+                        getErrorTitle(responseData.statusCode),
+                        'Senha de administrador incorreta',
                         'error')
                 }
             }
