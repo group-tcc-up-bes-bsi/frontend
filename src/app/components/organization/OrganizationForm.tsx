@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { Box, List, ListItem, ListItemText, Backdrop } from '@mui/material'; // Adicione Backdrop aqui
+import { Box, Backdrop } from '@mui/material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
 import { Close } from '@mui/icons-material';
 import CustomTextField from '../CustomTextField';
@@ -8,38 +8,46 @@ import CustomComboBox from '../CustomComboBox';
 import CustomButton from '../CustomButton';
 import CustomTypography from '../CustomTypography';
 import { organizationsTypeOptions, userTypeOptions } from '../../services/ConstantsTypes';
+import { getUsersOrganization } from '@/app/services/User/getUsersOrganization';
+import { useOrganizationStateStore } from '@/app/state/organizationState';
 
 const OrganizationForm: React.FC = () => {
     const { theme } = useTheme();
+    const organization = useOrganizationStateStore((state) => state.organization);
     const alterOrganizationForm = useOrganizationFormStore((state) => state.alter);
     const [selectedOrganizationType, setSelectedOrganizationType] = useState('');
     const [selectedUserType, setSelectedUserType] = useState('');
-    const [name, setName] = useState('');
+    const [name, setName] = useState(organization?.title || '');
     const [username, setUsername] = useState('');
-    const [description, setDescription] = useState('');
+    const [description, setDescription] = useState(organization?.description || '');
 
-    const handleChangeOrganizationType = (event: React.ChangeEvent<{ value: unknown }>) => {
-        setSelectedOrganizationType(event.target.value as string);
+    const handleChangeOrganizationType = (value: string) => {
+        setSelectedOrganizationType(value);
     };
 
-    const handleChangeUserType = (event: React.ChangeEvent<{ value: unknown }>) => {
-        setSelectedUserType(event.target.value as string);
+    const handleChangeUserType = (value: string) => {
+        setSelectedUserType(value);
     };
+
+    const users = getUsersOrganization();
 
     return (
-        <>
+        <Box>
             <Backdrop
                 open={true}
                 onClick={() => alterOrganizationForm(false)}
                 sx={{
-                    zIndex: 1320,
+                    zIndex: 3,
                     color: '#fff',
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
                 }}
             />
             <Box
-                className="fixed z-[1330] flex flex-col"
                 sx={{
+                    zIndex: 200,
+                    position: 'absolute',
+                    display: 'flex',
+                    flexDirection: 'column',
                     backgroundColor: theme.palette.background.default,
                     width: '1200px',
                     height: '750px',
@@ -106,7 +114,7 @@ const OrganizationForm: React.FC = () => {
                             name="organization-type"
                             label="Tipo"
                             value={selectedOrganizationType}
-                            onChange={handleChangeOrganizationType}
+                            onChange={(value) => handleChangeOrganizationType(value)}
                             options={organizationsTypeOptions}
                             focusedColor="primary"
                             hoverColor="info"
@@ -117,7 +125,7 @@ const OrganizationForm: React.FC = () => {
                             name="user-type"
                             label="Permissões"
                             value={selectedUserType}
-                            onChange={handleChangeUserType}
+                            onChange={(value) => handleChangeUserType(value)}
                             options={userTypeOptions}
                             focusedColor="primary"
                             hoverColor="info"
@@ -174,35 +182,63 @@ const OrganizationForm: React.FC = () => {
                                     borderRadius: '3px',
                                 },
                             }}>
-                            <List dense sx={{ py: 0 }}>
-                                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((item) => (
-                                    <ListItem
-                                        key={item}
+                            <Box
+                                sx={{
+                                    width: '100%',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    gap: 1,
+                                    maxHeight: '310px',
+                                    p: 2,
+                                    '&::-webkit-scrollbar': {
+                                        width: '6px',
+                                    },
+                                    '&::-webkit-scrollbar-track': {
+                                        background: theme.palette.background.paper,
+                                    },
+                                    '&::-webkit-scrollbar-thumb': {
+                                        backgroundColor: theme.palette.primary.main,
+                                        borderRadius: '3px',
+                                    },
+                                }}
+                            >
+                                {users.map((user) => (
+                                    <Box
+                                        key={user.id}
                                         sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'space-between',
                                             borderBottom: `1px solid ${theme.palette.divider}`,
-                                            py: 1.2,
-                                            px: 1
+                                            py: 1,
                                         }}
                                     >
-                                        <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
-                                            <ListItemText
-                                                primary={`Usuario ${item}`}
-                                                sx={{ flex: 1 }}
+                                        <Box sx={{ display: 'flex',width: '70%', justifyContent: 'space-between' ,gap: 1 }}>
+                                            <CustomTypography
+                                                text={user.username}
+                                                variant="body1"
+                                                sx={{ fontWeight: 'bold', color: theme.palette.text.primary }}
                                             />
-                                            <Close
-                                                sx={{
-                                                    fontSize: '1.5rem',
-                                                    color: theme.palette.text.secondary,
-                                                    cursor: 'pointer',
-                                                    '&:hover': {
-                                                        color: theme.palette.error.main,
-                                                    }
-                                                }}
+                                            <CustomTypography
+                                                text={`${user.type}`}
+                                                variant="body2"
+                                                sx={{ color: theme.palette.text.secondary }}
                                             />
                                         </Box>
-                                    </ListItem>
+                                        <Close
+                                            sx={{
+                                                fontSize: '1.5rem',
+                                                color: theme.palette.text.secondary,
+                                                cursor: 'pointer',
+                                                '&:hover': {
+                                                    color: theme.palette.error.main,
+                                                },
+                                            }}
+                                        />
+                                    </Box>
                                 ))}
-                            </List>
+                            </Box>
+
                         </Box>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'end', gap: 4 }}>
@@ -231,7 +267,7 @@ const OrganizationForm: React.FC = () => {
                     </Box>
                 </Box>
             </Box>
-        </>
+        </Box>
     );
 };
 

@@ -12,9 +12,19 @@ import {
 import CustomTypography from '../CustomTypography';
 import { AccountCircleRounded, CachedRounded } from '@mui/icons-material';
 import CustomButton from '../CustomButton';
+import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
+import MsgConfirm from '../notification/msgConfirm';
 
 const SettingsComponent: React.FC = () => {
     const { theme } = useTheme();
+    const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
+    const alterConfirm = useMsgConfirmStore((state) => state.alter);
+    const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
+
+    const toggleConfirm = () => {
+        alterMsgConfirm('Excluir a Conta?')
+        alterConfirm(!openConfirm);
+    }
 
     return (
         <Box sx={{
@@ -118,7 +128,7 @@ const SettingsComponent: React.FC = () => {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        flexDirection:'column'
+                        flexDirection: 'column'
                     }}>
                         <CustomTypography
                             text='Tema'
@@ -230,6 +240,7 @@ const SettingsComponent: React.FC = () => {
                     <CustomButton
                         text="Excluir conta"
                         fullWidth={false}
+                        onClick={() => toggleConfirm()}
                         type="button"
                         colorType="error"
                         hoverColorType="error"
@@ -239,6 +250,10 @@ const SettingsComponent: React.FC = () => {
                     />
                 </Box>
             </Box>
+            {openConfirm && (
+                <MsgConfirm />
+            )
+            }
         </Box >
     );
 };

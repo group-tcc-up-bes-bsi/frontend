@@ -94,6 +94,7 @@ const HomeComponent: React.FC = () => {
                         pr: 2,
                         '&::-webkit-scrollbar': {
                             width: '2px',
+                            height: '6px',
                         },
                         '&::-webkit-scrollbar-track': {
                             background: theme.palette.background.default,

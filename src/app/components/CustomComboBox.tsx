@@ -4,19 +4,13 @@ import React from "react";
 import { TextField, TextFieldProps, MenuItem } from "@mui/material";
 import { useTheme as useCustomTheme } from "../theme/ThemeContext";
 
-interface Option {
-  value: string | number;
-  label: string;
-  disabled?: boolean;
-}
-
 interface CustomComboBoxProps
   extends Omit<TextFieldProps, "onChange" | "value" | "name" | "label"> {
   name: string;
   label: string;
-  value: string | number;
-  onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  options: Option[];
+  value: string;
+  onChange: (value: string) => void;
+  options: { value: string; label: string }[];
   marginBottom?: number;
   focusedColor?: "primary" | "secondary" | "error" | "warning" | "info" | "success";
   hoverColor?: "primary" | "secondary" | "error" | "warning" | "info" | "success";
@@ -49,7 +43,7 @@ const CustomComboBox: React.FC<CustomComboBoxProps> = ({
       name={name}
       label={label}
       value={value}
-      onChange={onChange}
+      onChange={(event) => onChange(event.target.value)}
       autoComplete={autoComplete}
       slotProps={{
         select: {
@@ -84,7 +78,6 @@ const CustomComboBox: React.FC<CustomComboBoxProps> = ({
         <MenuItem
           key={option.value}
           value={option.value}
-          disabled={option.disabled}
           sx={{
             color: theme.palette.text.primary,
             backgroundColor: theme.palette.background.paper,

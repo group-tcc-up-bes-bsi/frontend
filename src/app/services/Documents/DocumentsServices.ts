@@ -11,6 +11,7 @@ export function getDocuments(): DocumentObj[] {
       version: "Test",
       creator: "User A",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 1, title: "TCC" },
     },
     {
       id: 2,
@@ -21,6 +22,7 @@ export function getDocuments(): DocumentObj[] {
       version: "2.0",
       creator: "User B",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 1, title: "TCC" },
     },
     {
       id: 3,
@@ -31,6 +33,7 @@ export function getDocuments(): DocumentObj[] {
       version: "1.5",
       creator: "User C",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 1, title: "TCC" },
     },
     {
       id: 4,
@@ -41,6 +44,7 @@ export function getDocuments(): DocumentObj[] {
       version: "1.5",
       creator: "User D",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 2, title: "Projeto Front" },
     },
     {
       id: 5,
@@ -51,6 +55,7 @@ export function getDocuments(): DocumentObj[] {
       version: "1.5",
       creator: "User E",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 2, title: "Projeto Front" },
     },
     {
       id: 6,
@@ -61,6 +66,7 @@ export function getDocuments(): DocumentObj[] {
       version: "1.5",
       creator: "User F",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 2, title: "Projeto Front" },
     },
     {
       id: 7,
@@ -71,6 +77,7 @@ export function getDocuments(): DocumentObj[] {
       version: "1.5",
       creator: "User G",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 2, title: "Projeto Front" },
     },
     {
       id: 8,
@@ -81,6 +88,7 @@ export function getDocuments(): DocumentObj[] {
       version: "1.5",
       creator: "User H",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 2, title: "Projeto Front" },
     },
     {
       id: 9,
@@ -91,6 +99,7 @@ export function getDocuments(): DocumentObj[] {
       version: "1.5",
       creator: "User I",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 2, title: "Projeto Backend Node Teste" },
     },
   ];
 }
@@ -157,6 +166,7 @@ export function getDocumentsTrash(): DocumentObj[] {
       version: "Test",
       creator: "User A",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 2, title: "Projeto Front" },
     },
     {
       id: 2,
@@ -167,6 +177,7 @@ export function getDocumentsTrash(): DocumentObj[] {
       version: "2.0",
       creator: "User B",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 2, title: "Projeto Front" },
     },
     {
       id: 3,
@@ -177,6 +188,7 @@ export function getDocumentsTrash(): DocumentObj[] {
       version: "1.5",
       creator: "User C",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 2, title: "Projeto Front" },
     },
     {
       id: 4,
@@ -187,6 +199,7 @@ export function getDocumentsTrash(): DocumentObj[] {
       version: "1.5",
       creator: "User D",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 2, title: "Projeto Front" },
     },
     {
       id: 5,
@@ -197,6 +210,7 @@ export function getDocumentsTrash(): DocumentObj[] {
       version: "1.5",
       creator: "User E",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 2, title: "Projeto Front" },
     },
     {
       id: 6,
@@ -207,6 +221,7 @@ export function getDocumentsTrash(): DocumentObj[] {
       version: "1.5",
       creator: "User F",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 2, title: "Projeto Front" },
     },
     {
       id: 7,
@@ -217,6 +232,7 @@ export function getDocumentsTrash(): DocumentObj[] {
       version: "1.5",
       creator: "User G",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 2, title: "Projeto Front" },
     },
     {
       id: 8,
@@ -227,6 +243,7 @@ export function getDocumentsTrash(): DocumentObj[] {
       version: "1.5",
       creator: "User H",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 2, title: "Projeto Front" },
     },
     {
       id: 9,
@@ -237,6 +254,7 @@ export function getDocumentsTrash(): DocumentObj[] {
       version: "1.5",
       creator: "User I",
       imagemSrc: "/login/img_fundo_1.png",
+      organization: { id: 2, title: "Projeto backend" },
     },
   ];
 }

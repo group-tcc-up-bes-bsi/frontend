@@ -5,6 +5,7 @@ export enum organizationsType {
 };
 
 export enum userType {
+  OWNER = 'Proprietário',
   READ = 'Editor',
   VIEWER = 'Visualizador',
 };
