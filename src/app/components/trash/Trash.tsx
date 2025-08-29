@@ -13,10 +13,15 @@ import CustomButton from '../CustomButton';
 import { DocumentObj } from '@/app/models/DocumentObj';
 import { formatDate, getDocumentsTrash } from '@/app/services/Documents/DocumentsServices';
 import { useFilterStore } from '@/app/state/filterState';
+import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
+import MsgConfirm from '../notification/msgConfirm';
 
 const Trash: React.FC = () => {
     const { theme } = useTheme();
     const { filter, setFilter } = useFilterStore();
+    const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
+    const alterConfirm = useMsgConfirmStore((state) => state.alter);
+    const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
 
     const documents: DocumentObj[] = getDocumentsTrash();
 
@@ -35,6 +40,16 @@ const Trash: React.FC = () => {
             doc.version.toLowerCase().includes(searchTerm)
         );
     }, [documents, filter]);
+
+    const toggleConfirm = (document: DocumentObj) => {
+        alterMsgConfirm(`excluir permanentemente documento ${document.name}?`);
+        alterConfirm(!openConfirm);
+    }
+
+    const toggleConfirmEmpty = () => {
+        alterMsgConfirm(`esvaziar a lixeira?`);
+        alterConfirm(!openConfirm);
+    }
 
     return (
         <Box sx={{ maxWidth: '100%' }}>
@@ -56,6 +71,7 @@ const Trash: React.FC = () => {
                             fullWidth={false}
                             text="Esvaziar Lixeira"
                             type="button"
+                            onClick={toggleConfirmEmpty}
                             colorType="primary"
                             hoverColorType="primary"
                             paddingY={2}
@@ -108,6 +124,7 @@ const Trash: React.FC = () => {
                                             <TableCell>
                                                 <TableSortLabel sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Última Alteração</TableSortLabel>
                                             </TableCell>
+                                            <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Organização</TableCell>
                                             <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Versão</TableCell>
                                             <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Ações</TableCell>
                                         </TableRow>
@@ -119,6 +136,7 @@ const Trash: React.FC = () => {
                                                 <TableCell sx={{ background: theme.palette.background.default }}>{doc.type}</TableCell>
                                                 <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(doc.createdAt)}</TableCell>
                                                 <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(doc.updatedAt)}</TableCell>
+                                                <TableCell sx={{ background: theme.palette.background.default }}>{doc.organization.title}</TableCell>
                                                 <TableCell sx={{ background: theme.palette.background.default }}>
                                                     <Box
                                                         sx={{
@@ -136,7 +154,7 @@ const Trash: React.FC = () => {
                                                     <IconButton aria-label="more">
                                                         <CachedRounded sx={{ color: theme.palette.text.primary }} />
                                                     </IconButton>
-                                                    <IconButton aria-label="delete">
+                                                    <IconButton aria-label="delete" onClick={() => toggleConfirm(doc)}>
                                                         <Delete color="error" />
                                                     </IconButton>
                                                 </TableCell>
@@ -149,6 +167,10 @@ const Trash: React.FC = () => {
                     </Box>
                 </Box>
             </Box>
+            {openConfirm && (
+                <MsgConfirm />
+            )
+            }
         </Box>
     );
 };

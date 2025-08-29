@@ -13,6 +13,8 @@ import { DocumentObj } from '../models/DocumentObj';
 import { formatDate, getDocuments } from '../services/Documents/DocumentsServices';
 import { useFilterStore } from '../state/filterState';
 import CustomTypography from './CustomTypography';
+import { useMsgConfirmStore } from '../state/msgConfirmState';
+import MsgConfirm from './notification/msgConfirm';
 
 const Documents: React.FC = () => {
   const { theme } = useTheme();
@@ -21,6 +23,9 @@ const Documents: React.FC = () => {
   const alterDoc = useDocumentStateStore((state) => state.alter);
   const alterOption = useOptionsDashboardStore((state) => state.alter);
   const { filter } = useFilterStore();
+  const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
+  const alterConfirm = useMsgConfirmStore((state) => state.alter);
+  const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
 
   const allDocuments = getDocuments();
 
@@ -46,6 +51,11 @@ const Documents: React.FC = () => {
     }
     setAnchorEl(null);
   };
+
+  const toggleConfirm = (document: DocumentObj) => {
+    alterMsgConfirm(`mover o documento ${document.name} para a Lixeira?`);
+    alterConfirm(!openConfirm);
+  }
 
   return (
     <Box
@@ -76,8 +86,11 @@ const Documents: React.FC = () => {
           boxShadow: 3,
         }}
       >
-        <Box fontWeight="bold" fontSize="0.9rem" mb={1}>
+        <Box fontWeight="bold" fontSize="0.9rem">
           {doc.name}
+        </Box>
+        <Box fontWeight="bold" fontSize="0.9rem" mb={1}>
+          Organização: {doc.organization.title}
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', }}>
@@ -106,7 +119,7 @@ const Documents: React.FC = () => {
               <MenuItem onClick={() => { setAnchorEl(null); }}>Alterar</MenuItem>
               <MenuItem onClick={() => { setAnchorEl(null); }}>Versões</MenuItem>
               <MenuItem onClick={handleEstatisticasClick}>Estatísticas</MenuItem>
-              <MenuItem onClick={() => { setAnchorEl(null); }}>Excluir</MenuItem>
+              <MenuItem onClick={() => toggleConfirm(doc)}>Excluir</MenuItem>
             </Menu>
           </Box>
         </Box>
@@ -129,6 +142,10 @@ const Documents: React.FC = () => {
         </Box>
       </Box>
     ))}
+      {openConfirm && (
+        <MsgConfirm />
+      )
+      }
     </Box>
   );
 };

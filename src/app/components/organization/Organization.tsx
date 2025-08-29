@@ -1,26 +1,36 @@
 import React, { useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { Box, Divider } from '@mui/material';
+import { Box, Divider, IconButton, Menu, MenuItem } from '@mui/material';
 import CustomTypography from '../CustomTypography';
 import CustomComboBox from '../CustomComboBox';
 import CustomTextField from '../CustomTextField';
 import CustomButton from '../CustomButton';
-import { Star } from '@mui/icons-material';
+import { MoreVert, Star } from '@mui/icons-material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
 import OrganizationForm from './OrganizationForm';
 import { organizationsType, organizationsTypeOptions } from '../../services/ConstantsTypes';
 import { getOrganizationsByUser } from '@/app/services/Organizations/OrganizationsServices';
 import { useFilterStore } from '@/app/state/filterState';
+import { OrganizationObj } from '@/app/models/OrganizationObj';
+import { useOrganizationStateStore } from '@/app/state/organizationState';
+import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
+import MsgConfirm from '../notification/msgConfirm';
 
 const Organization: React.FC = () => {
     const { theme } = useTheme();
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedOrganizationType, setSelectedOrganizationType] = useState('');
     const { filter, setFilter } = useFilterStore();
     const organizationForm = useOrganizationFormStore((state) => state.organizationForm);
     const alterOrganizationForm = useOrganizationFormStore((state) => state.alter);
+    const [selectedOrganization, setSelectedOrganization] = useState<OrganizationObj | null>(null);
+    const alterOrganization = useOrganizationStateStore((state) => state.alter);
+    const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
+    const alterConfirm = useMsgConfirmStore((state) => state.alter);
+    const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
 
-    const handleChangeOrganizationType = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setSelectedOrganizationType(event.target.value.trim());
+    const handleChangeOrganizationType = (value: string) => {
+        setSelectedOrganizationType(value);
     };
 
     const toggleOrganizationForm = () => {
@@ -50,6 +60,30 @@ const Organization: React.FC = () => {
         );
     }, [organizations, filter]);
 
+    const handleOrganizationAlter = () => {
+        if (selectedOrganization) {
+            alterOrganization(selectedOrganization);
+            toggleOrganizationForm();
+        }
+        setAnchorEl(null);
+    };
+
+    const hanfleOrganizationCreate = () => {
+        const orgNull: OrganizationObj = {
+            id: 0,
+            title: '',
+            description: '',
+            createdBy: '',
+        };
+        alterOrganization(orgNull);
+        toggleOrganizationForm();
+    }
+
+    const toggleConfirm = (organization: OrganizationObj) => {
+        alterMsgConfirm(`excluir a organização ${organization.title}?`);
+        alterConfirm(!openConfirm);
+    }
+
     return (
         <Box sx={{ maxWidth: '100%' }}>
             <Box>
@@ -60,7 +94,7 @@ const Organization: React.FC = () => {
                             type="button"
                             colorType="primary"
                             hoverColorType="primary"
-                            onClick={toggleOrganizationForm}
+                            onClick={hanfleOrganizationCreate}
                             paddingY={2}
                             marginTop={0.5}
                         />
@@ -160,14 +194,23 @@ const Organization: React.FC = () => {
                                     variant="h6"
                                     sx={{ color: theme.palette.text.secondary, mb: 1 }}
                                 />
-                                <CustomButton
-                                    text="Alterar"
-                                    type="button"
-                                    colorType="primary"
-                                    hoverColorType="primary"
-                                    fullWidth={false}
-                                    paddingX={5.0}
-                                />
+                                <IconButton
+                                    aria-label="more"
+                                    onClick={(event) => {
+                                        setAnchorEl(event.currentTarget);
+                                        setSelectedOrganization(org);
+                                    }}
+                                >
+                                    <MoreVert />
+                                </IconButton>
+                                <Menu
+                                    anchorEl={anchorEl}
+                                    open={Boolean(anchorEl) && selectedOrganization?.id === org.id}
+                                    onClose={() => setAnchorEl(null)}
+                                >
+                                    <MenuItem onClick={handleOrganizationAlter}>Alterar</MenuItem>
+                                    <MenuItem onClick={() => toggleConfirm(org)}>Excluir</MenuItem>
+                                </Menu>
                             </Box>
                         </Box>
                     ))}
@@ -176,6 +219,9 @@ const Organization: React.FC = () => {
                     <OrganizationForm />
                 )
                 }
+                {openConfirm && (
+                    <MsgConfirm />
+                )}
             </Box>
         </Box >
     );

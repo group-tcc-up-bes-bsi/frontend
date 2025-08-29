@@ -21,16 +21,18 @@ const AdminPasswordModal: React.FC = () => {
 
     const handleConfirm = async () => {
         try {
-            if(admin) {
+            if (admin) {
                 const result = await updatePasswordUser(admin.userId, admin.UserName, admin.Password, adminPass);
                 setMessage(result.message);
 
                 await new Promise(resolve => setTimeout(resolve, 1000));
+                if (message.severity === 'success') {
+                    handleClose();
+                }
             }
         } catch (error) {
             console.error('Erro ao atualizar usuário:', error);
         }
-        handleClose();
     };
 
     useEffect(() => {
@@ -110,28 +112,29 @@ const AdminPasswordModal: React.FC = () => {
                 >
                     Confirmar
                 </Button>
-                {showMessage && message && (
-                    <Box
-                        sx={{
-                            position: 'absolute',
-                            bottom: '10%',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            display: 'flex',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            gap: 2,
-                            textAlign: 'left',
-                        }}>
-                        <CustomAlert
-                            severity={message.severity}
-                            colorType={message.colorType}
-                            title={message.title}
-                            description={message.description}
-                        />
-                    </Box>
-                )}
             </Box>
+            {showMessage && message && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        bottom: '10%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        zIndex: 1500,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 2,
+                        textAlign: 'left',
+                    }}>
+                    <CustomAlert
+                        severity={message.severity}
+                        colorType={message.colorType}
+                        title={message.title}
+                        description={message.description}
+                    />
+                </Box>
+            )}
         </Box>
     );
 };

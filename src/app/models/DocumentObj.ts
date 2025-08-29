@@ -9,6 +9,7 @@ export interface DocumentObj {
   version: string;
   creator: string;
   imagemSrc: string;
+  organization: OrganizationObjSimple;
 }
 
 export interface DocumentFavorite{

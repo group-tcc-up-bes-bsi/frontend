@@ -12,15 +12,16 @@ import {
     MenuItem,
     Typography
 } from '@mui/material';
-import { Delete, MoreVert } from '@mui/icons-material';
+import { MoreVert } from '@mui/icons-material';
 import { useTheme } from '@/app/theme/ThemeContext';
-
 import React, { useState, useMemo } from 'react';
 import { useDocumentStateStore } from '../state/documentState';
 import { useOptionsDashboardStore } from '../state/optionsDashboard';
 import { formatDate, getDocuments } from '../services/Documents/DocumentsServices';
 import { DocumentObj } from '../models/DocumentObj';
 import { useFilterStore } from '../state/filterState';
+import { useMsgConfirmStore } from '../state/msgConfirmState';
+import MsgConfirm from './notification/msgConfirm';
 
 const TableDocuments = () => {
     const { theme } = useTheme();
@@ -29,7 +30,10 @@ const TableDocuments = () => {
     const alterDoc = useDocumentStateStore((state) => state.alter);
     const alterOption = useOptionsDashboardStore((state) => state.alter);
     const { filter } = useFilterStore();
-    
+    const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
+    const alterConfirm = useMsgConfirmStore((state) => state.alter);
+    const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
+
     const allDocuments = getDocuments();
 
     const filteredDocuments = useMemo(() => {
@@ -38,8 +42,8 @@ const TableDocuments = () => {
         }
 
         const searchTerm = filter.toLowerCase().trim();
-        
-        return allDocuments.filter((doc) => 
+
+        return allDocuments.filter((doc) =>
             doc.name.toLowerCase().includes(searchTerm) ||
             doc.type.toLowerCase().includes(searchTerm) ||
             formatDate(doc.createdAt).toLowerCase().includes(searchTerm) ||
@@ -56,29 +60,35 @@ const TableDocuments = () => {
         setAnchorEl(null);
     };
 
+    const toggleConfirm = (document: DocumentObj) => {
+        alterMsgConfirm(`mover o documento ${document.name} para a Lixeira?`);
+        alterConfirm(!openConfirm);
+    }
+
     return (
         <TableContainer>
             <Table sx={{ minWidth: 650 }} aria-label="tabela de Documentos">
                 <TableHead>
                     <TableRow sx={{ backgroundColor: theme.palette.background.default }}>
-                        <TableCell sx={{textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem'}}>Documento</TableCell>
-                        <TableCell sx={{textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem'}}>Tipo</TableCell>
-                        <TableCell sx={{textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem'}}>
+                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Documento</TableCell>
+                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Tipo</TableCell>
+                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>
                             <TableSortLabel>Data de Criação</TableSortLabel>
                         </TableCell>
-                        <TableCell sx={{textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem'}}>
+                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>
                             <TableSortLabel>Última Alteração</TableSortLabel>
                         </TableCell>
-                        <TableCell sx={{textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem'}}>Versão</TableCell>
-                        <TableCell sx={{textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem'}}>Ações</TableCell>
+                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Organização</TableCell>
+                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Versão</TableCell>
+                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Ações</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {filteredDocuments.length === 0 ? (
                         <TableRow>
-                            <TableCell colSpan={6} align="center" sx={{ 
+                            <TableCell colSpan={6} align="center" sx={{
                                 backgroundColor: theme.palette.background.default,
-                                py: 4 
+                                py: 4
                             }}>
                                 <Typography variant="h6" color={theme.palette.text.primary}>
                                     {filter ? 'Nenhum documento encontrado para o filtro informado' : 'Nenhum documento disponível'}
@@ -101,6 +111,9 @@ const TableDocuments = () => {
                                     {formatDate(Doc.updatedAt)}
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
+                                    {Doc.organization.title}
+                                </TableCell>
+                                <TableCell sx={{ background: theme.palette.background.default }}>
                                     <Box
                                         sx={{
                                             backgroundColor: theme.palette.background.paper,
@@ -114,9 +127,6 @@ const TableDocuments = () => {
                                     </Box>
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                    <IconButton aria-label="delete">
-                                        <Delete color="error" />
-                                    </IconButton>
                                     <IconButton
                                         aria-label="more"
                                         onClick={(event) => {
@@ -134,6 +144,7 @@ const TableDocuments = () => {
                                         <MenuItem onClick={() => { setAnchorEl(null); }}>Alterar</MenuItem>
                                         <MenuItem onClick={() => { setAnchorEl(null); }}>Versões</MenuItem>
                                         <MenuItem onClick={handleEstatisticasClick}>Estatísticas</MenuItem>
+                                        <MenuItem onClick={() => toggleConfirm(Doc)}>Excluir</MenuItem>
                                     </Menu>
                                 </TableCell>
                             </TableRow>
@@ -141,6 +152,10 @@ const TableDocuments = () => {
                     )}
                 </TableBody>
             </Table>
+            {openConfirm && (
+                <MsgConfirm />
+            )
+            }
         </TableContainer>
     );
 };
