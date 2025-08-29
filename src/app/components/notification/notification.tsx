@@ -75,8 +75,10 @@ const Notification: React.FC = () => {
                                             fontSize: '1.5rem',
                                             color: theme.palette.text.secondary,
                                             cursor: 'pointer',
+                                            borderRadius: '50%',
                                             '&:hover': {
-                                                color: theme.palette.success.main,
+                                                backgroundColor: theme.palette.success.light,
+                                                color: theme.palette.success.dark,
                                             }
                                         }}
                                     />
@@ -85,7 +87,9 @@ const Notification: React.FC = () => {
                                             fontSize: '1.5rem',
                                             color: theme.palette.text.secondary,
                                             cursor: 'pointer',
+                                            borderRadius: '50%',
                                             '&:hover': {
+                                                backgroundColor: theme.palette.error.light,
                                                 color: theme.palette.error.main,
                                             }
                                         }}

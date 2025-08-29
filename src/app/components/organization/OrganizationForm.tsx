@@ -7,7 +7,7 @@ import CustomTextField from '../CustomTextField';
 import CustomComboBox from '../CustomComboBox';
 import CustomButton from '../CustomButton';
 import CustomTypography from '../CustomTypography';
-import { organizationsTypeOptions, userTypeOptions } from '../../services/ConstantsTypes';
+import { organizationsTypeOptionsNoAll, userTypeOptions } from '../../services/ConstantsTypes';
 import { getUsersOrganization } from '@/app/services/User/getUsersOrganization';
 import { useOrganizationStateStore } from '@/app/state/organizationState';
 
@@ -50,31 +50,33 @@ const OrganizationForm: React.FC = () => {
                     flexDirection: 'column',
                     backgroundColor: theme.palette.background.default,
                     width: '1200px',
-                    height: '750px',
+                    height: '700px',
                     borderRadius: '4px',
                     boxShadow: theme.shadows[3],
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    p: 4
+                    p: 3
                 }}
             >
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
                     <CustomTypography
-                        text="Organizações"
+                        text={organization?.title == '' ? "Criar Organização" : "Editar Organização"}
                         component="h2"
                         variant="h6"
                         sx={{
                             color: theme.palette.text.primary,
-                            mb: 2,
-                            mt: 1,
-                            fontWeight: 'bold'
+                            mb: 1,
+                            padding: 1,
+                            fontWeight: 'bold',
+                            width: '100%',
+                            borderBottom: `1px solid ${theme.palette.text.primary}`,
                         }}
                     />
                 </Box>
                 <Box>
                     <Box
-                        sx={{ width: '100%', display: 'flex', gap: 4 }}>
+                        sx={{ width: '100%', display: 'flex', gap: 4, marginTop: 1 }}>
                         <CustomTextField
                             name="Name"
                             label="Nome"
@@ -95,19 +97,16 @@ const OrganizationForm: React.FC = () => {
                             hoverColor="info"
                             marginBottom={2}
                         />
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'end' }}>
-                        <CustomButton
-                            text="Procurar"
-                            type="button"
-                            colorType="primary"
-                            hoverColorType="primary"
-                            fullWidth={false}
-                            paddingY={1}
-                            paddingX={3.0}
-                            marginBottom={0}
-                            marginTop={0}
-                        />
+                        <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+                            <CustomButton
+                                text="Buscar"
+                                type="button"
+                                colorType="primary"
+                                hoverColorType="primary"
+                                fullWidth={false}
+                                sx={{ width: '120px', height: '56px', marginTop: '16px' }}
+                            />
+                        </Box>
                     </Box>
                     <Box sx={{ width: '100%', display: 'flex', gap: 4 }}>
                         <CustomComboBox
@@ -115,7 +114,7 @@ const OrganizationForm: React.FC = () => {
                             label="Tipo"
                             value={selectedOrganizationType}
                             onChange={(value) => handleChangeOrganizationType(value)}
-                            options={organizationsTypeOptions}
+                            options={organizationsTypeOptionsNoAll}
                             focusedColor="primary"
                             hoverColor="info"
                             marginBottom={2}
@@ -131,35 +130,35 @@ const OrganizationForm: React.FC = () => {
                             hoverColor="info"
                             marginBottom={2}
                         />
-                    </Box>
-                    <Box sx={{ display: 'flex', justifyContent: 'end' }}>
-                        <CustomButton
-                            text="Adicionar"
-                            type="button"
-                            colorType="primary"
-                            hoverColorType="primary"
-                            fullWidth={false}
-                            paddingY={1}
-                            paddingX={3.0}
-                            marginBottom={2}
-                            marginTop={0}
-                        />
+                        <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+                            <CustomButton
+                                text="Adicionar"
+                                type="button"
+                                colorType="primary"
+                                hoverColorType="primary"
+                                fullWidth={false}
+                                sx={{ width: '120px', height: '56px', marginTop: '16px' }}
+                            />
+                        </Box>
                     </Box>
                     <Box
-                        sx={{ width: '100%', display: 'flex', gap: 4 }}>
-                        <Box sx={{ width: '50%' }}>
+                        sx={{ width: '100%', display: 'flex', gap: 4, marginTop: 2 }}>
+                        <Box sx={{
+                            width: { xs: '100%', lg: '50%' }
+                        }}>
                             <CustomTextField
                                 name="Description"
-                                label="Descrição"
+                                label='Descrição'
+                                placeholder="Descreva a finalidade desta organização..."
                                 type="text"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                                 focusedColor="primary"
                                 hoverColor="info"
+                                fullWidth
                                 marginTop={0}
-                                marginBottom={2}
                                 multiline={true}
-                                maxRows={12}
+                                rows={12}
                             />
                         </Box>
                         <Box
@@ -213,7 +212,7 @@ const OrganizationForm: React.FC = () => {
                                             py: 1,
                                         }}
                                     >
-                                        <Box sx={{ display: 'flex',width: '70%', justifyContent: 'space-between' ,gap: 1 }}>
+                                        <Box sx={{ display: 'flex', width: '70%', justifyContent: 'space-between', gap: 1 }}>
                                             <CustomTypography
                                                 text={user.username}
                                                 variant="body1"
@@ -229,10 +228,12 @@ const OrganizationForm: React.FC = () => {
                                             sx={{
                                                 fontSize: '1.5rem',
                                                 color: theme.palette.text.secondary,
+                                                borderRadius: '50%',
                                                 cursor: 'pointer',
                                                 '&:hover': {
+                                                    backgroundColor: theme.palette.error.light,
                                                     color: theme.palette.error.main,
-                                                },
+                                                }
                                             }}
                                         />
                                     </Box>
@@ -242,17 +243,6 @@ const OrganizationForm: React.FC = () => {
                         </Box>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'end', gap: 4 }}>
-                        <CustomButton
-                            text="Excluir"
-                            type="button"
-                            colorType="error"
-                            hoverColorType="error"
-                            fullWidth={false}
-                            paddingY={1}
-                            paddingX={3.0}
-                            marginBottom={2}
-                            marginTop={2}
-                        />
                         <CustomButton
                             text="Salvar"
                             type="button"

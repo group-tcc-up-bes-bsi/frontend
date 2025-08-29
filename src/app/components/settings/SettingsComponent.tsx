@@ -22,7 +22,7 @@ const SettingsComponent: React.FC = () => {
     const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
 
     const toggleConfirm = () => {
-        alterMsgConfirm('Excluir a Conta?')
+        alterMsgConfirm('excluir a Conta?')
         alterConfirm(!openConfirm);
     }
 

@@ -13,6 +13,8 @@ import { getOrganizationsByUser } from '@/app/services/Organizations/Organizatio
 import { useFilterStore } from '@/app/state/filterState';
 import { OrganizationObj } from '@/app/models/OrganizationObj';
 import { useOrganizationStateStore } from '@/app/state/organizationState';
+import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
+import MsgConfirm from '../notification/msgConfirm';
 
 const Organization: React.FC = () => {
     const { theme } = useTheme();
@@ -23,6 +25,9 @@ const Organization: React.FC = () => {
     const alterOrganizationForm = useOrganizationFormStore((state) => state.alter);
     const [selectedOrganization, setSelectedOrganization] = useState<OrganizationObj | null>(null);
     const alterOrganization = useOrganizationStateStore((state) => state.alter);
+    const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
+    const alterConfirm = useMsgConfirmStore((state) => state.alter);
+    const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
 
     const handleChangeOrganizationType = (value: string) => {
         setSelectedOrganizationType(value);
@@ -72,6 +77,11 @@ const Organization: React.FC = () => {
         };
         alterOrganization(orgNull);
         toggleOrganizationForm();
+    }
+
+    const toggleConfirm = (organization: OrganizationObj) => {
+        alterMsgConfirm(`excluir a organização ${organization.title}?`);
+        alterConfirm(!openConfirm);
     }
 
     return (
@@ -199,7 +209,7 @@ const Organization: React.FC = () => {
                                     onClose={() => setAnchorEl(null)}
                                 >
                                     <MenuItem onClick={handleOrganizationAlter}>Alterar</MenuItem>
-                                    <MenuItem onClick={() => { setAnchorEl(null); }}>Excluir</MenuItem>
+                                    <MenuItem onClick={() => toggleConfirm(org)}>Excluir</MenuItem>
                                 </Menu>
                             </Box>
                         </Box>
@@ -209,6 +219,9 @@ const Organization: React.FC = () => {
                     <OrganizationForm />
                 )
                 }
+                {openConfirm && (
+                    <MsgConfirm />
+                )}
             </Box>
         </Box >
     );

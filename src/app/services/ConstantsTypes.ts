@@ -1,21 +1,30 @@
 export enum organizationsType {
-  ALL = 'Todos',
-  INDIVIDUAL = 'Individual',
-  COLLABORATIVE = 'Colaborativo',
-};
+  ALL = "Todos",
+  INDIVIDUAL = "Individual",
+  COLLABORATIVE = "Colaborativo",
+}
 
 export enum userType {
-  OWNER = 'Proprietário',
-  READ = 'Editor',
-  VIEWER = 'Visualizador',
-};
+  OWNER = "Proprietário",
+  READ = "Editor",
+  VIEWER = "Visualizador",
+}
 
-export const organizationsTypeOptions = Object.entries(organizationsType).map(([key, value]) => ({
-  value: key,
-  label: value
-}));
+export const organizationsTypeOptions = Object.entries(organizationsType).map(
+  ([key, value]) => ({
+    value: key,
+    label: value,
+  })
+);
+
+export const organizationsTypeOptionsNoAll = Object.entries(organizationsType)
+  .filter(([key]) => key !== "ALL")
+  .map(([key, value]) => ({
+    value: key,
+    label: value,
+  }));
 
 export const userTypeOptions = Object.entries(userType).map(([key, value]) => ({
   value: key,
-  label: value
+  label: value,
 }));

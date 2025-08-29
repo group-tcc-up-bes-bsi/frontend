@@ -42,7 +42,12 @@ const Trash: React.FC = () => {
     }, [documents, filter]);
 
     const toggleConfirm = (document: DocumentObj) => {
-        alterMsgConfirm(`Excluir permanentemente documento ${document.name}?`);
+        alterMsgConfirm(`excluir permanentemente documento ${document.name}?`);
+        alterConfirm(!openConfirm);
+    }
+
+    const toggleConfirmEmpty = () => {
+        alterMsgConfirm(`esvaziar a lixeira?`);
         alterConfirm(!openConfirm);
     }
 
@@ -66,6 +71,7 @@ const Trash: React.FC = () => {
                             fullWidth={false}
                             text="Esvaziar Lixeira"
                             type="button"
+                            onClick={toggleConfirmEmpty}
                             colorType="primary"
                             hoverColorType="primary"
                             paddingY={2}
