@@ -107,7 +107,7 @@ const HomeComponent: React.FC = () => {
                 >
                     {organizations.map((org) => (
                         <Box
-                            key={org.id}
+                            key={org.organizationId}
                             sx={{
                                 mb: 0,
                                 p: 1,
@@ -118,7 +118,7 @@ const HomeComponent: React.FC = () => {
                                 <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'center' }}>
                                     {org.icon}
                                     <CustomTypography
-                                        text={org.title}
+                                        text={org.organizationName}
                                         component="h2"
                                         variant="h6"
                                         sx={{

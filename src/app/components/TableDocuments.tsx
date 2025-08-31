@@ -44,10 +44,10 @@ const TableDocuments = () => {
         const searchTerm = filter.toLowerCase().trim();
 
         return allDocuments.filter((doc) =>
-            doc.name.toLowerCase().includes(searchTerm) ||
-            doc.type.toLowerCase().includes(searchTerm) ||
-            formatDate(doc.createdAt).toLowerCase().includes(searchTerm) ||
-            formatDate(doc.updatedAt).toLowerCase().includes(searchTerm) ||
+            doc.documentName.toLowerCase().includes(searchTerm) ||
+            doc.documentType.toLowerCase().includes(searchTerm) ||
+            formatDate(doc.documentCreationDate).toLowerCase().includes(searchTerm) ||
+            formatDate(doc.documentLastModifiedDate).toLowerCase().includes(searchTerm) ||
             doc.version.toLowerCase().includes(searchTerm)
         );
     }, [allDocuments, filter]);
@@ -61,7 +61,7 @@ const TableDocuments = () => {
     };
 
     const toggleConfirm = (document: DocumentObj) => {
-        alterMsgConfirm(`mover o documento ${document.name} para a Lixeira?`);
+        alterMsgConfirm(`mover o documento ${document.documentName} para a Lixeira?`);
         alterConfirm(!openConfirm);
     }
 
@@ -97,21 +97,21 @@ const TableDocuments = () => {
                         </TableRow>
                     ) : (
                         filteredDocuments.map((Doc) => (
-                            <TableRow key={Doc.id}>
+                            <TableRow key={Doc.documentId}>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {Doc.name}
+                                    {Doc.documentName}
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {Doc.type}
+                                    {Doc.documentType}
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {formatDate(Doc.createdAt)}
+                                    {formatDate(Doc.documentCreationDate)}
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {formatDate(Doc.updatedAt)}
+                                    {formatDate(Doc.documentLastModifiedDate)}
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {Doc.organization.title}
+                                    {Doc.organization.organizationName}
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
                                     <Box
@@ -138,7 +138,7 @@ const TableDocuments = () => {
                                     </IconButton>
                                     <Menu
                                         anchorEl={anchorEl}
-                                        open={Boolean(anchorEl) && selectedDoc?.id === Doc.id}
+                                        open={Boolean(anchorEl) && selectedDoc?.documentId === Doc.documentId}
                                         onClose={() => setAnchorEl(null)}
                                     >
                                         <MenuItem onClick={() => { setAnchorEl(null); }}>Alterar</MenuItem>

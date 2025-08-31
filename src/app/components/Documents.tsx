@@ -37,9 +37,9 @@ const Documents: React.FC = () => {
     const searchTerm = filter.toLowerCase().trim();
 
     return allDocuments.filter((doc) =>
-      doc.name.toLowerCase().includes(searchTerm) ||
-      doc.type.toLowerCase().includes(searchTerm) ||
-      formatDate(doc.updatedAt).toLowerCase().includes(searchTerm) ||
+      doc.documentName.toLowerCase().includes(searchTerm) ||
+      doc.documentType.toLowerCase().includes(searchTerm) ||
+      formatDate(doc.documentCreationDate).toLowerCase().includes(searchTerm) ||
       doc.version.toLowerCase().includes(searchTerm)
     );
   }, [allDocuments, filter]);
@@ -53,7 +53,7 @@ const Documents: React.FC = () => {
   };
 
   const toggleConfirm = (document: DocumentObj) => {
-    alterMsgConfirm(`mover o documento ${document.name} para a Lixeira?`);
+    alterMsgConfirm(`mover o documento ${document.documentName} para a Lixeira?`);
     alterConfirm(!openConfirm);
   }
 
@@ -77,7 +77,7 @@ const Documents: React.FC = () => {
       />
     ) : filteredDocuments.map((doc) => (
       <Box
-        key={doc.id}
+        key={doc.documentId}
         width={240}
         borderRadius={2}
         p={2}
@@ -87,15 +87,15 @@ const Documents: React.FC = () => {
         }}
       >
         <Box fontWeight="bold" fontSize="0.9rem">
-          {doc.name}
+          {doc.documentName}
         </Box>
         <Box fontWeight="bold" fontSize="0.9rem" mb={1}>
-          Organização: {doc.organization.title}
+          Organização: {doc.organization.organizationName}
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', }}>
             <Box fontSize="0.8rem" mt={1} sx={{ color: theme.palette.text.primary }}>
-              Tipo: {doc.type}
+              Tipo: {doc.documentType}
             </Box>
             <Box fontSize="0.8rem" mb={1} sx={{ color: theme.palette.text.primary }}>
               Versão: {doc.version}
@@ -113,7 +113,7 @@ const Documents: React.FC = () => {
             </IconButton>
             <Menu
               anchorEl={anchorEl}
-              open={Boolean(anchorEl) && selectedDoc?.id === doc.id}
+              open={Boolean(anchorEl) && selectedDoc?.documentId === doc.documentId}
               onClose={() => setAnchorEl(null)}
             >
               <MenuItem onClick={() => { setAnchorEl(null); }}>Alterar</MenuItem>
@@ -137,7 +137,7 @@ const Documents: React.FC = () => {
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Box fontSize="0.75rem" mt={1} sx={{ color: theme.palette.text.primary }}>
-            Alterado em {formatDate(doc.updatedAt)}
+            Alterado em {formatDate(doc.documentCreationDate)}
           </Box>
         </Box>
       </Box>
