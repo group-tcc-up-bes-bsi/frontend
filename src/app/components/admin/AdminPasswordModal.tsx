@@ -26,7 +26,7 @@ const AdminPasswordModal: React.FC = () => {
                 setMessage(result.message);
 
                 await new Promise(resolve => setTimeout(resolve, 1000));
-                if (message.severity === 'success') {
+                if (result.message.severity === 'success') {
                     handleClose();
                 }
             }

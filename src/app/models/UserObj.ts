@@ -1,6 +1,6 @@
 import { userType } from "../services/ConstantsTypes";
 
-export interface userOrganization {
+export interface UserOrganization {
     userId: number;
     username: string;
     type: userType;

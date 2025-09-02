@@ -73,7 +73,7 @@ const Organization: React.FC = () => {
             organizationName: '',
             organizationDescription: '',
             favorite: false,
-            organizationType: organizationType.COLLABORATIVE,
+            organizationType: undefined,
             borderColor: undefined,
             icon: undefined
         };
@@ -183,7 +183,7 @@ const Organization: React.FC = () => {
                                     />
                                 </Box>
                                 <CustomTypography
-                                    text={org.organizationType}
+                                    text={org.organizationType || ''}
                                     component="p"
                                     variant="h6"
                                     sx={{ color: theme.palette.text.secondary, display: 'block' }}

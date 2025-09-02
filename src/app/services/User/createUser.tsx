@@ -24,8 +24,8 @@ export async function createUser(UserName: string, Password: string) {
                 return {
                     message: new MessageObj(
                         'error',
-                        getErrorTitle(responseData.statusCode),
                         'Usuário ja cadastrado',
+                        'Ja existe um usuário com esse nome',
                         'error')
                 }
             }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { Box, Backdrop } from '@mui/material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
@@ -7,9 +7,13 @@ import CustomTextField from '../CustomTextField';
 import CustomComboBox from '../CustomComboBox';
 import CustomButton from '../CustomButton';
 import CustomTypography from '../CustomTypography';
-import { organizationsTypeOptionsNoAll, userTypeOptions } from '../../services/ConstantsTypes';
+import { organizationsTypeOptionsNoAll, userType, userTypeOptionsNoOwner } from '../../services/ConstantsTypes';
 import { getUsersOrganization } from '@/app/services/User/getUsersOrganization';
 import { useOrganizationStateStore } from '@/app/state/organizationState';
+import { getByUserName } from '@/app/services/User/getByUserName';
+import { MessageObj } from '@/app/models/MessageObj';
+import CustomAlert from '../CustomAlert';
+import { UserOrganization } from '@/app/models/UserObj';
 
 const OrganizationForm: React.FC = () => {
     const { theme } = useTheme();
@@ -20,6 +24,19 @@ const OrganizationForm: React.FC = () => {
     const [name, setName] = useState(organization?.organizationName || '');
     const [username, setUsername] = useState('');
     const [description, setDescription] = useState(organization?.organizationDescription || '');
+    const [message, setMessage] = useState<MessageObj>(
+        new MessageObj()
+    );
+    const [showMessage, setShowMessage] = useState(false);
+    const [user, setUser] = useState<UserOrganization | null>(null);
+    const [users, setUsers] = useState<UserOrganization[]>([]);
+
+    useEffect(() => {
+        if (message) {
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 5000);
+        }
+    }, [message]);
 
     const handleChangeOrganizationType = (value: string) => {
         setSelectedOrganizationType(value);
@@ -29,7 +46,118 @@ const OrganizationForm: React.FC = () => {
         setSelectedUserType(value);
     };
 
-    const users = getUsersOrganization();
+    useEffect(() => {
+        let value = '';
+        if (organization?.organizationType == 'Colaborativo') {
+            value = 'COLLABORATIVE';
+            handleChangeOrganizationType(value);
+        } else if (organization?.organizationType == 'Individual') {
+            value = 'INDIVIDUAL';
+            handleChangeOrganizationType(value);
+        }
+        if (organization?.organizationId !== 0) {
+            setUsers(getUsersOrganization());
+        }
+    }, [organization]);
+
+    const handleFindUser = async () => {
+        try {
+            const result = await getByUserName(username);
+            setMessage(result.message);
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (result.message.severity === 'success') {
+                setUser(result.user);
+            }
+        } catch (error) {
+            setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
+        }
+    }
+
+    const addUser = () => {
+        let selectedOption = '';
+        if (selectedUserType === 'COLLABORATIVE') {
+            selectedOption = 'Colaborativo';
+        } else if (selectedUserType === 'INDIVIDUAL') {
+            selectedOption = 'Individual';
+        }
+
+        if (user) {
+            if (selectedOption !== '') {
+                const exists = users.some(u => u.username === user.username);
+
+                if (exists) {
+                    setMessage(new MessageObj(
+                        'warning',
+                        'Usuário já adicionado',
+                        `O usuário "${user.username}" já está na lista.`,
+                        'warning'
+                    ));
+                    return;
+                }
+
+                const newUser: UserOrganization = {
+                    userId: user.userId,
+                    username: user.username,
+                    type: selectedOption as userType,
+                    organizationId: organization?.organizationId || 0,
+                };
+
+                setUsers([...users, newUser]);
+                setUser(null);
+                setUsername('');
+                setSelectedUserType('');
+            } else {
+                setMessage(new MessageObj(
+                    'error',
+                    'Tipo de usuário não selecionado',
+                    'Selecione um tipo de usuário para adicionar.',
+                    'error'
+                ));
+            }
+        } else {
+            setMessage(new MessageObj(
+                'error',
+                'Usuário não encontrado',
+                'Primeiro realize a busca pelo nome do usuário.',
+                'error'
+            ));
+        }
+    };
+
+    const removeUser = (userId: number) => {
+        setUsers(users.filter(u => u.userId !== userId));
+    };
+
+    const handleSave = () => {
+        if (name.trim() === '') {
+            setMessage(new MessageObj(
+                'error',
+                'Nome obrigatório',
+                'Por favor, preencha o nome da organização.',
+                'error'
+            ));
+            return;
+        }
+        if (description.trim() === '') {
+            setMessage(new MessageObj(
+                'error',
+                'Descrição obrigatória',
+                'Por favor, preencha a descrição da organização.',
+                'error'
+            ));
+            return;
+        }
+        if (selectedOrganizationType === '') {
+            setMessage(new MessageObj(
+                'error',
+                'Tipo obrigatório',
+                'Por favor, selecione o tipo da organização.',
+                'error'
+            ));
+            return;
+        }
+    }
 
     return (
         <Box>
@@ -102,6 +230,7 @@ const OrganizationForm: React.FC = () => {
                                 text="Buscar"
                                 type="button"
                                 colorType="primary"
+                                onClick={handleFindUser}
                                 hoverColorType="primary"
                                 fullWidth={false}
                                 sx={{ width: '120px', height: '56px', marginTop: '16px' }}
@@ -125,7 +254,7 @@ const OrganizationForm: React.FC = () => {
                             label="Permissões"
                             value={selectedUserType}
                             onChange={(value) => handleChangeUserType(value)}
-                            options={userTypeOptions}
+                            options={userTypeOptionsNoOwner}
                             focusedColor="primary"
                             hoverColor="info"
                             marginBottom={2}
@@ -135,6 +264,7 @@ const OrganizationForm: React.FC = () => {
                                 text="Adicionar"
                                 type="button"
                                 colorType="primary"
+                                onClick={addUser}
                                 hoverColorType="primary"
                                 fullWidth={false}
                                 sx={{ width: '120px', height: '56px', marginTop: '16px' }}
@@ -224,18 +354,20 @@ const OrganizationForm: React.FC = () => {
                                                 sx={{ color: theme.palette.text.secondary }}
                                             />
                                         </Box>
-                                        <Close
-                                            sx={{
-                                                fontSize: '1.5rem',
-                                                color: theme.palette.text.secondary,
-                                                borderRadius: '50%',
-                                                cursor: 'pointer',
-                                                '&:hover': {
-                                                    backgroundColor: theme.palette.error.light,
-                                                    color: theme.palette.error.main,
-                                                }
-                                            }}
-                                        />
+                                        {user.type !== "Proprietário" && (
+                                            <Close
+                                                onClick={() => removeUser(user.userId)}
+                                                sx={{
+                                                    fontSize: '1.5rem',
+                                                    color: theme.palette.text.secondary,
+                                                    borderRadius: '50%',
+                                                    cursor: 'pointer',
+                                                    '&:hover': {
+                                                        backgroundColor: theme.palette.error.light,
+                                                        color: theme.palette.error.main,
+                                                    }
+                                                }}
+                                            />)}
                                     </Box>
                                 ))}
                             </Box>
@@ -247,6 +379,7 @@ const OrganizationForm: React.FC = () => {
                             text="Salvar"
                             type="button"
                             colorType="primary"
+                            onClick={handleSave}
                             hoverColorType="primary"
                             fullWidth={false}
                             paddingY={1}
@@ -256,6 +389,27 @@ const OrganizationForm: React.FC = () => {
                         />
                     </Box>
                 </Box>
+                {showMessage && message && (
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            bottom: '0%',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            gap: 2,
+                            textAlign: 'left',
+                        }}>
+                        <CustomAlert
+                            severity={message.severity}
+                            colorType={message.colorType}
+                            title={message.title}
+                            description={message.description}
+                        />
+                    </Box>
+                )}
             </Box>
         </Box>
     );

@@ -5,7 +5,7 @@ export interface OrganizationObj {
   organizationName: string;
   organizationDescription: string;
   favorite: boolean;
-  organizationType: organizationType;
+  organizationType?: organizationType;
   borderColor?: string;
   icon?: React.ReactNode;
 }
