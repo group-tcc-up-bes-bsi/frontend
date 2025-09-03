@@ -6,10 +6,12 @@ import Typography from "@mui/material/Typography";
 import { useDocumentStateStore } from "../state/documentState";
 import { Close } from '@mui/icons-material';
 import { useOptionsDashboardStore } from "../state/optionsDashboard";
-import CustomButton from "./CustomButton";
-import MonthsSelector from "./MonthsSelector";
+import CustomButton from "./customButton";
+import MonthsSelector from "./monthsSelector";
+import { useAuth } from "./useAuth";
 
 const StatsDocument: React.FC = () => {
+  useAuth();
   const theme = useTheme();
   const document = useDocumentStateStore((state) => state.document);
   const lastOption = useOptionsDashboardStore((state) => state.lastOption);

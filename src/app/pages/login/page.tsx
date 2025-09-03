@@ -1,9 +1,9 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '../../theme/ThemeContext';
-import CustomButton from '../../components/CustomButton';
-import CustomLink from '../../components/CustomLink';
-import CustomTextField from '../../components/CustomTextField';
+import CustomButton from '../../components/customButton';
+import CustomLink from '../../components/customLink';
+import CustomTextField from '../../components/customTextField';
 import {
   Box,
   Container,
@@ -11,8 +11,8 @@ import {
   useMediaQuery,
   Theme,
 } from '@mui/material';
-import CustomTypography from '../../components/CustomTypography';
-import CustomAlert from '../../components/CustomAlert';
+import CustomTypography from '../../components/customTypography';
+import CustomAlert from '../../components/customAlert';
 import { authLoginUser } from '../../services/User/authLogin';
 import { MessageObj } from '@/app/models/MessageObj';
 
@@ -38,7 +38,10 @@ const Login: React.FC = () => {
       setMessage(new MessageObj('error', 'Erro', 'O usuário é obrigatório', 'error'));
       return;
     }
-
+    if (password.length < 4) {
+      setMessage(new MessageObj('error', 'Erro', 'A senha deve ter no mínimo 4 caracteres', 'error'));
+      return;
+    }
     if (!password.trim()) {
       setMessage(new MessageObj('error', 'Erro', 'A senha inválida', 'error'));
       return;

@@ -12,11 +12,13 @@ import { useOptionsDashboardStore } from '../state/optionsDashboard';
 import { DocumentObj } from '../models/DocumentObj';
 import { formatDate, getDocuments } from '../services/Documents/DocumentsServices';
 import { useFilterStore } from '../state/filterState';
-import CustomTypography from './CustomTypography';
+import CustomTypography from './customTypography';
 import { useMsgConfirmStore } from '../state/msgConfirmState';
 import MsgConfirm from './notification/msgConfirm';
+import { useAuth } from './useAuth';
 
 const Documents: React.FC = () => {
+  useAuth();
   const { theme } = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedDoc, setSelectedDoc] = useState<DocumentObj | null>(null);

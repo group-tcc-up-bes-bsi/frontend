@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { Box, Divider, } from '@mui/material';
-import CustomTypography from '../CustomTypography';
+import CustomTypography from '../customTypography';
 import Menu from '@mui/icons-material/Menu';
 import SpaceDashboard from '@mui/icons-material/SpaceDashboard';
-import TableDocuments from '../TableDocuments';
-import Documents from '../Documents';
-import CustomButton from '../CustomButton';
-import CustomTextField from '../CustomTextField';
+import TableDocuments from '../tableDocuments';
+import Documents from '../documents';
 import { useDocumentViewerStore } from '@/app/state/documentViewerState';
-import { useFilterStore } from '@/app/state/filterState';
+import { getOrganizationsByUser } from '@/app/services/Organizations/organizationsServices';
+import { useAuth } from '../useAuth';
 
-const DocumentsComponent: React.FC = () => {
+const HomeComponent: React.FC = () => {
+    useAuth();
     const { theme } = useTheme();
-    const { filter, setFilter } = useFilterStore();
     const modeViewer = useDocumentViewerStore((state) => state.mode);
     const alterModeViewer = useDocumentViewerStore((state) => state.alter);
     const [colorMode1, setColorMode1] = useState(theme.palette.button.primary);
@@ -35,34 +34,23 @@ const DocumentsComponent: React.FC = () => {
         toggleModeViewer(modeViewer)
     },);
 
-    const toggleDocumentForm = () => {
-
-    }
+    const organizations = getOrganizationsByUser(theme);
 
     return (
         <Box sx={{ maxWidth: '100%' }}>
             <Box sx={{ display: 'flex', gap: 4, alignItems: 'center', justifyContent: 'space-between' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <CustomButton
-                        text="+ Novo Documento"
-                        type="button"
-                        colorType="primary"
-                        hoverColorType="primary"
-                        onClick={toggleDocumentForm}
-                        paddingY={2}
-                        marginTop={0.5}
-                    />
-                </Box>
-                <Box
-                    sx={{ width: '75%' }}>
-                    <CustomTextField
-                        name="filter"
-                        label="Informe um detalhe do documento"
-                        type="text"
-                        value={filter}
-                        onChange={(e) => setFilter(e.target.value)}
-                        focusedColor="primary"
-                        hoverColor="info"
+                <Box>
+                    <CustomTypography
+                        text="Usuário: Gregory"
+                        component="h2"
+                        variant="h6"
+                        sx={{
+                            color: theme.palette.text.primary,
+                            fontWeight: 'bold',
+                            padding: 1,
+                            marginBottom: 1,
+                            background: theme.palette.background.default
+                        }}
                     />
                 </Box>
                 <Box sx={{
@@ -85,6 +73,70 @@ const DocumentsComponent: React.FC = () => {
                     <SpaceDashboard onClick={() => { toggleModeViewer(2) }} sx={{ color: colorMode2, fontSize: 32 }} />
                 </Box>
             </Box>
+            <Box sx={{ backgroundColor: theme.palette.background.default, padding: 1 }}>
+                <Box
+                    sx={{ width: '100%', display: 'flex', marginLeft: '1rem' }}
+                >
+                    <CustomTypography
+                        text="Organização Recentes"
+                        component="h2"
+                        variant="h6"
+                        sx={{
+                            color: theme.palette.text.primary,
+                            fontWeight: 'bold'
+                        }}
+                    />
+                </Box>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        gap: 3,
+                        maxHeight: 'calc(85vh - 150px)',
+                        overflowX: 'auto',
+                        pr: 2,
+                        '&::-webkit-scrollbar': {
+                            width: '2px',
+                            height: '6px',
+                        },
+                        '&::-webkit-scrollbar-track': {
+                            background: theme.palette.background.default,
+                        },
+                        '&::-webkit-scrollbar-thumb': {
+                            backgroundColor: theme.palette.primary.main,
+                            borderRadius: '6px',
+                        },
+                    }}
+                >
+                    {organizations.map((org) => (
+                        <Box
+                            key={org.organizationId}
+                            sx={{
+                                mb: 0,
+                                p: 1,
+                                display: 'flex',
+                            }}
+                        >
+                            <Box sx={{ display: 'flex', gap: 4, justifyContent: 'space-between', alignItems: 'center' }}>
+                                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'center' }}>
+                                    {org.icon}
+                                    <CustomTypography
+                                        text={org.organizationName}
+                                        component="h2"
+                                        variant="h6"
+                                        sx={{
+                                            color: theme.palette.text.primary,
+                                            fontWeight: 'bold',
+                                            mb: 0,
+                                            whiteSpace: 'nowrap',
+                                        }}
+                                    />
+
+                                </Box>
+                            </Box>
+                        </Box>
+                    ))}
+                </Box>
+            </Box>
             <Box sx={{
                 display: 'flex',
                 width: '100%',
@@ -93,7 +145,7 @@ const DocumentsComponent: React.FC = () => {
                 paddingLeft: 2
             }}>
                 <CustomTypography
-                    text="Documentos"
+                    text="Documentos Recentes"
                     component="h2"
                     variant="h5"
                     sx={{
@@ -148,4 +200,4 @@ const DocumentsComponent: React.FC = () => {
     );
 };
 
-export default DocumentsComponent;
+export default HomeComponent;

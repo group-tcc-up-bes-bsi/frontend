@@ -9,11 +9,13 @@ import {
     Radio,
     IconButton,
 } from '@mui/material';
-import CustomTypography from '../CustomTypography';
+import CustomTypography from '../customTypography';
 import { AccountCircleRounded, CachedRounded } from '@mui/icons-material';
-import CustomButton from '../CustomButton';
+import CustomButton from '../customButton';
+import { useAuth } from '../useAuth';
 
 const SettingsComponent: React.FC = () => {
+    useAuth();
     const { theme } = useTheme();
 
     return (

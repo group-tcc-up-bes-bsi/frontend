@@ -3,19 +3,23 @@ import { useTheme } from '@/app/theme/ThemeContext';
 import { Box, Backdrop } from '@mui/material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
 import { Close } from '@mui/icons-material';
-import CustomTextField from '../CustomTextField';
-import CustomComboBox from '../CustomComboBox';
-import CustomButton from '../CustomButton';
-import CustomTypography from '../CustomTypography';
+import CustomTextField from '../customTextField';
+import CustomComboBox from '../customComboBox';
+import CustomButton from '../customButton';
+import CustomTypography from '../customTypography';
 import { organizationsTypeOptionsNoAll, userType, userTypeOptionsNoOwner } from '../../services/ConstantsTypes';
-import { getUsersOrganization } from '@/app/services/User/getUsersOrganization';
+import { getUsersOrganization } from '@/app/services/User/GetUsersOrganization';
 import { useOrganizationStateStore } from '@/app/state/organizationState';
 import { getByUserName } from '@/app/services/User/getByUserName';
 import { MessageObj } from '@/app/models/MessageObj';
-import CustomAlert from '../CustomAlert';
+import CustomAlert from '../customAlert';
 import { UserOrganization } from '@/app/models/UserObj';
+import { useUserStore } from '@/app/state/userState';
+import { createOrganization } from '@/app/services/Organizations/createOrganization';
+import { useAuth } from '../useAuth';
 
 const OrganizationForm: React.FC = () => {
+    useAuth();
     const { theme } = useTheme();
     const organization = useOrganizationStateStore((state) => state.organization);
     const alterOrganizationForm = useOrganizationFormStore((state) => state.alter);
@@ -25,11 +29,13 @@ const OrganizationForm: React.FC = () => {
     const [username, setUsername] = useState('');
     const [description, setDescription] = useState(organization?.organizationDescription || '');
     const [message, setMessage] = useState<MessageObj>(
-        new MessageObj()
+        organization?.organizationId == 0 ? new MessageObj('info', 'Criação de Organização', 'Preencha os dados da Organização', 'info')
+            : new MessageObj('info', 'Edição de Organização', 'Preencha os dados da Organização', 'info')
     );
     const [showMessage, setShowMessage] = useState(false);
     const [user, setUser] = useState<UserOrganization | null>(null);
     const [users, setUsers] = useState<UserOrganization[]>([]);
+    const userCurrent = useUserStore((state) => state.userCurrent)
 
     useEffect(() => {
         if (message) {
@@ -57,6 +63,17 @@ const OrganizationForm: React.FC = () => {
         }
         if (organization?.organizationId !== 0) {
             setUsers(getUsersOrganization());
+        } else {
+            if (userCurrent != undefined) {
+                const newUser: UserOrganization = {
+                    userId: userCurrent.userId,
+                    username: userCurrent.username,
+                    type: userType.OWNER,
+                    organizationId: organization?.organizationId || 0,
+                };
+
+                setUsers([...users, newUser]);
+            }
         }
     }, [organization]);
 
@@ -129,7 +146,7 @@ const OrganizationForm: React.FC = () => {
         setUsers(users.filter(u => u.userId !== userId));
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (name.trim() === '') {
             setMessage(new MessageObj(
                 'error',
@@ -156,6 +173,23 @@ const OrganizationForm: React.FC = () => {
                 'error'
             ));
             return;
+        }
+        if (userCurrent != undefined) {
+            try {
+                const result = await createOrganization(name, description, selectedOrganizationType, userCurrent);
+                setMessage(result.message);
+                
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+            } catch (error) {
+                setMessage(new MessageObj(
+                    'error',
+                    'Erro inesperado',
+                    `${error}`,
+                    'error'
+                ));
+
+            }
         }
     }
 

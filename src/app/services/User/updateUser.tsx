@@ -2,8 +2,9 @@ import { MessageObj } from "@/app/models/MessageObj";
 import { getErrorTitle } from "../ErrorTitle";
 
 export async function updatePasswordUser(userId: number, UserName: string, Password: string, AdminPass: string) {
-    const url = `${process.env.NEXT_PUBLIC_BACKEND}/users/update-password/${userId}`;
+    const url = `${process.env.NEXT_PUBLIC_BACKEND}/users/update-password/`;
     const userData = {
+        userName: UserName,
         password: Password,
         adminPass: AdminPass
     };

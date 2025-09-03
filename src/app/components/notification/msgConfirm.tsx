@@ -2,10 +2,12 @@ import React from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { Box, Backdrop } from '@mui/material';
 import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
-import CustomButton from '../CustomButton';
-import CustomTypography from '../CustomTypography';
+import CustomButton from '../customButton';
+import CustomTypography from '../customTypography';
+import { useAuth } from '../useAuth';
 
 const MsgConfirm: React.FC = () => {
+    useAuth();
     const { theme } = useTheme();
     const alterMsgConfirm = useMsgConfirmStore((state) => state.alter);
     const msgConfirm = useMsgConfirmStore((state) => state.msgConfirm);

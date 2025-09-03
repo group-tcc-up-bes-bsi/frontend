@@ -1,27 +1,29 @@
 "use client"
-import React, { /*useEffect*/ } from 'react';
+import React from 'react';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box, Backdrop } from '@mui/material';
 import { Settings, Star, Folder, Groups, Home, Delete } from '@mui/icons-material';
 import { useTheme } from '@/app/theme/ThemeContext';
-import CustomTypography from '@/app/components/CustomTypography';
+import CustomTypography from '@/app/components/customTypography';
 import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import Notification from '@/app/components/notification/notification';
 import { useNotificationStore } from '@/app/state/notificationState';
-import Organization from '@/app/components/organization/Organization';
+import Organization from '@/app/components/organization/organization';
 import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
-import HomeComponent from '@/app/components/home/HomeComponent';
-import DocumentsComponent from '@/app/components/documents/DocumentsComponent';
-import Favorites from '@/app/components/favorites/Favorites';
-import Trash from '@/app/components/trash/Trash';
-import SettingsComponent from '@/app/components/settings/SettingsComponent';
-import StatsDocument from '@/app/components/StatsDocument';
+import HomeComponent from '@/app/components/home/homeComponent';
+import DocumentsComponent from '@/app/components/documents/documentsComponent';
+import Favorites from '@/app/components/favorites/favorites';
+import Trash from '@/app/components/trash/trash';
+import SettingsComponent from '@/app/components/settings/settingsComponent';
+import StatsDocument from '@/app/components/statsDocument';
 import { useFilterStore } from '@/app/state/filterState';
-//import { getAuthToken } from '@/app/services/User/GetAuthToken';
+import { logoutUser } from '@/app/services/User/logoutUser';
+import { useAuth } from '@/app/components/useAuth';
 
 const Dashboard = () => {
+    useAuth();
     const [open, setOpen] = React.useState(false);
     const { theme, toggleTheme, isDarkMode } = useTheme();
     const openNotification = useNotificationStore((state) => state.openNotification);
@@ -30,13 +32,6 @@ const Dashboard = () => {
     const alterOption = useOptionsDashboardStore((state) => state.alter);
     const [optionMenu, setOptionMenu] = React.useState('');
     const { setFilter } = useFilterStore();
-
-    /*useEffect(() => {
-        const token = getAuthToken();
-        if(token == 'Usuário não autenticado'){
-            logoutUser();
-        }
-    }, []);*/
 
     const toggleDrawer = () => {
         setOpen(!open);
@@ -88,11 +83,6 @@ const Dashboard = () => {
 
     const toggleNotification = () => {
         alterNotification(!openNotification);
-    }
-
-    const logoutUser = () => {
-        localStorage.removeItem('jwtToken');
-        window.location.href = "/";
     }
 
     return (

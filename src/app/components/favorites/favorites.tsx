@@ -5,14 +5,16 @@ import {
     TableHead, TableRow, Paper,
     IconButton
 } from '@mui/material';
-import CustomTypography from '../CustomTypography';
-import CustomTextField from '../CustomTextField';
+import CustomTypography from '../customTypography';
+import CustomTextField from '../customTextField';
 import { Star } from '@mui/icons-material';
-import { getOrganizationsByUser } from '@/app/services/Organizations/OrganizationsServices';
+import { getOrganizationsByUser } from '@/app/services/Organizations/organizationsServices';
 import { getDocuments } from '@/app/services/Documents/DocumentsServices';
 import { useFilterStore } from '@/app/state/filterState';
+import { useAuth } from '../useAuth';
 
 const Favorites: React.FC = () => {
+    useAuth();
     const { theme } = useTheme();
     const { filter, setFilter } = useFilterStore();
 

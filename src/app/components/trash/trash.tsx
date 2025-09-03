@@ -6,17 +6,19 @@ import {
     IconButton,
     TableSortLabel
 } from '@mui/material';
-import CustomTypography from '../CustomTypography';
-import CustomTextField from '../CustomTextField';
+import CustomTypography from '../customTypography';
+import CustomTextField from '../customTextField';
 import { CachedRounded, Delete } from '@mui/icons-material';
-import CustomButton from '../CustomButton';
+import CustomButton from '../customButton';
 import { DocumentObj } from '@/app/models/DocumentObj';
 import { formatDate, getDocumentsTrash } from '@/app/services/Documents/DocumentsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
 import MsgConfirm from '../notification/msgConfirm';
+import { useAuth } from '../useAuth';
 
 const Trash: React.FC = () => {
+    useAuth();
     const { theme } = useTheme();
     const { filter, setFilter } = useFilterStore();
     const openConfirm = useMsgConfirmStore((state) => state.openConfirm);

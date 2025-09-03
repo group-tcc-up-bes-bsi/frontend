@@ -1,22 +1,24 @@
 import React, { useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { Box, Divider, IconButton, Menu, MenuItem } from '@mui/material';
-import CustomTypography from '../CustomTypography';
-import CustomComboBox from '../CustomComboBox';
-import CustomTextField from '../CustomTextField';
-import CustomButton from '../CustomButton';
+import CustomTypography from '../customTypography';
+import CustomComboBox from '../customComboBox';
+import CustomTextField from '../customTextField';
+import CustomButton from '../customButton';
 import { MoreVert, Star } from '@mui/icons-material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
-import OrganizationForm from './OrganizationForm';
+import OrganizationForm from './organizationForm';
 import { organizationType, organizationsTypeOptions } from '../../services/ConstantsTypes';
-import { getOrganizationsByUser } from '@/app/services/Organizations/OrganizationsServices';
+import { getOrganizationsByUser } from '@/app/services/Organizations/organizationsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { OrganizationObj } from '@/app/models/OrganizationObj';
 import { useOrganizationStateStore } from '@/app/state/organizationState';
 import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
 import MsgConfirm from '../notification/msgConfirm';
+import { useAuth } from '../useAuth';
 
 const Organization: React.FC = () => {
+    useAuth();
     const { theme } = useTheme();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedOrganizationType, setSelectedOrganizationType] = useState('');

@@ -22,8 +22,10 @@ import { DocumentObj } from '../models/DocumentObj';
 import { useFilterStore } from '../state/filterState';
 import { useMsgConfirmStore } from '../state/msgConfirmState';
 import MsgConfirm from './notification/msgConfirm';
+import { useAuth } from './useAuth';
 
 const TableDocuments = () => {
+    useAuth();
     const { theme } = useTheme();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedDoc, setSelectedDoc] = useState<DocumentObj | null>(null);

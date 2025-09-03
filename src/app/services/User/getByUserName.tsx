@@ -2,14 +2,15 @@ import { MessageObj } from "@/app/models/MessageObj";
 import { getErrorTitle } from "../ErrorTitle";
 
 export async function getByUserName(userName: string) {
-    const url = `${process.env.NEXT_PUBLIC_BACKEND}/users/by-username/${userName}`;
+    const url = `${process.env.NEXT_PUBLIC_BACKEND}/users/by-username/`;
 
     try {
         const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify({ userName })
         });
 
         const responseData = await response.json().catch(() => null);

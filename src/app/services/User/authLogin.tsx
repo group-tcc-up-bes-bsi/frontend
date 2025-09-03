@@ -38,6 +38,16 @@ export async function authLoginUser(User: string, Password: string) {
                         'error')
                 }
             }
+            if (responseData.message == `User not found`) {
+                return {
+
+                    message: new MessageObj(
+                        'error',
+                        getErrorTitle(responseData.statusCode),
+                        'Usuário não encontrado',
+                        'error')
+                }
+            }
             return {
                 message: new MessageObj(
                     'error',
