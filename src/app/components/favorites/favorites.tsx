@@ -28,8 +28,8 @@ const Favorites: React.FC = () => {
         const searchTerm = filter.toLowerCase().trim();
 
         return documents.filter((doc) =>
-            doc.documentName.toLowerCase().includes(searchTerm) ||
-            doc.organization.organizationName.toLowerCase().includes(searchTerm)
+            doc.name.toLowerCase().includes(searchTerm) ||
+            doc.organization.name.toLowerCase().includes(searchTerm)
         );
     }, [documents, filter]);
 
@@ -42,7 +42,7 @@ const Favorites: React.FC = () => {
 
         const searchTerm = filter.toLowerCase().trim();
         return organizations.filter((org) =>
-            org.organizationName.toLowerCase().includes(searchTerm)
+            org.name.toLowerCase().includes(searchTerm)
         );
     }, [organizations, filter]);
 
@@ -127,8 +127,8 @@ const Favorites: React.FC = () => {
                                                         }} />
                                                     </IconButton>
                                                 </TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>{doc.documentName}</TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>{doc.organization.organizationName}</TableCell>
+                                                <TableCell sx={{ color: theme.palette.text.primary }}>{doc.name}</TableCell>
+                                                <TableCell sx={{ color: theme.palette.text.primary }}>{doc.organization.name}</TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -201,7 +201,7 @@ const Favorites: React.FC = () => {
                                                         }} />
                                                     </IconButton>
                                                 </TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>{org.organizationName}</TableCell>
+                                                <TableCell sx={{ color: theme.palette.text.primary }}>{org.name}</TableCell>
                                                 <TableCell sx={{ color: theme.palette.text.primary }}>10</TableCell>
                                             </TableRow>
                                         ))}

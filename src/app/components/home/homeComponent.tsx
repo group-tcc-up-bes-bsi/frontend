@@ -138,7 +138,7 @@ const HomeComponent: React.FC = () => {
                                 }}>
                                     {org.icon}
                                     <CustomTypography
-                                        text={org.organizationName}
+                                        text={org.name}
                                         component="h2"
                                         variant="h6"
                                         sx={{

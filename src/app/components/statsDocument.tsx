@@ -42,7 +42,7 @@ const StatsDocument: React.FC = () => {
     <Box sx={{ p: 3, background: theme.palette.background.default, height: '100%' }}>
       <Box sx={{ display: "flex", flexDirection: "row", justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h4" gutterBottom>
-          {document?.documentName}
+          {document?.name}
         </Typography>
 
 
@@ -71,7 +71,7 @@ const StatsDocument: React.FC = () => {
       </Box>
       <Box sx={{ display: "flex", flexDirection: "row", justifyContent: 'space-between', mt: 2 }}>
         <Typography variant="h6" gutterBottom>
-          {"Data criação: " + document?.documentCreationDate?.toLocaleDateString("pt-BR", {})}
+          {"Data criação: " + document?.creationDate?.toLocaleDateString("pt-BR", {})}
         </Typography>
         <Typography variant="h6" gutterBottom>
           {"Criado por " + document?.creator}

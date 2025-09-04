@@ -2,8 +2,8 @@ import { organizationType } from "../services/ConstantsTypes";
 
 export interface OrganizationObj {
   organizationId: number;
-  organizationName: string;
-  organizationDescription: string;
+  name: string;
+  description: string;
   favorite: boolean;
   organizationType?: organizationType;
   borderColor?: string;

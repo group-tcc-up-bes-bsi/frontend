@@ -56,8 +56,8 @@ const Organization: React.FC = () => {
 
         const searchTerm = filter.toLowerCase().trim();
         return filtered.filter((org) =>
-            org.organizationName.toLowerCase().includes(searchTerm) ||
-            org.organizationDescription.toLowerCase().includes(searchTerm)
+            org.name.toLowerCase().includes(searchTerm) ||
+            org.description.toLowerCase().includes(searchTerm)
         );
     }, [organizations, filter]);
 
@@ -72,8 +72,8 @@ const Organization: React.FC = () => {
     const handleOrganizationCreate = () => {
         const orgNull: OrganizationObj = {
             organizationId: 0,
-            organizationName: '',
-            organizationDescription: '',
+            name: '',
+            description: '',
             favorite: false,
             organizationType: undefined,
             borderColor: undefined,
@@ -84,7 +84,7 @@ const Organization: React.FC = () => {
     }
 
     const toggleConfirm = (organization: OrganizationObj) => {
-        alterMsgConfirm(`excluir a organização ${organization.organizationName}?`);
+        alterMsgConfirm(`excluir a organização ${organization.name}?`);
         alterConfirm(!openConfirm);
     }
 
@@ -175,7 +175,7 @@ const Organization: React.FC = () => {
                                 <Box sx={{ display: 'flex', gap: 4 }}>
                                     <Star sx={{ color: theme.palette.text.primary }} />
                                     <CustomTypography
-                                        text={org.organizationName}
+                                        text={org.name}
                                         component="h2"
                                         variant="h5"
                                         sx={{
@@ -193,7 +193,7 @@ const Organization: React.FC = () => {
                             </Box>
                             <Box sx={{ display: 'flex', gap: 4, justifyContent: 'space-between', alignItems: 'center' }}>
                                 <CustomTypography
-                                    text={org.organizationDescription}
+                                    text={org.description}
                                     component="p"
                                     variant="h6"
                                     sx={{ color: theme.palette.text.secondary, mb: 1 }}

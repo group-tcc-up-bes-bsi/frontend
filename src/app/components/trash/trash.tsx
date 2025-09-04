@@ -35,16 +35,16 @@ const Trash: React.FC = () => {
         const searchTerm = filter.toLowerCase().trim();
 
         return documents.filter((doc) =>
-            doc.documentName.toLowerCase().includes(searchTerm) ||
-            doc.documentType.toLowerCase().includes(searchTerm) ||
-            formatDate(doc.documentCreationDate).toLowerCase().includes(searchTerm) ||
-            formatDate(doc.documentLastModifiedDate).toLowerCase().includes(searchTerm) ||
+            doc.name.toLowerCase().includes(searchTerm) ||
+            doc.type.toLowerCase().includes(searchTerm) ||
+            formatDate(doc.creationDate).toLowerCase().includes(searchTerm) ||
+            formatDate(doc.lastModifiedDate).toLowerCase().includes(searchTerm) ||
             doc.version.toLowerCase().includes(searchTerm)
         );
     }, [documents, filter]);
 
     const toggleConfirm = (document: DocumentObj) => {
-        alterMsgConfirm(`excluir permanentemente documento ${document.documentName}?`);
+        alterMsgConfirm(`excluir permanentemente documento ${document.name}?`);
         alterConfirm(!openConfirm);
     }
 
@@ -134,11 +134,11 @@ const Trash: React.FC = () => {
                                     <TableBody>
                                         {filteredDocuments.map((doc) => (
                                             <TableRow key={doc.documentId}>
-                                                <TableCell sx={{ background: theme.palette.background.default }}>{doc.documentName}</TableCell>
-                                                <TableCell sx={{ background: theme.palette.background.default }}>{doc.documentType}</TableCell>
-                                                <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(doc.documentCreationDate)}</TableCell>
-                                                <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(doc.documentLastModifiedDate)}</TableCell>
-                                                <TableCell sx={{ background: theme.palette.background.default }}>{doc.organization.organizationName}</TableCell>
+                                                <TableCell sx={{ background: theme.palette.background.default }}>{doc.name}</TableCell>
+                                                <TableCell sx={{ background: theme.palette.background.default }}>{doc.type}</TableCell>
+                                                <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(doc.creationDate)}</TableCell>
+                                                <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(doc.lastModifiedDate)}</TableCell>
+                                                <TableCell sx={{ background: theme.palette.background.default }}>{doc.organization.name}</TableCell>
                                                 <TableCell sx={{ background: theme.palette.background.default }}>
                                                     <Box
                                                         sx={{

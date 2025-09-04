@@ -2,11 +2,11 @@ import { OrganizationObj } from "./OrganizationObj";
 
 export interface DocumentObj {
   documentId: number;
-  documentName: string;
-  documentType: string;
-  documentDescription: string;
-  documentCreationDate: Date;
-  documentLastModifiedDate: Date;
+  name: string;
+  type: string;
+  description: string;
+  creationDate: Date;
+  lastModifiedDate: Date;
   version: string;
   creator: string;
   imagemSrc: string;

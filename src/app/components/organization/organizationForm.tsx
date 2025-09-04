@@ -25,9 +25,9 @@ const OrganizationForm: React.FC = () => {
     const alterOrganizationForm = useOrganizationFormStore((state) => state.alter);
     const [selectedOrganizationType, setSelectedOrganizationType] = useState('');
     const [selectedUserType, setSelectedUserType] = useState('');
-    const [name, setName] = useState(organization?.organizationName || '');
+    const [name, setName] = useState(organization?.name || '');
     const [username, setUsername] = useState('');
-    const [description, setDescription] = useState(organization?.organizationDescription || '');
+    const [description, setDescription] = useState(organization?.description || '');
     const [message, setMessage] = useState<MessageObj>(
         organization?.organizationId == 0 ? new MessageObj('info', 'Criação de Organização', 'Preencha os dados da Organização', 'info')
             : new MessageObj('info', 'Edição de Organização', 'Preencha os dados da Organização', 'info')
@@ -223,7 +223,7 @@ const OrganizationForm: React.FC = () => {
             >
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
                     <CustomTypography
-                        text={organization?.organizationName == '' ? "Criar Organização" : "Editar Organização"}
+                        text={organization?.name == '' ? "Criar Organização" : "Editar Organização"}
                         component="h2"
                         variant="h6"
                         sx={{

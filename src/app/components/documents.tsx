@@ -39,9 +39,9 @@ const Documents: React.FC = () => {
     const searchTerm = filter.toLowerCase().trim();
 
     return allDocuments.filter((doc) =>
-      doc.documentName.toLowerCase().includes(searchTerm) ||
-      doc.documentType.toLowerCase().includes(searchTerm) ||
-      formatDate(doc.documentCreationDate).toLowerCase().includes(searchTerm) ||
+      doc.name.toLowerCase().includes(searchTerm) ||
+      doc.type.toLowerCase().includes(searchTerm) ||
+      formatDate(doc.creationDate).toLowerCase().includes(searchTerm) ||
       doc.version.toLowerCase().includes(searchTerm)
     );
   }, [allDocuments, filter]);
@@ -55,7 +55,7 @@ const Documents: React.FC = () => {
   };
 
   const toggleConfirm = (document: DocumentObj) => {
-    alterMsgConfirm(`mover o documento ${document.documentName} para a Lixeira?`);
+    alterMsgConfirm(`mover o documento ${document.name} para a Lixeira?`);
     alterConfirm(!openConfirm);
   }
 
@@ -89,15 +89,15 @@ const Documents: React.FC = () => {
         }}
       >
         <Box fontWeight="bold" fontSize="0.9rem">
-          {doc.documentName}
+          {doc.name}
         </Box>
         <Box fontWeight="bold" fontSize="0.9rem" mb={1}>
-          Organização: {doc.organization.organizationName}
+          Organização: {doc.organization.name}
         </Box>
         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
           <Box sx={{ display: 'flex', flexDirection: 'column', }}>
             <Box fontSize="0.8rem" mt={1} sx={{ color: theme.palette.text.primary }}>
-              Tipo: {doc.documentType}
+              Tipo: {doc.type}
             </Box>
             <Box fontSize="0.8rem" mb={1} sx={{ color: theme.palette.text.primary }}>
               Versão: {doc.version}
@@ -139,7 +139,7 @@ const Documents: React.FC = () => {
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Box fontSize="0.75rem" mt={1} sx={{ color: theme.palette.text.primary }}>
-            Alterado em {formatDate(doc.documentCreationDate)}
+            Alterado em {formatDate(doc.creationDate)}
           </Box>
         </Box>
       </Box>

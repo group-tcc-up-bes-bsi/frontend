@@ -4,7 +4,7 @@ import { UserObj } from "@/app/models/UserObj";
 import { getByUserName } from "../User/getByUserName";
 
 export async function createOrganization(Name: string, Description: string, OrganizationType: string, userCurrent: UserObj) {
-    const userExists = await getByUserName(userCurrent.username);
+    const userExists = await getByUserName(userCurrent.username, userCurrent);
     if (userExists.message.severity == 'error'){
         return {
             message: new MessageObj(

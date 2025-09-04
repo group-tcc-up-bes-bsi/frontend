@@ -46,10 +46,10 @@ const TableDocuments = () => {
         const searchTerm = filter.toLowerCase().trim();
 
         return allDocuments.filter((doc) =>
-            doc.documentName.toLowerCase().includes(searchTerm) ||
-            doc.documentType.toLowerCase().includes(searchTerm) ||
-            formatDate(doc.documentCreationDate).toLowerCase().includes(searchTerm) ||
-            formatDate(doc.documentLastModifiedDate).toLowerCase().includes(searchTerm) ||
+            doc.name.toLowerCase().includes(searchTerm) ||
+            doc.type.toLowerCase().includes(searchTerm) ||
+            formatDate(doc.creationDate).toLowerCase().includes(searchTerm) ||
+            formatDate(doc.lastModifiedDate).toLowerCase().includes(searchTerm) ||
             doc.version.toLowerCase().includes(searchTerm)
         );
     }, [allDocuments, filter]);
@@ -63,7 +63,7 @@ const TableDocuments = () => {
     };
 
     const toggleConfirm = (document: DocumentObj) => {
-        alterMsgConfirm(`mover o documento ${document.documentName} para a Lixeira?`);
+        alterMsgConfirm(`mover o documento ${document.name} para a Lixeira?`);
         alterConfirm(!openConfirm);
     }
 
@@ -101,19 +101,19 @@ const TableDocuments = () => {
                         filteredDocuments.map((Doc) => (
                             <TableRow key={Doc.documentId}>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {Doc.documentName}
+                                    {Doc.name}
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {Doc.documentType}
+                                    {Doc.type}
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {formatDate(Doc.documentCreationDate)}
+                                    {formatDate(Doc.creationDate)}
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {formatDate(Doc.documentLastModifiedDate)}
+                                    {formatDate(Doc.lastModifiedDate)}
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {Doc.organization.organizationName}
+                                    {Doc.organization.name}
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
                                     <Box
