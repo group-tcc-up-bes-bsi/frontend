@@ -1,5 +1,5 @@
 "use client"
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box, Backdrop } from '@mui/material';
 import { Settings, Star, Folder, Groups, Home, Delete } from '@mui/icons-material';
 import { useTheme } from '@/app/theme/ThemeContext';
@@ -21,6 +21,8 @@ import StatsDocument from '@/app/components/statsDocument';
 import { useFilterStore } from '@/app/state/filterState';
 import { logoutUser } from '@/app/services/User/logoutUser';
 import { useAuth } from '@/app/components/useAuth';
+import { getMeAuth } from '@/app/services/User/GetAuthToken';
+import { useUserStore } from '@/app/state/userState';
 
 const Dashboard = () => {
     useAuth();
@@ -32,6 +34,20 @@ const Dashboard = () => {
     const alterOption = useOptionsDashboardStore((state) => state.alter);
     const [optionMenu, setOptionMenu] = React.useState('');
     const { setFilter } = useFilterStore();
+    const alterUserCurrent = useUserStore((state) => state.alter);
+
+    useEffect(() => {
+        async function fetchUserData() {
+            const userCurrent = await getMeAuth();
+            if (userCurrent) {
+                alterUserCurrent(userCurrent);
+            } else {
+                logoutUser();
+            }
+        }
+
+        fetchUserData();
+    }, [alterUserCurrent]);
 
     const toggleDrawer = () => {
         setOpen(!open);

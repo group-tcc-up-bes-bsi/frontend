@@ -212,6 +212,7 @@ const Organization: React.FC = () => {
                                     open={Boolean(anchorEl) && selectedOrganization?.organizationId === org.organizationId}
                                     onClose={() => setAnchorEl(null)}
                                 >
+                                    <MenuItem onClick={() => ({})}>Abrir</MenuItem>
                                     <MenuItem onClick={handleOrganizationAlter}>Alterar</MenuItem>
                                     <MenuItem onClick={() => toggleConfirm(org)}>Excluir</MenuItem>
                                 </Menu>

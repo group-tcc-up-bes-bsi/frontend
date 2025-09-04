@@ -111,13 +111,31 @@ const HomeComponent: React.FC = () => {
                         <Box
                             key={org.organizationId}
                             sx={{
-                                mb: 0,
+                                mb: 1,
                                 p: 1,
                                 display: 'flex',
+                                cursor: 'pointer',
+                                '&:hover': {
+                                    backgroundColor: theme.palette.action.hover,
+                                    borderRadius: 1,
+                                },
+                                transition: 'all 0.2s ease-in-out',
                             }}
+                            onClick={() => ({})}
                         >
-                            <Box sx={{ display: 'flex', gap: 4, justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', justifyContent: 'center' }}>
+                            <Box sx={{
+                                display: 'flex',
+                                gap: 4,
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                width: '100%'
+                            }}>
+                                <Box sx={{
+                                    display: 'flex',
+                                    gap: 1,
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
                                     {org.icon}
                                     <CustomTypography
                                         text={org.organizationName}
@@ -130,7 +148,6 @@ const HomeComponent: React.FC = () => {
                                             whiteSpace: 'nowrap',
                                         }}
                                     />
-
                                 </Box>
                             </Box>
                         </Box>
