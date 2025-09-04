@@ -36,9 +36,11 @@ const Dashboard = () => {
     const { setFilter } = useFilterStore();
     const alterUserCurrent = useUserStore((state) => state.alter);
 
+
     useEffect(() => {
         async function fetchUserData() {
             const userCurrent = await getMeAuth();
+            console.log(userCurrent);
             if (userCurrent) {
                 alterUserCurrent(userCurrent);
             } else {
@@ -47,7 +49,8 @@ const Dashboard = () => {
         }
 
         fetchUserData();
-    }, [alterUserCurrent]);
+    }, []);
+
 
     const toggleDrawer = () => {
         setOpen(!open);

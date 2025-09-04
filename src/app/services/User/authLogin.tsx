@@ -38,7 +38,7 @@ export async function authLoginUser(User: string, Password: string) {
                         'error')
                 }
             }
-            if (responseData.message == `User not found`) {
+            if (responseData.message == `Invalid username`) {
                 return {
 
                     message: new MessageObj(
