@@ -3,7 +3,7 @@ import { getErrorTitle } from "../ErrorTitle";
 import { UserObj } from "@/app/models/UserObj";
 
 export async function getByUserName(userName: string, userCurrent: UserObj) {
-    const url = `${process.env.NEXT_PUBLIC_BACKEND}/users/by-username/`;
+    const url = `${process.env.NEXT_PUBLIC_BACKEND}/users/by-username`;
 
     try {
         const response = await fetch(url, {

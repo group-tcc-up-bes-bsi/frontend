@@ -79,7 +79,7 @@ const OrganizationForm: React.FC = () => {
 
     const handleFindUser = async () => {
         try {
-            const result = await getByUserName(username);
+            const result = await getByUserName(username, userCurrent!);
             setMessage(result.message);
 
             await new Promise(resolve => setTimeout(resolve, 1000));
