@@ -3,16 +3,15 @@ import { getErrorTitle } from "../ErrorTitle";
 import { UserObj } from "@/app/models/UserObj";
 
 export async function getByUserName(userName: string, userCurrent: UserObj) {
-    const url = `${process.env.NEXT_PUBLIC_BACKEND}/users/by-username`;
+    const url = `${process.env.NEXT_PUBLIC_BACKEND}/users/by-username?username=${userName}`;
 
     try {
         const response = await fetch(url, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${userCurrent?.jwtToken}`
+                'Authorization': `Bearer ${userCurrent?.jwtToken}`,
             },
-            body: JSON.stringify({ userName })
         });
 
         const responseData = await response.json().catch(() => null);
@@ -26,7 +25,9 @@ export async function getByUserName(userName: string, userCurrent: UserObj) {
                 )
             }
         }
-
+        console.log(responseData);
+        console.log(userName);
+        console.log(userCurrent);
         return {
             message: new MessageObj(
                 'success',
