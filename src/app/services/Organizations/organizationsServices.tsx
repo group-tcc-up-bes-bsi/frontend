@@ -2,152 +2,125 @@ import { Folder } from "@mui/icons-material";
 import { OrganizationObj } from "../../models/OrganizationObj";
 import { Theme } from "@mui/material";
 import { organizationType } from "../ConstantsTypes";
+import { MessageObj } from "@/app/models/MessageObj";
+import { getErrorTitle } from "../ErrorTitle";
+import { UserObj, UserOrganization } from "@/app/models/UserObj";
 
-export function getOrganizationsByUser(theme: Theme): OrganizationObj[] {
-    return [
-        {
-            organizationId: 1,
-            name: 'Projeto Inovação',
-            description: 'Descrição do Projeto Inovação',
-            favorite: true,
-            organizationType: organizationType.COLLABORATIVE,
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.star }} />
-        },
-        {
-            organizationId: 2,
-            name: 'Dev Ops',
-            description: 'Descrição do Dev Ops',
-            favorite: true,
-            organizationType: organizationType.INDIVIDUAL,
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.primary }} />
-        },
-        {
-            organizationId: 3,
-            name: 'Teste',
-            description: 'Descrição do Teste',
-            favorite: true,
-            organizationType: organizationType.INDIVIDUAL,
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.primary }} />
-        },
-        {
-            organizationId: 4,
-            name: 'Objetivos',
-            description: 'Descrição do Objetivos',
-            favorite: true,
-            organizationType: organizationType.COLLABORATIVE,
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.primary }} />
-        },
-        {
-            organizationId: 5,
-            name: 'Projeto Inovação',
-            description: 'Descrição do Projeto Inovação',
-            favorite: true,
-            organizationType: organizationType.COLLABORATIVE,
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.star }} />
-        },
-        {
-            organizationId: 6,
-            name: 'Dev Ops',
-            description: 'Descrição do Dev Ops',
-            favorite: false,
-            organizationType: organizationType.INDIVIDUAL,
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.primary }} />
-        },
-        {
-            organizationId: 7,
-            name: 'Teste',
-            description: 'Descrição do Teste',
-            favorite: false,
-            organizationType: organizationType.INDIVIDUAL,
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.primary }} />
-        },
-        {
-            organizationId: 8,
-            name: 'Objetivos',
-            description: 'Descrição do Objetivos',
-            favorite: false,
-            organizationType: organizationType.COLLABORATIVE,
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.primary }} />
-        },
-        {
-            organizationId: 9,
-            name: 'Projeto Inovação',
-            description: 'Descrição do Projeto Inovação',
-            favorite: false,
-            organizationType: organizationType.COLLABORATIVE,
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.star }} />
-        },
-        {
-            organizationId: 10,
-            name: 'Dev Ops',
-            description: 'Descrição do Dev Ops',
-            favorite: false,
-            organizationType: organizationType.INDIVIDUAL,
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.primary }} />
-        },
-        {
-            organizationId: 11,
-            name: 'Teste',
-            description: 'Descrição do Teste',
-            favorite: false,
-            organizationType: organizationType.INDIVIDUAL,
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.primary }} />
-        },
-        {
-            organizationId: 12,
-            name: 'Objetivos',
-            description: 'Descrição do Objetivos',
-            favorite: false,
-            organizationType: organizationType.COLLABORATIVE,
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.primary }} />
-        },
-        {
-            organizationId: 13,
-            name: 'Projeto Inovação',
-            description: 'Descrição do Projeto Inovação',
-            favorite: false,
-            organizationType: organizationType.COLLABORATIVE,
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.star }} />
-        },
-        {
-            organizationId: 14,
-            name: 'Dev Ops',
-            description: 'Descrição do Dev Ops',
-            favorite: true,
-            organizationType: organizationType.INDIVIDUAL,
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.primary }} />
-        },
-        {
-            organizationId: 15,
-            name: 'Teste',
-            description: 'Descrição do Teste',
-            favorite: true,
-            organizationType: organizationType.INDIVIDUAL,
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.primary }} />
-        },
-        {
-            organizationId: 16,
-            name: 'Objetivos',
-            description: 'Descrição do Objetivos',
-            favorite: true,
-            organizationType: organizationType.COLLABORATIVE,
-            borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.primary }} />
+export async function getMyOrganizations(userCurrent: UserObj, theme: Theme): Promise<{ message: MessageObj; organizations: OrganizationObj[] }> {
+    const url = `${process.env.NEXT_PUBLIC_BACKEND}/organizations/my`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userCurrent?.jwtToken}`,
+            },
+        });
+
+        const responseData = await response.json().catch(() => null);
+        if (!responseData || !Array.isArray(responseData) || responseData.length === 0) {
+            return {
+                message: new MessageObj(
+                    'error',
+                    getErrorTitle(responseData?.statusCode || 404),
+                    'Nenhuma organização encontrada',
+                    'error'
+                ),
+                organizations: []
+            };
         }
-    ];
+
+        const organizations: OrganizationObj[] = responseData.map((item) => ({
+            organizationId: item.organizationId,
+            name: item.name,
+            description: item.description,
+            organizationType: item.organizationType.toUpperCase() === 'COLLABORATIVE' ? organizationType.COLLABORATIVE : organizationType.INDIVIDUAL,
+            favorite: false, //Ajustar quando implementar favoritos
+            borderColor: theme.palette.text.primary,
+            icon: <Folder sx={{ color: theme.palette.button.primary }} />
+
+        }));
+
+        return {
+            message: new MessageObj(
+                'success',
+                'Organizações carregadas',
+                'Organizações carregadas com sucesso',
+                'success'
+            ),
+            organizations,
+        };
+
+    } catch (error) {
+        console.error(error);
+        return {
+            message: new MessageObj(
+                'error',
+                getErrorTitle(500),
+                'Erro: Servidor inoperante',
+                'error'
+            ),
+            organizations: []
+        };
+    }
+}
+
+export async function getOrganizationUsers(
+    orgId: number,
+    userCurrent: UserObj
+): Promise<{ message: MessageObj; users: UserOrganization[] }> {
+    const url = `${process.env.NEXT_PUBLIC_BACKEND}/organizations/data/${orgId}`;
+
+    try {
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userCurrent?.jwtToken}`,
+            },
+        });
+
+        const responseData = await response.json().catch(() => null);
+
+        if (!responseData || !Array.isArray(responseData) || responseData.length === 0) {
+            return {
+                message: new MessageObj(
+                    'error',
+                    getErrorTitle(responseData?.statusCode || 404),
+                    'Nenhum usuário encontrado para a organização',
+                    'error'
+                ),
+                users: []
+            };
+        }
+
+        const users: UserOrganization[] = responseData.map((item) => ({
+            username: item.user,
+            type: item.userType,
+            inviteAccepted: item.inviteAccepted,
+        }));
+
+        return {
+            message: new MessageObj(
+                'success',
+                'Usuários encontrados',
+                'Organização carregada com sucesso',
+                'success'
+            ),
+            users,
+        };
+
+    } catch (error) {
+        console.error(error);
+        return {
+            message: new MessageObj(
+                'error',
+                getErrorTitle(500),
+                'Erro: Servidor inoperante',
+                'error'
+            ),
+            users: []
+        };
+    }
 }

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { Box, Divider, IconButton, Menu, MenuItem } from '@mui/material';
 import CustomTypography from '../customTypography';
@@ -9,13 +9,14 @@ import { MoreVert, Star } from '@mui/icons-material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
 import OrganizationForm from './organizationForm';
 import { organizationType, organizationsTypeOptions } from '../../services/ConstantsTypes';
-import { getOrganizationsByUser } from '@/app/services/Organizations/organizationsServices';
+import { getMyOrganizations } from '@/app/services/Organizations/organizationsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { OrganizationObj } from '@/app/models/OrganizationObj';
 import { useOrganizationStateStore } from '@/app/state/organizationState';
 import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
 import MsgConfirm from '../notification/msgConfirm';
 import { useAuth } from '../useAuth';
+import { useUserStore } from '@/app/state/userState';
 
 const Organization: React.FC = () => {
     useAuth();
@@ -30,6 +31,17 @@ const Organization: React.FC = () => {
     const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
     const alterConfirm = useMsgConfirmStore((state) => state.alter);
     const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
+    const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
+    const userCurrent = useUserStore((state) => state.userCurrent)
+
+    useEffect(() => {
+        if (userCurrent != undefined) {
+            (async () => {
+                const result = await getMyOrganizations(userCurrent, theme);
+                setOrganizations(result.organizations);
+            })();
+        }
+    }, [userCurrent, theme]);
 
     const handleChangeOrganizationType = (value: string) => {
         setSelectedOrganizationType(value);
@@ -38,8 +50,6 @@ const Organization: React.FC = () => {
     const toggleOrganizationForm = () => {
         alterOrganizationForm(!organizationForm);
     }
-
-    const organizations = getOrganizationsByUser(theme);
 
     const filteredOrganizations = useMemo(() => {
         let filtered = organizations;

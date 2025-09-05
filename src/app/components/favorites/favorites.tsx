@@ -8,7 +8,7 @@ import {
 import CustomTypography from '../customTypography';
 import CustomTextField from '../customTextField';
 import { Star } from '@mui/icons-material';
-import { getOrganizationsByUser } from '@/app/services/Organizations/organizationsServices';
+import { getMyOrganizations } from '@/app/services/Organizations/organizationsServices';
 import { getDocuments } from '@/app/services/Documents/DocumentsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { useAuth } from '../useAuth';
@@ -33,7 +33,7 @@ const Favorites: React.FC = () => {
         );
     }, [documents, filter]);
 
-    const [organizations, setOrganizations] = useState(getOrganizationsByUser(theme));
+    const [organizations, setOrganizations] = useState(getMyOrganizations(theme));
 
     const filteredOrganizations = useMemo(() => {
         if (!filter.trim()) {

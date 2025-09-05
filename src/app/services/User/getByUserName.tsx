@@ -25,9 +25,6 @@ export async function getByUserName(userName: string, userCurrent: UserObj) {
                 )
             }
         }
-        console.log(responseData);
-        console.log(userName);
-        console.log(userCurrent);
         return {
             message: new MessageObj(
                 'success',

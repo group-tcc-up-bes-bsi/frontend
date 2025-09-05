@@ -40,7 +40,6 @@ const Dashboard = () => {
     useEffect(() => {
         async function fetchUserData() {
             const userCurrent = await getMeAuth();
-            console.log(userCurrent);
             if (userCurrent) {
                 alterUserCurrent(userCurrent);
             } else {

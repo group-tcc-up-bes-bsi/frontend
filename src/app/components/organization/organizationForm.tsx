@@ -8,7 +8,7 @@ import CustomComboBox from '../customComboBox';
 import CustomButton from '../customButton';
 import CustomTypography from '../customTypography';
 import { organizationsTypeOptionsNoAll, userType, userTypeOptionsNoOwner } from '../../services/ConstantsTypes';
-import { getUsersOrganization } from '@/app/services/User/GetUsersOrganization';
+import { getOrganizationUsers } from '@/app/services/Organizations/organizationsServices';
 import { useOrganizationStateStore } from '@/app/state/organizationState';
 import { getByUserName } from '@/app/services/User/getByUserName';
 import { MessageObj } from '@/app/models/MessageObj';
@@ -61,15 +61,23 @@ const OrganizationForm: React.FC = () => {
             value = 'INDIVIDUAL';
             handleChangeOrganizationType(value);
         }
-        if (organization?.organizationId !== 0) {
-            setUsers(getUsersOrganization());
+        if (organization?.organizationId !== 0 && organization != undefined && userCurrent != undefined) {
+            (async () => {
+                try {
+                    const result = await getOrganizationUsers(organization.organizationId, userCurrent)
+                    setUsers(result.users);
+                    setMessage(result.message);
+
+                } catch (error) {
+                    setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
+                }
+            })();
         } else {
             if (userCurrent != undefined) {
                 const newUser: UserOrganization = {
-                    userId: userCurrent.userId,
                     username: userCurrent.username,
                     type: userType.OWNER,
-                    organizationId: organization?.organizationId || 0,
+                    inviteAccepted: true,
                 };
 
                 setUsers([...users, newUser]);
@@ -114,10 +122,9 @@ const OrganizationForm: React.FC = () => {
                 }
 
                 const newUser: UserOrganization = {
-                    userId: user.userId,
                     username: user.username,
                     type: selectedOption as userType,
-                    organizationId: organization?.organizationId || 0,
+                    inviteAccepted: false,
                 };
 
                 setUsers([...users, newUser]);
@@ -142,8 +149,8 @@ const OrganizationForm: React.FC = () => {
         }
     };
 
-    const removeUser = (userId: number) => {
-        setUsers(users.filter(u => u.userId !== userId));
+    const removeUser = (username: string) => {
+        setUsers(users.filter(u => u.username !== username));
     };
 
     const handleSave = async () => {
@@ -178,7 +185,7 @@ const OrganizationForm: React.FC = () => {
             try {
                 const result = await createOrganization(name, description, selectedOrganizationType, userCurrent);
                 setMessage(result.message);
-                
+
                 await new Promise(resolve => setTimeout(resolve, 1000));
 
             } catch (error) {
@@ -367,7 +374,7 @@ const OrganizationForm: React.FC = () => {
                             >
                                 {users.map((user) => (
                                     <Box
-                                        key={user.userId}
+                                        key={user.username}
                                         sx={{
                                             display: 'flex',
                                             alignItems: 'center',
@@ -390,7 +397,7 @@ const OrganizationForm: React.FC = () => {
                                         </Box>
                                         {user.type !== "Proprietário" && (
                                             <Close
-                                                onClick={() => removeUser(user.userId)}
+                                                onClick={() => removeUser(user.username)}
                                                 sx={{
                                                     fontSize: '1.5rem',
                                                     color: theme.palette.text.secondary,

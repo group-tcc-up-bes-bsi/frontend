@@ -7,8 +7,12 @@ import SpaceDashboard from '@mui/icons-material/SpaceDashboard';
 import TableDocuments from '../tableDocuments';
 import Documents from '../documents';
 import { useDocumentViewerStore } from '@/app/state/documentViewerState';
-import { getOrganizationsByUser } from '@/app/services/Organizations/organizationsServices';
+import { getMyOrganizations } from '@/app/services/Organizations/organizationsServices';
 import { useAuth } from '../useAuth';
+import { useUserStore } from '@/app/state/userState';
+import { OrganizationObj } from '@/app/models/OrganizationObj';
+import { MessageObj } from '@/app/models/MessageObj';
+import CustomAlert from '../customAlert';
 
 const HomeComponent: React.FC = () => {
     useAuth();
@@ -17,6 +21,12 @@ const HomeComponent: React.FC = () => {
     const alterModeViewer = useDocumentViewerStore((state) => state.alter);
     const [colorMode1, setColorMode1] = useState(theme.palette.button.primary);
     const [colorMode2, setColorMode2] = useState(theme.palette.text.primary);
+    const userCurrent = useUserStore((state) => state.userCurrent)
+    const [message, setMessage] = useState<MessageObj>(
+        new MessageObj('info', 'Tela Principal', '', 'info')
+    );
+    const [showMessage, setShowMessage] = useState(false);
+    const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
 
     const toggleModeViewer = (mode: number) => {
         alterModeViewer(mode)
@@ -31,10 +41,25 @@ const HomeComponent: React.FC = () => {
     };
 
     useEffect(() => {
-        toggleModeViewer(modeViewer)
-    },);
+        if (message) {
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 5000);
+        }
+    }, [message]);
 
-    const organizations = getOrganizationsByUser(theme);
+    useEffect(() => {
+        toggleModeViewer(modeViewer)
+    }, [modeViewer]);
+
+    useEffect(() => {
+        if (userCurrent != undefined) {
+            (async () => {
+                const result = await getMyOrganizations(userCurrent, theme);
+                setOrganizations(result.organizations);
+                setMessage(result.message);
+            })();
+        }
+    }, [userCurrent, theme]);
 
     return (
         <Box sx={{ maxWidth: '100%' }}>
@@ -211,6 +236,27 @@ const HomeComponent: React.FC = () => {
                     },
                 }}>
                     <Documents />
+                </Box>
+            )}
+            {showMessage && message && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        bottom: '0%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 2,
+                        textAlign: 'left',
+                    }}>
+                    <CustomAlert
+                        severity={message.severity}
+                        colorType={message.colorType}
+                        title={message.title}
+                        description={message.description}
+                    />
                 </Box>
             )}
         </Box >
