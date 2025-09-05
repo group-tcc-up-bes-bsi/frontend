@@ -99,7 +99,7 @@ const Organization: React.FC = () => {
         alterMsgConfirm(`excluir a organização ${organization.name}?`);
         alterConfirm(!openConfirm);
         if(confirm){
-            deleteOrganization(organization.organizationId, userCurrent)
+            deleteOrganization(/*organization.organizationId, userCurrent*/)
         }
     }
 

@@ -1,3 +1,3 @@
-export async function deleteOrganization(organizationId: number, userCurrent: UserObj) {
+export async function deleteOrganization(/*organizationId: number, userCurrent: UserObj*/) {
 
 }
