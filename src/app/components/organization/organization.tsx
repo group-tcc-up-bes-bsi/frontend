@@ -17,6 +17,7 @@ import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
 import MsgConfirm from '../notification/msgConfirm';
 import { useAuth } from '../useAuth';
 import { useUserStore } from '@/app/state/userState';
+import { deleteOrganization } from '@/app/services/Organizations/deleteOrganization';
 
 const Organization: React.FC = () => {
     useAuth();
@@ -30,6 +31,7 @@ const Organization: React.FC = () => {
     const alterOrganization = useOrganizationStateStore((state) => state.alter);
     const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
     const alterConfirm = useMsgConfirmStore((state) => state.alter);
+    const confirm= useMsgConfirmStore((state) => state.confirm);
     const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
     const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
     const userCurrent = useUserStore((state) => state.userCurrent)
@@ -96,6 +98,9 @@ const Organization: React.FC = () => {
     const toggleConfirm = (organization: OrganizationObj) => {
         alterMsgConfirm(`excluir a organização ${organization.name}?`);
         alterConfirm(!openConfirm);
+        if(confirm){
+            deleteOrganization(organization.organizationId, userCurrent)
+        }
     }
 
     return (
