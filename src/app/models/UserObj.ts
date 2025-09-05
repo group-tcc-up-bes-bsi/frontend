@@ -1,8 +1,13 @@
 import { userType } from "../services/ConstantsTypes";
 
-export interface userOrganization {
-    id: number;
+export interface UserObj{
+    userId: number;
+    username: string;
+    jwtToken: string;
+}
+
+export interface UserOrganization {
     username: string;
     type: userType;
-    organizationId: number;
+    inviteAccepted: boolean;
 }

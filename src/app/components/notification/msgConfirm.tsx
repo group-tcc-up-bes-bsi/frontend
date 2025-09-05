@@ -2,20 +2,28 @@ import React from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { Box, Backdrop } from '@mui/material';
 import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
-import CustomButton from '../CustomButton';
-import CustomTypography from '../CustomTypography';
+import CustomButton from '../customButton';
+import CustomTypography from '../customTypography';
+import { useAuth } from '../useAuth';
 
 const MsgConfirm: React.FC = () => {
+    useAuth();
     const { theme } = useTheme();
-    const alterMsgConfirm = useMsgConfirmStore((state) => state.alter);
     const msgConfirm = useMsgConfirmStore((state) => state.msgConfirm);
+    const alterConfirm = useMsgConfirmStore((state) => state.alter);
+    const alterConfirmRes = useMsgConfirmStore((state) => state.alterConfirm);
     const textMsg = 'Deseja realmente ' + msgConfirm;
-    
+
+    const toggleConfirm = () => {
+        alterConfirm(false);
+        alterConfirmRes(true);
+    }
+
     return (
         <Box className="flex items-center justify-center">
             <Backdrop
                 open={true}
-                onClick={() => alterMsgConfirm(false)}
+                onClick={() => { alterConfirm(false); alterConfirmRes(false); }}
                 sx={{
                     zIndex: 1320,
                     color: '#fff',
@@ -55,12 +63,13 @@ const MsgConfirm: React.FC = () => {
                     text="Confirmar"
                     fullWidth={false}
                     type="button"
+                    onClick={toggleConfirm}
                     colorType="primary"
                     hoverColorType="primary"
                     paddingY={1}
                     paddingX={2}
                     marginTop={0.5}
-                    sx={{width: '70%'}}
+                    sx={{ width: '70%' }}
                 />
             </Box>
         </Box>

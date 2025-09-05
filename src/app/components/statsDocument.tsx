@@ -6,12 +6,14 @@ import Typography from "@mui/material/Typography";
 import { useDocumentStateStore } from "../state/documentState";
 import { Close } from '@mui/icons-material';
 import { useOptionsDashboardStore } from "../state/optionsDashboard";
-import CustomButton from "./CustomButton";
-import MonthsSelector from "./MonthsSelector";
+import CustomButton from "./customButton";
+import MonthsSelector from "./monthsSelector";
+import { useAuth } from "./useAuth";
 
 const StatsDocument: React.FC = () => {
+  useAuth();
   const theme = useTheme();
-  const file = useDocumentStateStore((state) => state.document);
+  const document = useDocumentStateStore((state) => state.document);
   const lastOption = useOptionsDashboardStore((state) => state.lastOption);
   const alterOption = useOptionsDashboardStore((state) => state.alter);
 
@@ -40,7 +42,7 @@ const StatsDocument: React.FC = () => {
     <Box sx={{ p: 3, background: theme.palette.background.default, height: '100%' }}>
       <Box sx={{ display: "flex", flexDirection: "row", justifyContent: 'space-between', alignItems: 'center' }}>
         <Typography variant="h4" gutterBottom>
-          {file?.name}
+          {document?.name}
         </Typography>
 
 
@@ -69,10 +71,10 @@ const StatsDocument: React.FC = () => {
       </Box>
       <Box sx={{ display: "flex", flexDirection: "row", justifyContent: 'space-between', mt: 2 }}>
         <Typography variant="h6" gutterBottom>
-          {"Data criação: " + file?.createdAt?.toLocaleDateString("pt-BR", {})}
+          {"Data criação: " + document?.creationDate?.toLocaleDateString("pt-BR", {})}
         </Typography>
         <Typography variant="h6" gutterBottom>
-          {"Criado por " + file?.creator}
+          {"Criado por " + document?.creator}
         </Typography>
       </Box>
 

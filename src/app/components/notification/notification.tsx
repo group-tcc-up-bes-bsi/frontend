@@ -4,8 +4,10 @@ import { Box, List, ListItem, ListItemText, Backdrop } from '@mui/material';
 import { useNotificationStore } from '@/app/state/notificationState';
 import { Close } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
+import { useAuth } from '../useAuth';
 
 const Notification: React.FC = () => {
+    useAuth();
     const { theme } = useTheme();
     const alterNotification = useNotificationStore((state) => state.alter);
 

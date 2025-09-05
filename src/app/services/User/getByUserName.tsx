@@ -1,15 +1,17 @@
 import { MessageObj } from "@/app/models/MessageObj";
 import { getErrorTitle } from "../ErrorTitle";
+import { UserObj } from "@/app/models/UserObj";
 
-export async function getByUserName(userName: string) {
-    const url = `${process.env.NEXT_PUBLIC_BACKEND}/users/by-username/${userName}`;
+export async function getByUserName(userName: string, userCurrent: UserObj) {
+    const url = `${process.env.NEXT_PUBLIC_BACKEND}/users/by-username?username=${userName}`;
 
     try {
         const response = await fetch(url, {
             method: 'GET',
             headers: {
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userCurrent?.jwtToken}`,
+            },
         });
 
         const responseData = await response.json().catch(() => null);
@@ -23,7 +25,6 @@ export async function getByUserName(userName: string) {
                 )
             }
         }
-
         return {
             message: new MessageObj(
                 'success',

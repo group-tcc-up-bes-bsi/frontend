@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { Box, Divider, } from '@mui/material';
-import CustomTypography from '../CustomTypography';
+import CustomTypography from '../customTypography';
 import Menu from '@mui/icons-material/Menu';
 import SpaceDashboard from '@mui/icons-material/SpaceDashboard';
-import TableDocuments from '../TableDocuments';
-import Documents from '../Documents';
-import CustomButton from '../CustomButton';
-import CustomTextField from '../CustomTextField';
+import TableDocuments from '../tableDocuments';
+import Documents from '../documents';
+import CustomButton from '../customButton';
+import CustomTextField from '../customTextField';
 import { useDocumentViewerStore } from '@/app/state/documentViewerState';
 import { useFilterStore } from '@/app/state/filterState';
+import { useAuth } from '../useAuth';
 
 const DocumentsComponent: React.FC = () => {
+    useAuth();
     const { theme } = useTheme();
     const { filter, setFilter } = useFilterStore();
     const modeViewer = useDocumentViewerStore((state) => state.mode);

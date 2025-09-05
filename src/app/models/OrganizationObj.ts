@@ -1,31 +1,11 @@
-import { organizationsType } from "../services/ConstantsTypes";
+import { organizationType } from "../services/ConstantsTypes";
 
 export interface OrganizationObj {
-  id: number;
-  title: string;
+  organizationId: number;
+  name: string;
   description: string;
-  createdBy: string;
-  borderColor?: string;
-}
-
-export interface OrganizationObjSimple {
-  id: number;
-  title: string;
-}
-
-export interface OrganizationObjWithIcon {
-  id: number;
-  title: string;
-  description: string;
-  createdBy: string;
-  type: organizationsType;
+  favorite: boolean;
+  organizationType?: organizationType;
   borderColor?: string;
   icon?: React.ReactNode;
-}
-
-export interface OrganizationFavorite {
-  id: number;
-  title: string;
-  favorite: boolean;
-  totDocuments: number;
 }

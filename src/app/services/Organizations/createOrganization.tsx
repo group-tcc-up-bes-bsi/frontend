@@ -1,31 +1,33 @@
 import { MessageObj } from "@/app/models/MessageObj";
 import { getErrorTitle } from "../ErrorTitle";
+import { UserObj } from "@/app/models/UserObj";
 
-export async function createUser(UserName: string, Password: string) {
-    const url = `${process.env.NEXT_PUBLIC_BACKEND}/users`;
-    const userData = {
-        username: UserName,
-        password: Password,
+export async function createOrganization(Name: string, Description: string, OrganizationType: string, userCurrent: UserObj) {
+    const url = `${process.env.NEXT_PUBLIC_BACKEND}/organizations`;
+    const organizationData = {
+        name: Name,
+        description: Description,
+        organizationType: OrganizationType.toLowerCase(),
     };
-
     try {
         const response = await fetch(url, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${userCurrent?.jwtToken}`
             },
-            body: JSON.stringify(userData)
+            body: JSON.stringify(organizationData)
         });
 
         const responseData = await response.json().catch(() => null);
 
         if (!response.ok) {
-            if (responseData.message == 'User already exists') {
+            if (responseData.message == 'Organization already exists') {
                 return {
                     message: new MessageObj(
                         'error',
-                        'Usuário ja cadastrado',
-                        'Ja existe um usuário com esse nome',
+                        'Organização já cadastrada',
+                        'Já existe uma Organização com esse nome',
                         'error')
                 }
             }
@@ -41,8 +43,8 @@ export async function createUser(UserName: string, Password: string) {
         return {
             message: new MessageObj(
                 'success',
-                'Usuário criado',
-                'Usuário criado com sucesso',
+                'Organização criada',
+                'Organização criada com sucesso',
                 'success'
             )
         };

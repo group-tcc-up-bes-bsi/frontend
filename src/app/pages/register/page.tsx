@@ -1,8 +1,8 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '../../theme/ThemeContext';
-import CustomButton from '../../components/CustomButton';
-import CustomTextField from '../../components/CustomTextField';
+import CustomButton from '../../components/customButton';
+import CustomTextField from '../../components/customTextField';
 import {
     Box,
     Container,
@@ -10,8 +10,8 @@ import {
     useMediaQuery,
     Theme,
 } from '@mui/material';
-import CustomTypography from '../../components/CustomTypography';
-import CustomAlert from '../../components/CustomAlert';
+import CustomTypography from '../../components/customTypography';
+import CustomAlert from '../../components/customAlert';
 import { MessageObj } from '@/app/models/MessageObj';
 import { createUser } from '@/app/services/User/createUser';
 

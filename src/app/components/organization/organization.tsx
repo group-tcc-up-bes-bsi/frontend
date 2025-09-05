@@ -1,22 +1,26 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { Box, Divider, IconButton, Menu, MenuItem } from '@mui/material';
-import CustomTypography from '../CustomTypography';
-import CustomComboBox from '../CustomComboBox';
-import CustomTextField from '../CustomTextField';
-import CustomButton from '../CustomButton';
+import CustomTypography from '../customTypography';
+import CustomComboBox from '../customComboBox';
+import CustomTextField from '../customTextField';
+import CustomButton from '../customButton';
 import { MoreVert, Star } from '@mui/icons-material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
-import OrganizationForm from './OrganizationForm';
-import { organizationsType, organizationsTypeOptions } from '../../services/ConstantsTypes';
-import { getOrganizationsByUser } from '@/app/services/Organizations/OrganizationsServices';
+import OrganizationForm from './organizationForm';
+import { organizationType, organizationsTypeOptions } from '../../services/ConstantsTypes';
+import { getMyOrganizations } from '@/app/services/Organizations/organizationsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { OrganizationObj } from '@/app/models/OrganizationObj';
 import { useOrganizationStateStore } from '@/app/state/organizationState';
 import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
 import MsgConfirm from '../notification/msgConfirm';
+import { useAuth } from '../useAuth';
+import { useUserStore } from '@/app/state/userState';
+import { deleteOrganization } from '@/app/services/Organizations/deleteOrganization';
 
 const Organization: React.FC = () => {
+    useAuth();
     const { theme } = useTheme();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedOrganizationType, setSelectedOrganizationType] = useState('');
@@ -27,7 +31,19 @@ const Organization: React.FC = () => {
     const alterOrganization = useOrganizationStateStore((state) => state.alter);
     const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
     const alterConfirm = useMsgConfirmStore((state) => state.alter);
+    const confirm= useMsgConfirmStore((state) => state.confirm);
     const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
+    const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
+    const userCurrent = useUserStore((state) => state.userCurrent)
+
+    useEffect(() => {
+        if (userCurrent != undefined) {
+            (async () => {
+                const result = await getMyOrganizations(userCurrent, theme);
+                setOrganizations(result.organizations);
+            })();
+        }
+    }, [userCurrent, theme]);
 
     const handleChangeOrganizationType = (value: string) => {
         setSelectedOrganizationType(value);
@@ -37,15 +53,13 @@ const Organization: React.FC = () => {
         alterOrganizationForm(!organizationForm);
     }
 
-    const organizations = getOrganizationsByUser(theme);
-
     const filteredOrganizations = useMemo(() => {
         let filtered = organizations;
 
         if (selectedOrganizationType == 'COLLABORATIVE') {
-            filtered = filtered.filter((org) => org.type === organizationsType.COLLABORATIVE);
+            filtered = filtered.filter((org) => org.organizationType === organizationType.COLLABORATIVE);
         } else if (selectedOrganizationType == 'INDIVIDUAL') {
-            filtered = filtered.filter((org) => org.type === organizationsType.INDIVIDUAL);
+            filtered = filtered.filter((org) => org.organizationType === organizationType.INDIVIDUAL);
         }
 
         if (!filter.trim()) {
@@ -54,9 +68,8 @@ const Organization: React.FC = () => {
 
         const searchTerm = filter.toLowerCase().trim();
         return filtered.filter((org) =>
-            org.title.toLowerCase().includes(searchTerm) ||
-            org.description.toLowerCase().includes(searchTerm) ||
-            org.createdBy.toLowerCase().includes(searchTerm)
+            org.name.toLowerCase().includes(searchTerm) ||
+            org.description.toLowerCase().includes(searchTerm)
         );
     }, [organizations, filter]);
 
@@ -68,20 +81,26 @@ const Organization: React.FC = () => {
         setAnchorEl(null);
     };
 
-    const hanfleOrganizationCreate = () => {
+    const handleOrganizationCreate = () => {
         const orgNull: OrganizationObj = {
-            id: 0,
-            title: '',
+            organizationId: 0,
+            name: '',
             description: '',
-            createdBy: '',
+            favorite: false,
+            organizationType: undefined,
+            borderColor: undefined,
+            icon: undefined
         };
         alterOrganization(orgNull);
         toggleOrganizationForm();
     }
 
     const toggleConfirm = (organization: OrganizationObj) => {
-        alterMsgConfirm(`excluir a organização ${organization.title}?`);
+        alterMsgConfirm(`excluir a organização ${organization.name}?`);
         alterConfirm(!openConfirm);
+        if(confirm){
+            deleteOrganization(/*organization.organizationId, userCurrent*/)
+        }
     }
 
     return (
@@ -94,7 +113,7 @@ const Organization: React.FC = () => {
                             type="button"
                             colorType="primary"
                             hoverColorType="primary"
-                            onClick={hanfleOrganizationCreate}
+                            onClick={handleOrganizationCreate}
                             paddingY={2}
                             marginTop={0.5}
                         />
@@ -160,7 +179,7 @@ const Organization: React.FC = () => {
                 >
                     {filteredOrganizations.map((org) => (
                         <Box
-                            key={org.id}
+                            key={org.organizationId}
                             sx={{
                                 mb: 2,
                                 p: 2,
@@ -171,7 +190,7 @@ const Organization: React.FC = () => {
                                 <Box sx={{ display: 'flex', gap: 4 }}>
                                     <Star sx={{ color: theme.palette.text.primary }} />
                                     <CustomTypography
-                                        text={org.title}
+                                        text={org.name}
                                         component="h2"
                                         variant="h5"
                                         sx={{
@@ -181,7 +200,7 @@ const Organization: React.FC = () => {
                                     />
                                 </Box>
                                 <CustomTypography
-                                    text={org.type}
+                                    text={org.organizationType || ''}
                                     component="p"
                                     variant="h6"
                                     sx={{ color: theme.palette.text.secondary, display: 'block' }}
@@ -205,9 +224,10 @@ const Organization: React.FC = () => {
                                 </IconButton>
                                 <Menu
                                     anchorEl={anchorEl}
-                                    open={Boolean(anchorEl) && selectedOrganization?.id === org.id}
+                                    open={Boolean(anchorEl) && selectedOrganization?.organizationId === org.organizationId}
                                     onClose={() => setAnchorEl(null)}
                                 >
+                                    <MenuItem onClick={() => ({})}>Abrir</MenuItem>
                                     <MenuItem onClick={handleOrganizationAlter}>Alterar</MenuItem>
                                     <MenuItem onClick={() => toggleConfirm(org)}>Excluir</MenuItem>
                                 </Menu>

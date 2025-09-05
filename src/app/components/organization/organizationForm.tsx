@@ -1,25 +1,48 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { Box, Backdrop } from '@mui/material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
 import { Close } from '@mui/icons-material';
-import CustomTextField from '../CustomTextField';
-import CustomComboBox from '../CustomComboBox';
-import CustomButton from '../CustomButton';
-import CustomTypography from '../CustomTypography';
-import { organizationsTypeOptionsNoAll, userTypeOptions } from '../../services/ConstantsTypes';
-import { getUsersOrganization } from '@/app/services/User/getUsersOrganization';
+import CustomTextField from '../customTextField';
+import CustomComboBox from '../customComboBox';
+import CustomButton from '../customButton';
+import CustomTypography from '../customTypography';
+import { organizationsTypeOptionsNoAll, userType, userTypeOptionsNoOwner } from '../../services/ConstantsTypes';
+import { getOrganizationUsers } from '@/app/services/Organizations/organizationsServices';
 import { useOrganizationStateStore } from '@/app/state/organizationState';
+import { getByUserName } from '@/app/services/User/getByUserName';
+import { MessageObj } from '@/app/models/MessageObj';
+import CustomAlert from '../customAlert';
+import { UserOrganization } from '@/app/models/UserObj';
+import { useUserStore } from '@/app/state/userState';
+import { createOrganization } from '@/app/services/Organizations/createOrganization';
+import { useAuth } from '../useAuth';
 
 const OrganizationForm: React.FC = () => {
+    useAuth();
     const { theme } = useTheme();
     const organization = useOrganizationStateStore((state) => state.organization);
     const alterOrganizationForm = useOrganizationFormStore((state) => state.alter);
     const [selectedOrganizationType, setSelectedOrganizationType] = useState('');
     const [selectedUserType, setSelectedUserType] = useState('');
-    const [name, setName] = useState(organization?.title || '');
+    const [name, setName] = useState(organization?.name || '');
     const [username, setUsername] = useState('');
     const [description, setDescription] = useState(organization?.description || '');
+    const [message, setMessage] = useState<MessageObj>(
+        organization?.organizationId == 0 ? new MessageObj('info', 'Criação de Organização', 'Preencha os dados da Organização', 'info')
+            : new MessageObj('info', 'Edição de Organização', 'Preencha os dados da Organização', 'info')
+    );
+    const [showMessage, setShowMessage] = useState(false);
+    const [user, setUser] = useState<UserOrganization | null>(null);
+    const [users, setUsers] = useState<UserOrganization[]>([]);
+    const userCurrent = useUserStore((state) => state.userCurrent)
+
+    useEffect(() => {
+        if (message) {
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 5000);
+        }
+    }, [message]);
 
     const handleChangeOrganizationType = (value: string) => {
         setSelectedOrganizationType(value);
@@ -29,7 +52,153 @@ const OrganizationForm: React.FC = () => {
         setSelectedUserType(value);
     };
 
-    const users = getUsersOrganization();
+    useEffect(() => {
+        let value = '';
+        if (organization?.organizationType == 'Colaborativo') {
+            value = 'COLLABORATIVE';
+            handleChangeOrganizationType(value);
+        } else if (organization?.organizationType == 'Individual') {
+            value = 'INDIVIDUAL';
+            handleChangeOrganizationType(value);
+        }
+        if (organization?.organizationId !== 0 && organization != undefined && userCurrent != undefined) {
+            (async () => {
+                try {
+                    const result = await getOrganizationUsers(organization.organizationId, userCurrent)
+                    setUsers(result.users);
+                    setMessage(result.message);
+
+                } catch (error) {
+                    setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
+                }
+            })();
+        } else {
+            if (userCurrent != undefined) {
+                const newUser: UserOrganization = {
+                    username: userCurrent.username,
+                    type: userType.OWNER,
+                    inviteAccepted: true,
+                };
+
+                setUsers([...users, newUser]);
+            }
+        }
+    }, [organization]);
+
+    const handleFindUser = async () => {
+        try {
+            const result = await getByUserName(username, userCurrent!);
+            setMessage(result.message);
+
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            if (result.message.severity === 'success') {
+                setUser(result.user);
+            }
+        } catch (error) {
+            setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
+        }
+    }
+
+    const addUser = () => {
+        let selectedOption = '';
+        if (selectedUserType === 'COLLABORATIVE') {
+            selectedOption = 'Colaborativo';
+        } else if (selectedUserType === 'INDIVIDUAL') {
+            selectedOption = 'Individual';
+        }
+
+        if (user) {
+            if (selectedOption !== '') {
+                const exists = users.some(u => u.username === user.username);
+
+                if (exists) {
+                    setMessage(new MessageObj(
+                        'warning',
+                        'Usuário já adicionado',
+                        `O usuário "${user.username}" já está na lista.`,
+                        'warning'
+                    ));
+                    return;
+                }
+
+                const newUser: UserOrganization = {
+                    username: user.username,
+                    type: selectedOption as userType,
+                    inviteAccepted: false,
+                };
+
+                setUsers([...users, newUser]);
+                setUser(null);
+                setUsername('');
+                setSelectedUserType('');
+            } else {
+                setMessage(new MessageObj(
+                    'error',
+                    'Tipo de usuário não selecionado',
+                    'Selecione um tipo de usuário para adicionar.',
+                    'error'
+                ));
+            }
+        } else {
+            setMessage(new MessageObj(
+                'error',
+                'Usuário não encontrado',
+                'Primeiro realize a busca pelo nome do usuário.',
+                'error'
+            ));
+        }
+    };
+
+    const removeUser = (username: string) => {
+        setUsers(users.filter(u => u.username !== username));
+    };
+
+    const handleSave = async () => {
+        if (name.trim() === '') {
+            setMessage(new MessageObj(
+                'error',
+                'Nome obrigatório',
+                'Por favor, preencha o nome da organização.',
+                'error'
+            ));
+            return;
+        }
+        if (description.trim() === '') {
+            setMessage(new MessageObj(
+                'error',
+                'Descrição obrigatória',
+                'Por favor, preencha a descrição da organização.',
+                'error'
+            ));
+            return;
+        }
+        if (selectedOrganizationType === '') {
+            setMessage(new MessageObj(
+                'error',
+                'Tipo obrigatório',
+                'Por favor, selecione o tipo da organização.',
+                'error'
+            ));
+            return;
+        }
+        if (userCurrent != undefined) {
+            try {
+                const result = await createOrganization(name, description, selectedOrganizationType, userCurrent);
+                setMessage(result.message);
+
+                await new Promise(resolve => setTimeout(resolve, 1000));
+
+            } catch (error) {
+                setMessage(new MessageObj(
+                    'error',
+                    'Erro inesperado',
+                    `${error}`,
+                    'error'
+                ));
+
+            }
+        }
+    }
 
     return (
         <Box>
@@ -61,7 +230,7 @@ const OrganizationForm: React.FC = () => {
             >
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
                     <CustomTypography
-                        text={organization?.title == '' ? "Criar Organização" : "Editar Organização"}
+                        text={organization?.name == '' ? "Criar Organização" : "Editar Organização"}
                         component="h2"
                         variant="h6"
                         sx={{
@@ -102,6 +271,7 @@ const OrganizationForm: React.FC = () => {
                                 text="Buscar"
                                 type="button"
                                 colorType="primary"
+                                onClick={handleFindUser}
                                 hoverColorType="primary"
                                 fullWidth={false}
                                 sx={{ width: '120px', height: '56px', marginTop: '16px' }}
@@ -125,7 +295,7 @@ const OrganizationForm: React.FC = () => {
                             label="Permissões"
                             value={selectedUserType}
                             onChange={(value) => handleChangeUserType(value)}
-                            options={userTypeOptions}
+                            options={userTypeOptionsNoOwner}
                             focusedColor="primary"
                             hoverColor="info"
                             marginBottom={2}
@@ -135,6 +305,7 @@ const OrganizationForm: React.FC = () => {
                                 text="Adicionar"
                                 type="button"
                                 colorType="primary"
+                                onClick={addUser}
                                 hoverColorType="primary"
                                 fullWidth={false}
                                 sx={{ width: '120px', height: '56px', marginTop: '16px' }}
@@ -203,7 +374,7 @@ const OrganizationForm: React.FC = () => {
                             >
                                 {users.map((user) => (
                                     <Box
-                                        key={user.id}
+                                        key={user.username}
                                         sx={{
                                             display: 'flex',
                                             alignItems: 'center',
@@ -224,18 +395,20 @@ const OrganizationForm: React.FC = () => {
                                                 sx={{ color: theme.palette.text.secondary }}
                                             />
                                         </Box>
-                                        <Close
-                                            sx={{
-                                                fontSize: '1.5rem',
-                                                color: theme.palette.text.secondary,
-                                                borderRadius: '50%',
-                                                cursor: 'pointer',
-                                                '&:hover': {
-                                                    backgroundColor: theme.palette.error.light,
-                                                    color: theme.palette.error.main,
-                                                }
-                                            }}
-                                        />
+                                        {user.type !== "Proprietário" && (
+                                            <Close
+                                                onClick={() => removeUser(user.username)}
+                                                sx={{
+                                                    fontSize: '1.5rem',
+                                                    color: theme.palette.text.secondary,
+                                                    borderRadius: '50%',
+                                                    cursor: 'pointer',
+                                                    '&:hover': {
+                                                        backgroundColor: theme.palette.error.light,
+                                                        color: theme.palette.error.main,
+                                                    }
+                                                }}
+                                            />)}
                                     </Box>
                                 ))}
                             </Box>
@@ -247,6 +420,7 @@ const OrganizationForm: React.FC = () => {
                             text="Salvar"
                             type="button"
                             colorType="primary"
+                            onClick={handleSave}
                             hoverColorType="primary"
                             fullWidth={false}
                             paddingY={1}
@@ -256,6 +430,27 @@ const OrganizationForm: React.FC = () => {
                         />
                     </Box>
                 </Box>
+                {showMessage && message && (
+                    <Box
+                        sx={{
+                            position: 'absolute',
+                            bottom: '0%',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            display: 'flex',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            gap: 2,
+                            textAlign: 'left',
+                        }}>
+                        <CustomAlert
+                            severity={message.severity}
+                            colorType={message.colorType}
+                            title={message.title}
+                            description={message.description}
+                        />
+                    </Box>
+                )}
             </Box>
         </Box>
     );

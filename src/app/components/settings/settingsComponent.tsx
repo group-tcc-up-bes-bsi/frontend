@@ -9,22 +9,14 @@ import {
     Radio,
     IconButton,
 } from '@mui/material';
-import CustomTypography from '../CustomTypography';
+import CustomTypography from '../customTypography';
 import { AccountCircleRounded, CachedRounded } from '@mui/icons-material';
-import CustomButton from '../CustomButton';
-import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
-import MsgConfirm from '../notification/msgConfirm';
+import CustomButton from '../customButton';
+import { useAuth } from '../useAuth';
 
 const SettingsComponent: React.FC = () => {
+    useAuth();
     const { theme } = useTheme();
-    const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
-    const alterConfirm = useMsgConfirmStore((state) => state.alter);
-    const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
-
-    const toggleConfirm = () => {
-        alterMsgConfirm('excluir a Conta?')
-        alterConfirm(!openConfirm);
-    }
 
     return (
         <Box sx={{
@@ -37,8 +29,8 @@ const SettingsComponent: React.FC = () => {
         }}>
             <Box sx={{
                 backgroundColor: theme.palette.background.default,
-                padding: 3,
-                width: '50%'
+                padding: 2,
+                width: '70%'
             }}>
                 <Box sx={{
                     display: 'flex',
@@ -53,16 +45,7 @@ const SettingsComponent: React.FC = () => {
                             color: theme.palette.text.primary,
                             fontSize: 100
                         }} />
-                        <CustomButton
-                            text="Alterar foto"
-                            fullWidth={false}
-                            type="button"
-                            colorType="primary"
-                            hoverColorType="primary"
-                            paddingY={2}
-                            paddingX={4}
-                            marginTop={0.5}
-                        />
+
                     </Box>
                     <CustomTypography
                         text='Usuário'
@@ -237,23 +220,8 @@ const SettingsComponent: React.FC = () => {
                         paddingX={4}
                         marginTop={0.5}
                     />
-                    <CustomButton
-                        text="Excluir conta"
-                        fullWidth={false}
-                        onClick={() => toggleConfirm()}
-                        type="button"
-                        colorType="error"
-                        hoverColorType="error"
-                        paddingY={2}
-                        paddingX={4}
-                        marginTop={0.5}
-                    />
                 </Box>
             </Box>
-            {openConfirm && (
-                <MsgConfirm />
-            )
-            }
         </Box >
     );
 };

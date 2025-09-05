@@ -1,8 +1,8 @@
 "use client"
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '../../theme/ThemeContext';
-import CustomButton from '../../components/CustomButton';
-import CustomTextField from '../../components/CustomTextField';
+import CustomButton from '../../components/customButton';
+import CustomTextField from '../../components/customTextField';
 import {
     Box,
     Container,
@@ -10,13 +10,11 @@ import {
     useMediaQuery,
     Theme,
 } from '@mui/material';
-import CustomTypography from '../../components/CustomTypography';
-import CustomAlert from '../../components/CustomAlert';
+import CustomTypography from '../../components/customTypography';
+import CustomAlert from '../../components/customAlert';
 import { MessageObj } from '@/app/models/MessageObj';
-import AdminPasswordModal from '@/app/components/admin/AdminPasswordModal';
+import AdminPasswordModal from '@/app/components/admin/adminPasswordModal';
 import { Admin, useAdminPassStore } from '@/app/state/adminPassState';
-import { isLoginValid } from '@/app/services/User/ValidForms';
-import { getByUserName } from '@/app/services/User/getByUserName';
 
 const ResetPassword: React.FC = () => {
     const [user, setUser] = useState('');
@@ -46,24 +44,27 @@ const ResetPassword: React.FC = () => {
     }, [showAdminRequest]);
 
     const handleSubmitUserName = async () => {
-        try {
-            const result = await getByUserName(user);
-            setMessage(result.message);
-
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            if (result.message.severity === 'success') {
-                const admin: Admin = {
-                    userId: result.user.userId,
-                    UserName: result.user.UserName,
-                    Password: password,
-                    AdminPass: ''
-                }
-                alterAdmin(admin);
-                alterAdminPass(true);
-            }
-        } catch (error) {
-            setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
+        if (!user.trim()) {
+            setMessage(new MessageObj('error', 'Erro', 'O usuário é obrigatório', 'error'));
+            return;
         }
+        if (password.length < 4) {
+            setMessage(new MessageObj('error', 'Erro', 'A senha deve ter no mínimo 4 caracteres', 'error'));
+            return;
+        }
+        if (!password.trim()) {
+            setMessage(new MessageObj('error', 'Erro', 'A senha inválida', 'error'));
+            return;
+        }
+        const admin: Admin = {
+            userId: 0,
+            UserName: user,
+            Password: password,
+            AdminPass: ''
+        }
+
+        alterAdmin(admin);
+        alterAdminPass(true);
     }
 
     return (
@@ -75,7 +76,6 @@ const ResetPassword: React.FC = () => {
         }}>
             <CssBaseline />
 
-            {/* Right side - Image/Title (60%) */}
             {!isMobile && (
                 <Box
                     sx={{
@@ -232,7 +232,6 @@ const ResetPassword: React.FC = () => {
                             type="button"
                             colorType="primary"
                             hoverColorType="primary"
-                            disabled={!isLoginValid(user, password)}
                             onClick={() => handleSubmitUserName()}
                         />
 

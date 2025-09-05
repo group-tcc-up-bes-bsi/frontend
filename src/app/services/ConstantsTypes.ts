@@ -1,4 +1,4 @@
-export enum organizationsType {
+export enum organizationType {
   ALL = "Todos",
   INDIVIDUAL = "Individual",
   COLLABORATIVE = "Colaborativo",
@@ -10,21 +10,24 @@ export enum userType {
   VIEWER = "Visualizador",
 }
 
-export const organizationsTypeOptions = Object.entries(organizationsType).map(
-  ([key, value]) => ({
-    value: key,
-    label: value,
-  })
-);
+export const organizationsTypeOptions = [
+  { value: "ALL", label: "Todos" },
+  { value: "INDIVIDUAL", label: "Individual" },
+  { value: "COLLABORATIVE", label: "Colaborativo" }
+];
 
-export const organizationsTypeOptionsNoAll = Object.entries(organizationsType)
-  .filter(([key]) => key !== "ALL")
-  .map(([key, value]) => ({
-    value: key,
-    label: value,
-  }));
+export const organizationsTypeOptionsNoAll = [
+  { value: "INDIVIDUAL", label: "Individual" },
+  { value: "COLLABORATIVE", label: "Colaborativo" }
+];
 
-export const userTypeOptions = Object.entries(userType).map(([key, value]) => ({
-  value: key,
-  label: value,
-}));
+export const userTypeOptions = [
+  { value: "OWNER", label: "Proprietário" },
+  { value: "INDIVIDUAL", label: "Individual" },
+  { value: "COLLABORATIVE", label: "Colaborativo" }
+];
+
+export const userTypeOptionsNoOwner = [
+  { value: "INDIVIDUAL", label: "Individual" },
+  { value: "COLLABORATIVE", label: "Colaborativo" }
+];

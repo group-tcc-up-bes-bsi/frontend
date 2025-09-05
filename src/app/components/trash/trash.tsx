@@ -6,17 +6,19 @@ import {
     IconButton,
     TableSortLabel
 } from '@mui/material';
-import CustomTypography from '../CustomTypography';
-import CustomTextField from '../CustomTextField';
+import CustomTypography from '../customTypography';
+import CustomTextField from '../customTextField';
 import { CachedRounded, Delete } from '@mui/icons-material';
-import CustomButton from '../CustomButton';
+import CustomButton from '../customButton';
 import { DocumentObj } from '@/app/models/DocumentObj';
 import { formatDate, getDocumentsTrash } from '@/app/services/Documents/DocumentsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
 import MsgConfirm from '../notification/msgConfirm';
+import { useAuth } from '../useAuth';
 
 const Trash: React.FC = () => {
+    useAuth();
     const { theme } = useTheme();
     const { filter, setFilter } = useFilterStore();
     const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
@@ -35,8 +37,8 @@ const Trash: React.FC = () => {
         return documents.filter((doc) =>
             doc.name.toLowerCase().includes(searchTerm) ||
             doc.type.toLowerCase().includes(searchTerm) ||
-            formatDate(doc.createdAt).toLowerCase().includes(searchTerm) ||
-            formatDate(doc.updatedAt).toLowerCase().includes(searchTerm) ||
+            formatDate(doc.creationDate).toLowerCase().includes(searchTerm) ||
+            formatDate(doc.lastModifiedDate).toLowerCase().includes(searchTerm) ||
             doc.version.toLowerCase().includes(searchTerm)
         );
     }, [documents, filter]);
@@ -131,12 +133,12 @@ const Trash: React.FC = () => {
                                     </TableHead>
                                     <TableBody>
                                         {filteredDocuments.map((doc) => (
-                                            <TableRow key={doc.id}>
+                                            <TableRow key={doc.documentId}>
                                                 <TableCell sx={{ background: theme.palette.background.default }}>{doc.name}</TableCell>
                                                 <TableCell sx={{ background: theme.palette.background.default }}>{doc.type}</TableCell>
-                                                <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(doc.createdAt)}</TableCell>
-                                                <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(doc.updatedAt)}</TableCell>
-                                                <TableCell sx={{ background: theme.palette.background.default }}>{doc.organization.title}</TableCell>
+                                                <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(doc.creationDate)}</TableCell>
+                                                <TableCell sx={{ background: theme.palette.background.default }}>{formatDate(doc.lastModifiedDate)}</TableCell>
+                                                <TableCell sx={{ background: theme.palette.background.default }}>{doc.organization.name}</TableCell>
                                                 <TableCell sx={{ background: theme.palette.background.default }}>
                                                     <Box
                                                         sx={{

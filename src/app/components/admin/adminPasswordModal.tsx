@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { Box, Backdrop, Button } from '@mui/material';
 import { Close } from '@mui/icons-material';
-import CustomTextField from '../CustomTextField';
+import CustomTextField from '../customTextField';
 import { useAdminPassStore } from '@/app/state/adminPassState';
 import { updatePasswordUser } from '@/app/services/User/updateUser';
 import { MessageObj } from '@/app/models/MessageObj';
-import CustomAlert from '../CustomAlert';
+import CustomAlert from '../customAlert';
 
 const AdminPasswordModal: React.FC = () => {
     const { theme } = useTheme();
@@ -26,7 +26,7 @@ const AdminPasswordModal: React.FC = () => {
                 setMessage(result.message);
 
                 await new Promise(resolve => setTimeout(resolve, 1000));
-                if (message.severity === 'success') {
+                if (result.message.severity === 'success') {
                     handleClose();
                 }
             }

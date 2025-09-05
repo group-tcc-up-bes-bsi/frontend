@@ -1,20 +1,15 @@
-import { OrganizationObjSimple } from "./OrganizationObj";
+import { OrganizationObj } from "./OrganizationObj";
 
 export interface DocumentObj {
-  id: number;
+  documentId: number;
   name: string;
   type: string;
-  createdAt: Date;
-  updatedAt: Date;
+  description: string;
+  creationDate: Date;
+  lastModifiedDate: Date;
   version: string;
   creator: string;
   imagemSrc: string;
-  organization: OrganizationObjSimple;
-}
-
-export interface DocumentFavorite{
-  id: number;
-  name: string;
+  organization: OrganizationObj;
   favorite: boolean;
-  organization: OrganizationObjSimple;
 }

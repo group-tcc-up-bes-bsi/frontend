@@ -5,18 +5,20 @@ import {
     TableHead, TableRow, Paper,
     IconButton
 } from '@mui/material';
-import CustomTypography from '../CustomTypography';
-import CustomTextField from '../CustomTextField';
+import CustomTypography from '../customTypography';
+import CustomTextField from '../customTextField';
 import { Star } from '@mui/icons-material';
-import { getOrganizationsFavorites } from '@/app/services/Organizations/OrganizationsServices';
-import { getDocumentsFavorites } from '@/app/services/Documents/DocumentsServices';
+import { getMyOrganizations } from '@/app/services/Organizations/organizationsServices';
+import { getDocuments } from '@/app/services/Documents/DocumentsServices';
 import { useFilterStore } from '@/app/state/filterState';
+import { useAuth } from '../useAuth';
 
 const Favorites: React.FC = () => {
+    useAuth();
     const { theme } = useTheme();
     const { filter, setFilter } = useFilterStore();
 
-    const [documents, setDocuments] = useState(getDocumentsFavorites());
+    const [documents, setDocuments] = useState(getDocuments());
 
     const filteredDocuments = useMemo(() => {
         if (!filter.trim()) {
@@ -27,11 +29,11 @@ const Favorites: React.FC = () => {
 
         return documents.filter((doc) =>
             doc.name.toLowerCase().includes(searchTerm) ||
-            doc.organization.title.toLowerCase().includes(searchTerm)
+            doc.organization.name.toLowerCase().includes(searchTerm)
         );
     }, [documents, filter]);
 
-    const [organizations, setOrganizations] = useState(getOrganizationsFavorites());
+    const [organizations, setOrganizations] = useState(getMyOrganizations(theme));
 
     const filteredOrganizations = useMemo(() => {
         if (!filter.trim()) {
@@ -40,8 +42,7 @@ const Favorites: React.FC = () => {
 
         const searchTerm = filter.toLowerCase().trim();
         return organizations.filter((org) =>
-            org.title.toLowerCase().includes(searchTerm) ||
-            org.totDocuments.toString().includes(searchTerm)
+            org.name.toLowerCase().includes(searchTerm)
         );
     }, [organizations, filter]);
 
@@ -114,7 +115,7 @@ const Favorites: React.FC = () => {
                                     </TableHead>
                                     <TableBody>
                                         {filteredDocuments.map((doc) => (
-                                            <TableRow key={doc.id}>
+                                            <TableRow key={doc.documentId}>
                                                 <TableCell>
                                                     <IconButton aria-label="star" onClick={() => handleFavoriteToggle(doc)}>
                                                         <Star sx={{
@@ -127,7 +128,7 @@ const Favorites: React.FC = () => {
                                                     </IconButton>
                                                 </TableCell>
                                                 <TableCell sx={{ color: theme.palette.text.primary }}>{doc.name}</TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>{doc.organization.title}</TableCell>
+                                                <TableCell sx={{ color: theme.palette.text.primary }}>{doc.organization.name}</TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -188,7 +189,7 @@ const Favorites: React.FC = () => {
                                     </TableHead>
                                     <TableBody>
                                         {filteredOrganizations.map((org) => (
-                                            <TableRow key={org.id}>
+                                            <TableRow key={org.organizationId}>
                                                 <TableCell>
                                                     <IconButton aria-label="star" onClick={() => handleFavoriteOrganizationToggle(org)}>
                                                         <Star sx={{
@@ -200,8 +201,8 @@ const Favorites: React.FC = () => {
                                                         }} />
                                                     </IconButton>
                                                 </TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>{org.title}</TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>{org.totDocuments}</TableCell>
+                                                <TableCell sx={{ color: theme.palette.text.primary }}>{org.name}</TableCell>
+                                                <TableCell sx={{ color: theme.palette.text.primary }}>10</TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
