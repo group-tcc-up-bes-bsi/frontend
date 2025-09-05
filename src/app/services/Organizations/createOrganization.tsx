@@ -22,7 +22,7 @@ export async function createOrganization(Name: string, Description: string, Orga
         const responseData = await response.json().catch(() => null);
 
         if (!response.ok) {
-            if (responseData.message == 'User already exists') {
+            if (responseData.message == 'Organization already exists') {
                 return {
                     message: new MessageObj(
                         'error',
