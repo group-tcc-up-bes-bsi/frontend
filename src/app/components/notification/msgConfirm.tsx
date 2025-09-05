@@ -10,15 +10,20 @@ const MsgConfirm: React.FC = () => {
     useAuth();
     const { theme } = useTheme();
     const msgConfirm = useMsgConfirmStore((state) => state.msgConfirm);
-    const alterMsgConfirm = useMsgConfirmStore((state) => state.alter);
-    const alterConfirm = useMsgConfirmStore((state) => state.alterConfirm);
+    const alterConfirm = useMsgConfirmStore((state) => state.alter);
+    const alterConfirmRes = useMsgConfirmStore((state) => state.alterConfirm);
     const textMsg = 'Deseja realmente ' + msgConfirm;
+
+    const toggleConfirm = () => {
+        alterConfirm(false);
+        alterConfirmRes(true);
+    }
 
     return (
         <Box className="flex items-center justify-center">
             <Backdrop
                 open={true}
-                onClick={() => { alterMsgConfirm(false); alterConfirm(false); }}
+                onClick={() => { alterConfirm(false); alterConfirmRes(false); }}
                 sx={{
                     zIndex: 1320,
                     color: '#fff',
@@ -58,7 +63,7 @@ const MsgConfirm: React.FC = () => {
                     text="Confirmar"
                     fullWidth={false}
                     type="button"
-                    onClick={() => { alterMsgConfirm(false); alterConfirm(true); }}
+                    onClick={toggleConfirm}
                     colorType="primary"
                     hoverColorType="primary"
                     paddingY={1}
