@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import {
     Box, Divider, Table, TableBody, TableCell, TableContainer,
@@ -12,13 +12,25 @@ import { getMyOrganizations } from '@/app/services/Organizations/organizationsSe
 import { getDocuments } from '@/app/services/Documents/DocumentsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { useAuth } from '../useAuth';
+import { useUserStore } from '@/app/state/userState';
+import { OrganizationObj } from '@/app/models/OrganizationObj';
 
 const Favorites: React.FC = () => {
     useAuth();
     const { theme } = useTheme();
     const { filter, setFilter } = useFilterStore();
-
+    const userCurrent = useUserStore((state) => state.userCurrent)
     const [documents, setDocuments] = useState(getDocuments());
+    const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
+
+    useEffect(() => {
+        if (userCurrent != undefined) {
+            (async () => {
+                const result = await getMyOrganizations(userCurrent, theme);
+                setOrganizations(result.organizations);
+            })();
+        }
+    }, [userCurrent, theme]);
 
     const filteredDocuments = useMemo(() => {
         if (!filter.trim()) {
@@ -32,8 +44,6 @@ const Favorites: React.FC = () => {
             doc.organization.name.toLowerCase().includes(searchTerm)
         );
     }, [documents, filter]);
-
-    const [organizations, setOrganizations] = useState(getMyOrganizations(theme));
 
     const filteredOrganizations = useMemo(() => {
         if (!filter.trim()) {

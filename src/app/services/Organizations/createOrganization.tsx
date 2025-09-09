@@ -2,7 +2,7 @@ import { MessageObj } from "@/app/models/MessageObj";
 import { getErrorTitle } from "../ErrorTitle";
 import { UserObj } from "@/app/models/UserObj";
 
-export async function createOrganization(Name: string, Description: string, OrganizationType: string, userCurrent: UserObj) {
+export async function createOrganization(Name: string, Description: string, OrganizationType: string, userCurrent: UserObj): Promise<{ message: MessageObj; organizationId: number }> {
     const url = `${process.env.NEXT_PUBLIC_BACKEND}/organizations`;
     const organizationData = {
         name: Name,
@@ -23,40 +23,45 @@ export async function createOrganization(Name: string, Description: string, Orga
 
         if (!response.ok) {
             if (responseData.message == 'Organization already exists') {
+                console.log(responseData)
                 return {
                     message: new MessageObj(
                         'error',
                         'Organização já cadastrada',
                         'Já existe uma Organização com esse nome',
-                        'error')
-                }
-            }
-            return {
-                message: new MessageObj(
-                    'error',
-                    getErrorTitle(responseData.statusCode),
-                    responseData.message,
-                    'error')
+                        'error'),
+                    organizationId: 0
             }
         }
-
-        return {
-            message: new MessageObj(
-                'success',
-                'Organização criada',
-                'Organização criada com sucesso',
-                'success'
-            )
-        };
-    } catch (error) {
-        console.error(error)
         return {
             message: new MessageObj(
                 'error',
-                getErrorTitle(500),
-                `Erro: Servidor inoperante`,
-                'error'
-            )
-        };
+                getErrorTitle(responseData.statusCode),
+                responseData.message,
+                'error'),
+            organizationId: 0
+        }
     }
+
+        return {
+        message: new MessageObj(
+            'success',
+            'Organização criada',
+            'Organização criada com sucesso',
+            'success'
+        ),
+        organizationId: responseData.organizationId
+    };
+} catch (error) {
+    console.error(error)
+    return {
+        message: new MessageObj(
+            'error',
+            getErrorTitle(500),
+            `Erro: Servidor inoperante`,
+            'error'
+        ),
+        organizationId: 0
+    };
+}
 }

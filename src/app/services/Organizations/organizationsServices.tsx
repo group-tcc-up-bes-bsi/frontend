@@ -35,10 +35,14 @@ export async function getMyOrganizations(userCurrent: UserObj, theme: Theme): Pr
             organizationId: item.organizationId,
             name: item.name,
             description: item.description,
-            organizationType: item.organizationType.toUpperCase() === 'COLLABORATIVE' ? organizationType.COLLABORATIVE : organizationType.INDIVIDUAL,
+            organizationType: item.organizationType.toUpperCase() === 'COLLABORATIVE' ?
+                organizationType.COLLABORATIVE
+                : organizationType.INDIVIDUAL,
             favorite: false, //Ajustar quando implementar favoritos
             borderColor: theme.palette.text.primary,
-            icon: <Folder sx={{ color: theme.palette.button.primary }} />
+            icon: item.organizationType.toUpperCase() === 'COLLABORATIVE'
+                ? <Folder sx={{ color: theme.palette.button.star }} />
+                : <Folder sx={{ color: theme.palette.button.primary }} />
 
         }));
 
@@ -83,7 +87,9 @@ export async function getOrganizationUsers(
 
         const responseData = await response.json().catch(() => null);
 
-        if (!responseData || !Array.isArray(responseData) || responseData.length === 0) {
+        const orgUsers = responseData?.organizationUsers;
+
+        if (!orgUsers || !Array.isArray(orgUsers) || orgUsers.length === 0) {
             return {
                 message: new MessageObj(
                     'error',
@@ -95,9 +101,11 @@ export async function getOrganizationUsers(
             };
         }
 
-        const users: UserOrganization[] = responseData.map((item) => ({
+        const users: UserOrganization[] = orgUsers.map((item) => ({
+            userId: 0,
+            organizationId: orgId,
             username: item.user,
-            type: item.userType,
+            userType: (item.userType).toUpperCase(),
             inviteAccepted: item.inviteAccepted,
         }));
 

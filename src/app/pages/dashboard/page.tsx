@@ -46,7 +46,6 @@ const Dashboard = () => {
                 logoutUser();
             }
         }
-
         fetchUserData();
     }, []);
 

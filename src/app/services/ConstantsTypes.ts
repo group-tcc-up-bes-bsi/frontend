@@ -6,8 +6,8 @@ export enum organizationType {
 
 export enum userType {
   OWNER = "Proprietário",
-  READ = "Editor",
-  VIEWER = "Visualizador",
+  WRITE = "Editor",
+  READ = "Visualizador",
 }
 
 export const organizationsTypeOptions = [
@@ -23,11 +23,16 @@ export const organizationsTypeOptionsNoAll = [
 
 export const userTypeOptions = [
   { value: "OWNER", label: "Proprietário" },
-  { value: "INDIVIDUAL", label: "Individual" },
-  { value: "COLLABORATIVE", label: "Colaborativo" }
+  { value: "WRITE", label: "Editor" },
+  { value: "READ", label: "Visualizador" }
 ];
 
 export const userTypeOptionsNoOwner = [
-  { value: "INDIVIDUAL", label: "Individual" },
-  { value: "COLLABORATIVE", label: "Colaborativo" }
+  { value: "WRITE", label: "Editor" },
+  { value: "READ", label: "Visualizador" }
 ];
+
+export function getUserTypeLabel(value: string): string {
+  const option = userTypeOptions.find(opt => opt.value === value.toUpperCase());
+  return option ? option.label : value;
+}
