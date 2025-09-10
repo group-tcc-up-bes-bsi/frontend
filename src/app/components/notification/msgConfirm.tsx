@@ -12,11 +12,12 @@ const MsgConfirm: React.FC = () => {
     const msgConfirm = useMsgConfirmStore((state) => state.msgConfirm);
     const alterConfirm = useMsgConfirmStore((state) => state.alter);
     const alterConfirmRes = useMsgConfirmStore((state) => state.alterConfirm);
+    const onConfirm = useMsgConfirmStore((state) => state.onConfirm);
     const textMsg = 'Deseja realmente ' + msgConfirm;
 
-    const toggleConfirm = () => {
+    const toggleConfirm = async () => {
+        if (onConfirm) await onConfirm();
         alterConfirm(false);
-        alterConfirmRes(true);
     }
 
     return (

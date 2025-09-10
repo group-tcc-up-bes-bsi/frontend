@@ -19,8 +19,8 @@ export async function updateOrganizationUser(user: UserOrganization, userCurrent
             body: JSON.stringify(organizationUserData)
         });
 
-        await response.json().catch(() => null);
-
+        const responseData = await response.json().catch(() => null);
+        console.log(responseData)
     } catch (error) {
         console.error(error)
         return {

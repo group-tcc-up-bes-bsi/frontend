@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { Box, Divider, IconButton, Menu, MenuItem } from '@mui/material';
+import { Box, Divider, IconButton, Menu, MenuItem, CircularProgress } from '@mui/material';
 import CustomTypography from '../customTypography';
 import CustomComboBox from '../customComboBox';
 import CustomTextField from '../customTextField';
@@ -31,19 +31,24 @@ const Organization: React.FC = () => {
     const alterOrganization = useOrganizationStateStore((state) => state.alter);
     const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
     const alterConfirm = useMsgConfirmStore((state) => state.alter);
-    const confirm= useMsgConfirmStore((state) => state.confirm);
     const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
     const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
-    const userCurrent = useUserStore((state) => state.userCurrent)
+    const userCurrent = useUserStore((state) => state.userCurrent);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (userCurrent != undefined) {
             (async () => {
-                const result = await getMyOrganizations(userCurrent, theme);
-                setOrganizations(result.organizations);
+                setLoading(true);
+                try {
+                    const result = await getMyOrganizations(userCurrent, theme);
+                    setOrganizations(result.organizations);
+                } finally {
+                    setLoading(false);
+                }
             })();
         }
-    }, [userCurrent, theme]);
+    }, [userCurrent, theme, organizationForm]);
 
     const handleChangeOrganizationType = (value: string) => {
         setSelectedOrganizationType(value);
@@ -54,6 +59,8 @@ const Organization: React.FC = () => {
     }
 
     const filteredOrganizations = useMemo(() => {
+        setLoading(true);
+
         let filtered = organizations;
 
         if (selectedOrganizationType == 'COLLABORATIVE') {
@@ -63,15 +70,19 @@ const Organization: React.FC = () => {
         }
 
         if (!filter.trim()) {
+            setTimeout(() => setLoading(false), 500);
             return filtered;
         }
 
         const searchTerm = filter.toLowerCase().trim();
-        return filtered.filter((org) =>
+        const result = filtered.filter((org) =>
             org.name.toLowerCase().includes(searchTerm) ||
             org.description.toLowerCase().includes(searchTerm)
         );
-    }, [organizations, filter]);
+
+        setTimeout(() => setLoading(false), 300);
+        return result;
+    }, [organizations, filter, selectedOrganizationType]);
 
     const handleOrganizationAlter = () => {
         if (selectedOrganization) {
@@ -97,11 +108,17 @@ const Organization: React.FC = () => {
 
     const toggleConfirm = (organization: OrganizationObj) => {
         alterMsgConfirm(`excluir a organização ${organization.name}?`);
-        alterConfirm(!openConfirm);
-        if(confirm){
-            deleteOrganization(/*organization.organizationId, userCurrent*/)
-        }
-    }
+        alterConfirm(true);
+        useMsgConfirmStore.getState().setOnConfirm(async () => {
+            if (userCurrent) {
+                await deleteOrganization(organization.organizationId, userCurrent);
+                setOrganizations((prev) =>
+                    prev.filter((org) => org.organizationId !== organization.organizationId)
+                );
+            }
+        });
+    };
+
 
     return (
         <Box sx={{ maxWidth: '100%' }}>
@@ -118,8 +135,7 @@ const Organization: React.FC = () => {
                             marginTop={0.5}
                         />
                     </Box>
-                    <Box
-                        sx={{ width: '60%' }}>
+                    <Box sx={{ width: '60%' }}>
                         <CustomTextField
                             name="filter"
                             label="Informe um detalhe da organização"
@@ -145,9 +161,7 @@ const Organization: React.FC = () => {
             </Box>
             <Divider sx={{ backgroundColor: theme.palette.text.primary, marginBottom: 3 }} />
             <Box sx={{ backgroundColor: theme.palette.background.default, padding: 1 }}>
-                <Box
-                    sx={{ width: '100%', display: 'flex', marginLeft: '3rem' }}
-                >
+                <Box sx={{ width: '100%', display: 'flex', marginLeft: '3rem' }}>
                     <CustomTypography
                         text="Organizações"
                         component="h2"
@@ -160,90 +174,93 @@ const Organization: React.FC = () => {
                         }}
                     />
                 </Box>
-                <Box
-                    sx={{
-                        maxHeight: 'calc(85vh - 150px)',
-                        overflowY: 'auto',
-                        pr: 2,
-                        '&::-webkit-scrollbar': {
-                            width: '6px',
-                        },
-                        '&::-webkit-scrollbar-track': {
-                            background: theme.palette.background.default,
-                        },
-                        '&::-webkit-scrollbar-thumb': {
-                            backgroundColor: theme.palette.primary.main,
-                            borderRadius: '3px',
-                        },
-                    }}
-                >
-                    {filteredOrganizations.map((org) => (
-                        <Box
-                            key={org.organizationId}
-                            sx={{
-                                mb: 2,
-                                p: 2,
-                                border: `1px solid ${org.borderColor}`,
-                            }}
-                        >
-                            <Box sx={{ display: 'flex', gap: 4, justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Box sx={{ display: 'flex', gap: 4 }}>
-                                    <Star sx={{ color: theme.palette.text.primary }} />
+
+                {loading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+                        <CircularProgress color="primary" />
+                    </Box>
+                ) : (
+                    <Box
+                        sx={{
+                            maxHeight: 'calc(85vh - 150px)',
+                            overflowY: 'auto',
+                            pr: 2,
+                            '&::-webkit-scrollbar': {
+                                width: '6px',
+                            },
+                            '&::-webkit-scrollbar-track': {
+                                background: theme.palette.background.default,
+                            },
+                            '&::-webkit-scrollbar-thumb': {
+                                backgroundColor: theme.palette.primary.main,
+                                borderRadius: '3px',
+                            },
+                        }}
+                    >
+                        {filteredOrganizations.map((org) => (
+                            <Box
+                                key={org.organizationId}
+                                sx={{
+                                    mb: 2,
+                                    p: 2,
+                                    border: `1px solid ${org.borderColor}`,
+                                }}
+                            >
+                                <Box sx={{ display: 'flex', gap: 4, justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Box sx={{ display: 'flex', gap: 4 }}>
+                                        <Star sx={{ color: theme.palette.text.primary }} />
+                                        <CustomTypography
+                                            text={org.name}
+                                            component="h2"
+                                            variant="h5"
+                                            sx={{
+                                                color: theme.palette.text.primary,
+                                                fontWeight: 'bold',
+                                            }}
+                                        />
+                                    </Box>
                                     <CustomTypography
-                                        text={org.name}
-                                        component="h2"
-                                        variant="h5"
-                                        sx={{
-                                            color: theme.palette.text.primary,
-                                            fontWeight: 'bold',
-                                        }}
+                                        text={org.organizationType || ''}
+                                        component="p"
+                                        variant="h6"
+                                        sx={{ color: theme.palette.text.secondary, display: 'block' }}
                                     />
                                 </Box>
-                                <CustomTypography
-                                    text={org.organizationType || ''}
-                                    component="p"
-                                    variant="h6"
-                                    sx={{ color: theme.palette.text.secondary, display: 'block' }}
-                                />
+                                <Box sx={{ display: 'flex', gap: 4, justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <CustomTypography
+                                        text={org.description}
+                                        component="p"
+                                        variant="h6"
+                                        sx={{ color: theme.palette.text.secondary, mb: 1 }}
+                                    />
+                                    <IconButton
+                                        aria-label="more"
+                                        onClick={(event) => {
+                                            setAnchorEl(event.currentTarget);
+                                            setSelectedOrganization(org);
+                                        }}
+                                    >
+                                        <MoreVert />
+                                    </IconButton>
+                                    <Menu
+                                        anchorEl={anchorEl}
+                                        open={Boolean(anchorEl) && selectedOrganization?.organizationId === org.organizationId}
+                                        onClose={() => setAnchorEl(null)}
+                                    >
+                                        <MenuItem onClick={() => ({})}>Abrir</MenuItem>
+                                        <MenuItem onClick={handleOrganizationAlter}>Alterar</MenuItem>
+                                        <MenuItem onClick={() => { toggleConfirm(org) }}>Excluir</MenuItem>
+                                    </Menu>
+                                </Box>
                             </Box>
-                            <Box sx={{ display: 'flex', gap: 4, justifyContent: 'space-between', alignItems: 'center' }}>
-                                <CustomTypography
-                                    text={org.description}
-                                    component="p"
-                                    variant="h6"
-                                    sx={{ color: theme.palette.text.secondary, mb: 1 }}
-                                />
-                                <IconButton
-                                    aria-label="more"
-                                    onClick={(event) => {
-                                        setAnchorEl(event.currentTarget);
-                                        setSelectedOrganization(org);
-                                    }}
-                                >
-                                    <MoreVert />
-                                </IconButton>
-                                <Menu
-                                    anchorEl={anchorEl}
-                                    open={Boolean(anchorEl) && selectedOrganization?.organizationId === org.organizationId}
-                                    onClose={() => setAnchorEl(null)}
-                                >
-                                    <MenuItem onClick={() => ({})}>Abrir</MenuItem>
-                                    <MenuItem onClick={handleOrganizationAlter}>Alterar</MenuItem>
-                                    <MenuItem onClick={() => toggleConfirm(org)}>Excluir</MenuItem>
-                                </Menu>
-                            </Box>
-                        </Box>
-                    ))}
-                </Box>
-                {organizationForm && (
-                    <OrganizationForm />
-                )
-                }
-                {openConfirm && (
-                    <MsgConfirm />
+                        ))}
+                    </Box>
                 )}
+
+                {organizationForm && <OrganizationForm />}
+                {openConfirm && <MsgConfirm />}
             </Box>
-        </Box >
+        </Box>
     );
 };
 

@@ -2,7 +2,7 @@ import { MessageObj } from "@/app/models/MessageObj";
 import { getErrorTitle } from "../ErrorTitle";
 import { UserObj } from "@/app/models/UserObj";
 
-export async function updateOrganization(orgId: number, Name: string, Description: string, OrganizationType: string, userCurrent: UserObj): Promise<{ message: MessageObj; organizationId: number }> {
+export async function updateOrganization(orgId: number, Name: string, Description: string, OrganizationType: string, userCurrent: UserObj): Promise<{ message: MessageObj }> {
     const url = `${process.env.NEXT_PUBLIC_BACKEND}/organizations/${orgId}`;
     const organizationData = {
         name: Name,
@@ -19,8 +19,7 @@ export async function updateOrganization(orgId: number, Name: string, Descriptio
             body: JSON.stringify(organizationData)
         });
 
-        const responseData = await response.json().catch(() => null);
-
+        await response.json().catch(() => null);
         return {
         message: new MessageObj(
             'success',
@@ -28,7 +27,6 @@ export async function updateOrganization(orgId: number, Name: string, Descriptio
             'Organização atualizada com sucesso',
             'success'
         ),
-        organizationId: responseData.organizationId
     };
 } catch (error) {
     console.error(error)
@@ -39,7 +37,6 @@ export async function updateOrganization(orgId: number, Name: string, Descriptio
             `Erro: Servidor inoperante`,
             'error'
         ),
-        organizationId: 0
     };
 }
 }

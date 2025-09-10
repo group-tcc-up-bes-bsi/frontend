@@ -293,17 +293,57 @@ const OrganizationForm: React.FC = () => {
                         );
 
                         for (const user of toAdd) {
-                            await addOrganizationUser(user, userCurrent!);
+                            if (user.userType != userType.OWNER) {
+                                try {
+                                    if (userCurrent != undefined) {
+                                        const resultUser = await getByUserName(user.username, userCurrent);
+                                        const userAdd: UserOrganization = {
+                                            userId: resultUser.user.userId,
+                                            organizationId: organization.organizationId,
+                                            username: user.username,
+                                            userType: user.userType,
+                                            inviteAccepted: false,
+                                        }
+                                        await addOrganizationUser(userAdd, userCurrent);
+                                    }
+                                } catch (err) {
+                                    console.error(`Erro ao adicionar ${user.username}`, err);
+                                }
+                            }
                         }
                         for (const user of toRemove) {
-                            await removeOrganizationUser(user, userCurrent!);
+                            try {
+                                const resultUser = await getByUserName(user.username, userCurrent);
+                                const userRemove: UserOrganization = {
+                                    userId: resultUser.user.userId,
+                                    organizationId: organization.organizationId,
+                                    username: user.username,
+                                    userType: user.userType,
+                                    inviteAccepted: false,
+                                }
+                                await removeOrganizationUser(userRemove, userCurrent!);
+                            } catch (err) {
+                                console.error(`Erro ao adicionar ${user.username}`, err);
+                            }
                         }
 
                         for (const user of toUpdate) {
-                            await updateOrganizationUser(user, userCurrent!);
+                            try {
+                                const resultUser = await getByUserName(user.username, userCurrent);
+                                const userUpdate: UserOrganization = {
+                                    userId: resultUser.user.userId,
+                                    organizationId: organization.organizationId,
+                                    username: user.username,
+                                    userType: user.userType,
+                                    inviteAccepted: false,
+                                }
+                                await updateOrganizationUser(userUpdate, userCurrent!);
+                            } catch (err) {
+                                console.error(`Erro ao adicionar ${user.username}`, err);
+                            }
                         }
                     }
-
+                    await new Promise(resolve => setTimeout(resolve, 1000));
                     alterOrganizationForm(false);
                 }
             } catch (error) {
@@ -495,19 +535,43 @@ const OrganizationForm: React.FC = () => {
                                             py: 1,
                                         }}
                                     >
-                                        <Box sx={{ display: 'flex', width: '70%', justifyContent: 'space-between', gap: 1 }}>
+                                        <Box sx={{ display: 'flex', width: '70%', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
                                             <CustomTypography
                                                 text={user.username}
                                                 variant="body1"
                                                 sx={{ fontWeight: 'bold', color: theme.palette.text.primary }}
                                             />
-                                            <CustomTypography
-                                                text={`${getUserTypeLabel(user.userType)}`}
-                                                variant="body2"
-                                                sx={{ color: theme.palette.text.secondary }}
-                                            />
+                                            {user.username === userCurrent?.username ? (
+                                                <CustomTypography
+                                                    text={getUserTypeLabel(user.userType)}
+                                                    variant="body2"
+                                                    sx={{ color: theme.palette.text.secondary }}
+                                                />
+                                            ) : (
+                                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 0.6 }}>
+                                                    <CustomComboBox
+                                                        name={`user-type-${user.username}`}
+                                                        label=""
+                                                        value={user.userType}
+                                                        onChange={(newValue) => {
+                                                            setUsers((prevUsers) =>
+                                                                prevUsers.map((u) =>
+                                                                    u.username === user.username
+                                                                        ? { ...u, userType: newValue as userType }
+                                                                        : u
+                                                                )
+                                                            );
+                                                        }}
+                                                        options={userTypeOptionsNoOwner}
+                                                        focusedColor="primary"
+                                                        hoverColor="info"
+                                                        marginBottom={0}
+                                                        sx={{marginTop: 0}}
+                                                    />
+                                                </Box>
+                                            )}
                                         </Box>
-                                        {user.userType !== "Proprietário" && (
+                                        {user.username !== userCurrent?.username && (
                                             <Close
                                                 onClick={() => removeUser(user.username)}
                                                 sx={{
