@@ -106,7 +106,6 @@ const CustomTextField = ({
           '&.Mui-focused fieldset': {
             borderColor: theme.palette[focusedColor].main
           },
-          // Estilos para a barra de rolagem
           '& textarea::-webkit-scrollbar': {
             width: '6px',
           },
@@ -114,7 +113,7 @@ const CustomTextField = ({
             background: theme.palette.background.paper,
           },
           '& textarea::-webkit-scrollbar-thumb': {
-            backgroundColor: theme.palette.primary.main, // Azul do tema
+            backgroundColor: theme.palette.primary.main,
             borderRadius: '3px',
           },
         },

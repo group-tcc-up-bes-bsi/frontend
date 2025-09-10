@@ -38,7 +38,7 @@ export async function getMyOrganizations(userCurrent: UserObj, theme: Theme): Pr
             organizationType: item.organizationType.toUpperCase() === 'COLLABORATIVE' ?
                 organizationType.COLLABORATIVE
                 : organizationType.INDIVIDUAL,
-            favorite: false, //Ajustar quando implementar favoritos
+            favorite: false,
             borderColor: theme.palette.text.primary,
             icon: item.organizationType.toUpperCase() === 'COLLABORATIVE'
                 ? <Folder sx={{ color: theme.palette.button.star }} />

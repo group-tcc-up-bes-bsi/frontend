@@ -3,12 +3,12 @@ import { Typography, TypographyProps } from '@mui/material';
 import { useTheme as useCustomTheme } from '../theme/ThemeContext';
 
 interface CustomTypographyProps {
-  text: string;
+  text?: string;
   component?: React.ElementType;
   variant?: TypographyProps['variant'];
   align?: 'left' | 'center' | 'right' | 'justify';
   gutterBottom?: boolean;
-  colorType?: 'primary' | 'secondary'; // Corrigido para usar as propriedades de text
+  colorType?: 'primary' | 'secondary';
   marginBottom?: number | string;
   fontWeight?: number | string;
   sx?: TypographyProps['sx'];
@@ -20,7 +20,7 @@ const CustomTypography = ({
   variant = 'h5',
   align = 'center',
   gutterBottom = true,
-  colorType = 'primary', // Valor padrão alterado
+  colorType = 'primary',
   marginBottom = 0,
   fontWeight,
   sx = {},
@@ -35,7 +35,7 @@ const CustomTypography = ({
       align={align}
       gutterBottom={gutterBottom}
       sx={{
-        color: theme.palette.text[colorType], // Acessando a propriedade correta
+        color: theme.palette.text[colorType],
         mb: marginBottom,
         fontWeight,
         ...sx

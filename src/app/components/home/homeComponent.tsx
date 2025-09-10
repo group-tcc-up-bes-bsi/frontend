@@ -66,7 +66,7 @@ const HomeComponent: React.FC = () => {
             <Box sx={{ display: 'flex', gap: 4, alignItems: 'center', justifyContent: 'space-between' }}>
                 <Box>
                     <CustomTypography
-                        text="Usuário: Gregory"
+                        text={userCurrent?.username}
                         component="h2"
                         variant="h6"
                         sx={{
