@@ -3,7 +3,7 @@ import { PieChart, BarChart } from "@mui/x-charts";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { useDocumentStateStore } from "../state/documentState";
+import { useDocumentStore } from "../state/documentState";
 import { Close } from '@mui/icons-material';
 import { useOptionsDashboardStore } from "../state/optionsDashboard";
 import CustomButton from "./customButton";
@@ -13,7 +13,7 @@ import { useAuth } from "./useAuth";
 const StatsDocument: React.FC = () => {
   useAuth();
   const theme = useTheme();
-  const document = useDocumentStateStore((state) => state.document);
+  const document = useDocumentStore((state) => state.document);
   const lastOption = useOptionsDashboardStore((state) => state.lastOption);
   const alterOption = useOptionsDashboardStore((state) => state.alter);
 

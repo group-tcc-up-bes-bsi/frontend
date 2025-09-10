@@ -11,6 +11,11 @@ import CustomTextField from '../customTextField';
 import { useDocumentViewerStore } from '@/app/state/documentViewerState';
 import { useFilterStore } from '@/app/state/filterState';
 import { useAuth } from '../useAuth';
+import { useDocumentFormStore } from '@/app/state/documentFormState';
+import DocumentForm from './documentForm';
+import { useDocumentStore } from '@/app/state/documentState';
+import { DocumentObj } from '@/app/models/DocumentObj';
+import { organizationType } from '@/app/services/ConstantsTypes';
 
 const DocumentsComponent: React.FC = () => {
     useAuth();
@@ -20,6 +25,9 @@ const DocumentsComponent: React.FC = () => {
     const alterModeViewer = useDocumentViewerStore((state) => state.alter);
     const [colorMode1, setColorMode1] = useState(theme.palette.button.primary);
     const [colorMode2, setColorMode2] = useState(theme.palette.text.primary);
+    const documentForm = useDocumentFormStore((state) => state.documentForm);
+    const alterDocumentForm = useDocumentFormStore((state) => state.alter);
+    const alterDoc = useDocumentStore((state) => state.alter);
 
     const toggleModeViewer = (mode: number) => {
         alterModeViewer(mode)
@@ -38,7 +46,29 @@ const DocumentsComponent: React.FC = () => {
     },);
 
     const toggleDocumentForm = () => {
-
+        const document: DocumentObj = {
+            documentId: 0,
+            name: '',
+            type: '',
+            description: '',
+            creationDate: new Date("2023-08-05"),
+            lastModifiedDate: new Date("2023-08-05"),
+            version: '',
+            creator: '',
+            imagemSrc: '',
+            organization: {
+                organizationId: 0,
+                name: "",
+                description: "",
+                favorite: false,
+                organizationType: organizationType.INDIVIDUAL,
+                borderColor: undefined,
+                icon: undefined,
+            },
+            favorite: false,
+        }
+        alterDoc(document)
+        alterDocumentForm(!documentForm);
     }
 
     return (
@@ -146,6 +176,7 @@ const DocumentsComponent: React.FC = () => {
                     <Documents />
                 </Box>
             )}
+            {documentForm && <DocumentForm />}
         </Box >
     );
 };

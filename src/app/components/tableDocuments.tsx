@@ -15,7 +15,7 @@ import {
 import { MoreVert } from '@mui/icons-material';
 import { useTheme } from '@/app/theme/ThemeContext';
 import React, { useState, useMemo } from 'react';
-import { useDocumentStateStore } from '../state/documentState';
+import { useDocumentStore } from '../state/documentState';
 import { useOptionsDashboardStore } from '../state/optionsDashboard';
 import { formatDate, getDocuments } from '../services/Documents/DocumentsServices';
 import { DocumentObj } from '../models/DocumentObj';
@@ -23,19 +23,22 @@ import { useFilterStore } from '../state/filterState';
 import { useMsgConfirmStore } from '../state/msgConfirmState';
 import MsgConfirm from './notification/msgConfirm';
 import { useAuth } from './useAuth';
+import { useDocumentFormStore } from '../state/documentFormState';
+import DocumentForm from './documents/documentForm';
 
 const TableDocuments = () => {
     useAuth();
     const { theme } = useTheme();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedDoc, setSelectedDoc] = useState<DocumentObj | null>(null);
-    const alterDoc = useDocumentStateStore((state) => state.alter);
+    const alterDoc = useDocumentStore((state) => state.alter);
     const alterOption = useOptionsDashboardStore((state) => state.alter);
     const { filter } = useFilterStore();
     const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
     const alterConfirm = useMsgConfirmStore((state) => state.alter);
     const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
-
+    const documentForm = useDocumentFormStore((state) => state.documentForm);
+    const alterDocumentForm = useDocumentFormStore((state) => state.alter);
     const allDocuments = getDocuments();
 
     const filteredDocuments = useMemo(() => {
@@ -65,6 +68,11 @@ const TableDocuments = () => {
     const toggleConfirm = (document: DocumentObj) => {
         alterMsgConfirm(`mover o documento ${document.name} para a Lixeira?`);
         alterConfirm(!openConfirm);
+    }
+
+    const toggleDocumentForm = (document: DocumentObj) => {
+        alterDoc(document)
+        alterDocumentForm(!documentForm);
     }
 
     return (
@@ -98,22 +106,22 @@ const TableDocuments = () => {
                             </TableCell>
                         </TableRow>
                     ) : (
-                        filteredDocuments.map((Doc) => (
-                            <TableRow key={Doc.documentId}>
+                        filteredDocuments.map((doc) => (
+                            <TableRow key={doc.documentId}>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {Doc.name}
+                                    {doc.name}
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {Doc.type}
+                                    {doc.type}
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {formatDate(Doc.creationDate)}
+                                    {formatDate(doc.creationDate)}
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {formatDate(Doc.lastModifiedDate)}
+                                    {formatDate(doc.lastModifiedDate)}
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {Doc.organization.name}
+                                    {doc.organization.name}
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
                                     <Box
@@ -125,7 +133,7 @@ const TableDocuments = () => {
                                             display: 'inline-block'
                                         }}
                                     >
-                                        {Doc.version}
+                                        {doc.version}
                                     </Box>
                                 </TableCell>
                                 <TableCell sx={{ background: theme.palette.background.default }}>
@@ -133,20 +141,20 @@ const TableDocuments = () => {
                                         aria-label="more"
                                         onClick={(event) => {
                                             setAnchorEl(event.currentTarget);
-                                            setSelectedDoc(Doc);
+                                            setSelectedDoc(doc);
                                         }}
                                     >
                                         <MoreVert />
                                     </IconButton>
                                     <Menu
                                         anchorEl={anchorEl}
-                                        open={Boolean(anchorEl) && selectedDoc?.documentId === Doc.documentId}
+                                        open={Boolean(anchorEl) && selectedDoc?.documentId === doc.documentId}
                                         onClose={() => setAnchorEl(null)}
                                     >
-                                        <MenuItem onClick={() => { setAnchorEl(null); }}>Alterar</MenuItem>
+                                        <MenuItem onClick={() => { toggleDocumentForm(doc) }}>Alterar</MenuItem>
                                         <MenuItem onClick={() => { setAnchorEl(null); }}>Versões</MenuItem>
                                         <MenuItem onClick={handleEstatisticasClick}>Estatísticas</MenuItem>
-                                        <MenuItem onClick={() => toggleConfirm(Doc)}>Excluir</MenuItem>
+                                        <MenuItem onClick={() => toggleConfirm(doc)}>Excluir</MenuItem>
                                     </Menu>
                                 </TableCell>
                             </TableRow>
@@ -158,6 +166,7 @@ const TableDocuments = () => {
                 <MsgConfirm />
             )
             }
+            {documentForm && (<DocumentForm />)}
         </TableContainer>
     );
 };

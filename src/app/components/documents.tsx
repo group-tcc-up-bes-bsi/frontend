@@ -7,7 +7,7 @@ import {
   MenuItem,
 } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
-import { useDocumentStateStore } from '../state/documentState';
+import { useDocumentStore } from '../state/documentState';
 import { useOptionsDashboardStore } from '../state/optionsDashboard';
 import { DocumentObj } from '../models/DocumentObj';
 import { formatDate, getDocuments } from '../services/Documents/DocumentsServices';
@@ -16,18 +16,22 @@ import CustomTypography from './customTypography';
 import { useMsgConfirmStore } from '../state/msgConfirmState';
 import MsgConfirm from './notification/msgConfirm';
 import { useAuth } from './useAuth';
+import { useDocumentFormStore } from '../state/documentFormState';
+import DocumentForm from './documents/documentForm';
 
 const Documents: React.FC = () => {
   useAuth();
   const { theme } = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selectedDoc, setSelectedDoc] = useState<DocumentObj | null>(null);
-  const alterDoc = useDocumentStateStore((state) => state.alter);
+  const alterDoc = useDocumentStore((state) => state.alter);
   const alterOption = useOptionsDashboardStore((state) => state.alter);
   const { filter } = useFilterStore();
   const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
   const alterConfirm = useMsgConfirmStore((state) => state.alter);
   const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
+  const documentForm = useDocumentFormStore((state) => state.documentForm);
+  const alterDocumentForm = useDocumentFormStore((state) => state.alter);
 
   const allDocuments = getDocuments();
 
@@ -57,6 +61,11 @@ const Documents: React.FC = () => {
   const toggleConfirm = (document: DocumentObj) => {
     alterMsgConfirm(`mover o documento ${document.name} para a Lixeira?`);
     alterConfirm(!openConfirm);
+  }
+
+  const toggleDocumentForm = (document: DocumentObj) => {
+    alterDoc(document)
+    alterDocumentForm(!documentForm);
   }
 
   return (
@@ -118,7 +127,7 @@ const Documents: React.FC = () => {
               open={Boolean(anchorEl) && selectedDoc?.documentId === doc.documentId}
               onClose={() => setAnchorEl(null)}
             >
-              <MenuItem onClick={() => { setAnchorEl(null); }}>Alterar</MenuItem>
+              <MenuItem onClick={() => { toggleDocumentForm(doc) }}>Alterar</MenuItem>
               <MenuItem onClick={() => { setAnchorEl(null); }}>Versões</MenuItem>
               <MenuItem onClick={handleEstatisticasClick}>Estatísticas</MenuItem>
               <MenuItem onClick={() => toggleConfirm(doc)}>Excluir</MenuItem>
@@ -148,6 +157,7 @@ const Documents: React.FC = () => {
         <MsgConfirm />
       )
       }
+      {documentForm && (<DocumentForm />)}
     </Box>
   );
 };
