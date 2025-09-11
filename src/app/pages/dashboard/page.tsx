@@ -1,6 +1,6 @@
 "use client"
-import React, { useEffect } from 'react';
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box, Backdrop } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box, Backdrop, Badge } from '@mui/material';
 import { Settings, Star, Folder, Groups, Home, Delete } from '@mui/icons-material';
 import { useTheme } from '@/app/theme/ThemeContext';
 import CustomTypography from '@/app/components/customTypography';
@@ -25,6 +25,7 @@ import { getMeAuth } from '@/app/services/User/GetAuthToken';
 import { useUserStore } from '@/app/state/userState';
 import StatsOrganization from '@/app/components/statsOrganization';
 import { useOrganizationStore } from '@/app/state/organizationState';
+import { getInvitesCount } from '@/app/services/Organizations/getInvites';
 
 const Dashboard = () => {
     useAuth();
@@ -38,7 +39,8 @@ const Dashboard = () => {
     const { setFilter } = useFilterStore();
     const alterUserCurrent = useUserStore((state) => state.alter);
     const organization = useOrganizationStore((state) => state.organization);
-
+    const userCurrent = useUserStore((state) => state.userCurrent);
+    const [invites, setInvites] = useState(0);
 
     useEffect(() => {
         async function fetchUserData() {
@@ -52,6 +54,21 @@ const Dashboard = () => {
         fetchUserData();
     }, []);
 
+
+    const loadInvitesCount = async () => {
+        if (!userCurrent) return;
+        try {
+            const result = await getInvitesCount(userCurrent, theme);
+            setInvites(result.count);
+        } catch (error) {
+            console.error("Erro ao carregar convites:", error);
+            setInvites(0);
+        }
+    };
+
+    useEffect(() => {
+        loadInvitesCount();
+    }, [userCurrent, theme, openNotification]);
 
     const toggleDrawer = () => {
         setOpen(!open);
@@ -129,7 +146,18 @@ const Dashboard = () => {
                     />
                 </Box>
                 <Box className="flex items-center justify-end w-full gap-8 p-8">
-                    <NotificationsIcon onClick={toggleNotification} sx={{ color: theme.palette.text.primary }} />
+                    <Box className="relative flex flex-col items-center">
+                        <Badge
+                            badgeContent={invites > 0 ? invites : null}
+                            color="info"
+                            overlap="circular"
+                        >
+                            <NotificationsIcon
+                                onClick={toggleNotification}
+                                sx={{ color: theme.palette.text.primary, cursor: 'pointer' }}
+                            />
+                        </Badge>
+                    </Box>
 
                     {isDarkMode ? (
                         <LightModeIcon onClick={toggleTheme} sx={{ color: theme.palette.text.primary }} />
