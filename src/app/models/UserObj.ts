@@ -7,7 +7,9 @@ export interface UserObj{
 }
 
 export interface UserOrganization {
+    userId: number;
+    organizationId: number;
     username: string;
-    type: userType;
+    userType: userType;
     inviteAccepted: boolean;
 }

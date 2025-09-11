@@ -6,7 +6,7 @@ interface DocumentState {
   alter: (by: DocumentObj) => void;
 }
 
-export const useDocumentStateStore = create<DocumentState>()((set) => ({
+export const useDocumentStore = create<DocumentState>()((set) => ({
   document: undefined,
   alter: (by) => set(() => ({ document: by })),
 }));

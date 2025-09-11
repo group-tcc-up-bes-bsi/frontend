@@ -6,28 +6,41 @@ export enum organizationType {
 
 export enum userType {
   OWNER = "Proprietário",
-  READ = "Editor",
-  VIEWER = "Visualizador",
+  WRITE = "Editor",
+  READ = "Visualizador",
 }
 
 export const organizationsTypeOptions = [
   { value: "ALL", label: "Todos" },
   { value: "INDIVIDUAL", label: "Individual" },
-  { value: "COLLABORATIVE", label: "Colaborativo" }
+  { value: "COLLABORATIVE", label: "Colaborativo" },
 ];
 
 export const organizationsTypeOptionsNoAll = [
   { value: "INDIVIDUAL", label: "Individual" },
-  { value: "COLLABORATIVE", label: "Colaborativo" }
+  { value: "COLLABORATIVE", label: "Colaborativo" },
 ];
 
 export const userTypeOptions = [
   { value: "OWNER", label: "Proprietário" },
-  { value: "INDIVIDUAL", label: "Individual" },
-  { value: "COLLABORATIVE", label: "Colaborativo" }
+  { value: "WRITE", label: "Editor" },
+  { value: "READ", label: "Visualizador" },
 ];
 
 export const userTypeOptionsNoOwner = [
-  { value: "INDIVIDUAL", label: "Individual" },
-  { value: "COLLABORATIVE", label: "Colaborativo" }
+  { value: "WRITE", label: "Editor" },
+  { value: "READ", label: "Visualizador" },
 ];
+
+export const userInviteAcceptedOptions = [
+  { value: "all", label: "Todos" },
+  { value: "true", label: "Aceito" },
+  { value: "false", label: "Pendente" },
+];
+
+export function getUserTypeLabel(value: string): string {
+  const option = userTypeOptions.find(
+    (opt) => opt.value === value.toUpperCase()
+  );
+  return option ? option.label : value;
+}

@@ -7,9 +7,9 @@ import CustomTextField from '../customTextField';
 import CustomComboBox from '../customComboBox';
 import CustomButton from '../customButton';
 import CustomTypography from '../customTypography';
-import { organizationsTypeOptionsNoAll, userType, userTypeOptionsNoOwner } from '../../services/ConstantsTypes';
+import { getUserTypeLabel, organizationsTypeOptionsNoAll, userType, userTypeOptionsNoOwner } from '../../services/ConstantsTypes';
 import { getOrganizationUsers } from '@/app/services/Organizations/organizationsServices';
-import { useOrganizationStateStore } from '@/app/state/organizationState';
+import { useOrganizationStore } from '@/app/state/organizationState';
 import { getByUserName } from '@/app/services/User/getByUserName';
 import { MessageObj } from '@/app/models/MessageObj';
 import CustomAlert from '../customAlert';
@@ -17,11 +17,15 @@ import { UserOrganization } from '@/app/models/UserObj';
 import { useUserStore } from '@/app/state/userState';
 import { createOrganization } from '@/app/services/Organizations/createOrganization';
 import { useAuth } from '../useAuth';
+import { addOrganizationUser } from '@/app/services/Organizations/addOrganizationUser';
+import { removeOrganizationUser } from '@/app/services/Organizations/removeOrganizationUser';
+import { updateOrganizationUser } from '@/app/services/Organizations/updateOrganizationUser';
+import { updateOrganization } from '@/app/services/Organizations/updateOrganization';
 
 const OrganizationForm: React.FC = () => {
     useAuth();
     const { theme } = useTheme();
-    const organization = useOrganizationStateStore((state) => state.organization);
+    const organization = useOrganizationStore((state) => state.organization);
     const alterOrganizationForm = useOrganizationFormStore((state) => state.alter);
     const [selectedOrganizationType, setSelectedOrganizationType] = useState('');
     const [selectedUserType, setSelectedUserType] = useState('');
@@ -35,6 +39,8 @@ const OrganizationForm: React.FC = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [user, setUser] = useState<UserOrganization | null>(null);
     const [users, setUsers] = useState<UserOrganization[]>([]);
+    const [usersDel, setUsersDel] = useState<UserOrganization[]>([]);
+    const [initialUsers, setInitialUsers] = useState<UserOrganization[]>([]);
     const userCurrent = useUserStore((state) => state.userCurrent)
 
     useEffect(() => {
@@ -66,6 +72,7 @@ const OrganizationForm: React.FC = () => {
                 try {
                     const result = await getOrganizationUsers(organization.organizationId, userCurrent)
                     setUsers(result.users);
+                    setInitialUsers(result.users);
                     setMessage(result.message);
 
                 } catch (error) {
@@ -75,8 +82,10 @@ const OrganizationForm: React.FC = () => {
         } else {
             if (userCurrent != undefined) {
                 const newUser: UserOrganization = {
+                    userId: 0,
+                    organizationId: 0,
                     username: userCurrent.username,
-                    type: userType.OWNER,
+                    userType: userType.OWNER,
                     inviteAccepted: true,
                 };
 
@@ -100,15 +109,17 @@ const OrganizationForm: React.FC = () => {
     }
 
     const addUser = () => {
-        let selectedOption = '';
-        if (selectedUserType === 'COLLABORATIVE') {
-            selectedOption = 'Colaborativo';
-        } else if (selectedUserType === 'INDIVIDUAL') {
-            selectedOption = 'Individual';
+        if (selectedOrganizationType === 'INDIVIDUAL') {
+            setMessage(new MessageObj(
+                'warning',
+                'Bloqueado',
+                `Não permitido adicionar usuário para organizações individuais`,
+                'warning'
+            ));
+            return;
         }
-
         if (user) {
-            if (selectedOption !== '') {
+            if (selectedUserType !== '') {
                 const exists = users.some(u => u.username === user.username);
 
                 if (exists) {
@@ -122,8 +133,10 @@ const OrganizationForm: React.FC = () => {
                 }
 
                 const newUser: UserOrganization = {
+                    userId: 0,
+                    organizationId: 0,
                     username: user.username,
-                    type: selectedOption as userType,
+                    userType: selectedUserType as userType,
                     inviteAccepted: false,
                 };
 
@@ -150,7 +163,12 @@ const OrganizationForm: React.FC = () => {
     };
 
     const removeUser = (username: string) => {
-        setUsers(users.filter(u => u.username !== username));
+        const userToRemove = users.find(u => u.username === username);
+
+        if (userToRemove) {
+            setUsers(users.filter(u => u.username !== username));
+            setUsersDel([...usersDel, userToRemove]);
+        }
     };
 
     const handleSave = async () => {
@@ -186,8 +204,32 @@ const OrganizationForm: React.FC = () => {
                 const result = await createOrganization(name, description, selectedOrganizationType, userCurrent);
                 setMessage(result.message);
 
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                if (selectedOrganizationType !== 'INDIVIDUAL') {
+                    if (result.message.severity === 'success') {
+                        for (const user of users) {
+                            if (user.userType != userType.OWNER) {
+                                try {
 
+                                    if (userCurrent != undefined) {
+                                        const resultUser = await getByUserName(user.username, userCurrent);
+                                        const userAdd: UserOrganization = {
+                                            userId: resultUser.user.userId,
+                                            organizationId: result.organizationId,
+                                            username: user.username,
+                                            userType: user.userType,
+                                            inviteAccepted: false,
+                                        }
+                                        await addOrganizationUser(userAdd, userCurrent);
+                                    }
+                                } catch (err) {
+                                    console.error(`Erro ao adicionar ${user.username}`, err);
+                                }
+                            }
+                        }
+                    }
+                }
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                alterOrganizationForm(false);
             } catch (error) {
                 setMessage(new MessageObj(
                     'error',
@@ -196,6 +238,116 @@ const OrganizationForm: React.FC = () => {
                     'error'
                 ));
 
+            }
+        }
+    }
+
+    const handleUpdate = async () => {
+        if (name.trim() === '') {
+            setMessage(new MessageObj(
+                'error',
+                'Nome obrigatório',
+                'Por favor, preencha o nome da organização.',
+                'error'
+            ));
+            return;
+        }
+        if (description.trim() === '') {
+            setMessage(new MessageObj(
+                'error',
+                'Descrição obrigatória',
+                'Por favor, preencha a descrição da organização.',
+                'error'
+            ));
+            return;
+        }
+        if (selectedOrganizationType === '') {
+            setMessage(new MessageObj(
+                'error',
+                'Tipo obrigatório',
+                'Por favor, selecione o tipo da organização.',
+                'error'
+            ));
+            return;
+        }
+        if (userCurrent != undefined) {
+            try {
+                if (organization != undefined) {
+                    const result = await updateOrganization(organization?.organizationId, name, description, selectedOrganizationType, userCurrent!);
+                    setMessage(result.message);
+
+                    if (result.message.severity === "success") {
+                        const toAdd = users.filter(
+                            u => !initialUsers.some(init => init.username === u.username)
+                        );
+
+                        const toRemove = initialUsers.filter(
+                            u => !users.some(curr => curr.username === u.username)
+                        );
+
+                        const toUpdate = users.filter(
+                            u => {
+                                const old = initialUsers.find(init => init.username === u.username);
+                                return old && old.userType !== u.userType;
+                            }
+                        );
+
+                        for (const user of toAdd) {
+                            if (user.userType != userType.OWNER) {
+                                try {
+                                    if (userCurrent != undefined) {
+                                        const resultUser = await getByUserName(user.username, userCurrent);
+                                        const userAdd: UserOrganization = {
+                                            userId: resultUser.user.userId,
+                                            organizationId: organization.organizationId,
+                                            username: user.username,
+                                            userType: user.userType,
+                                            inviteAccepted: false,
+                                        }
+                                        await addOrganizationUser(userAdd, userCurrent);
+                                    }
+                                } catch (err) {
+                                    console.error(`Erro ao adicionar ${user.username}`, err);
+                                }
+                            }
+                        }
+                        for (const user of toRemove) {
+                            try {
+                                const resultUser = await getByUserName(user.username, userCurrent);
+                                const userRemove: UserOrganization = {
+                                    userId: resultUser.user.userId,
+                                    organizationId: organization.organizationId,
+                                    username: user.username,
+                                    userType: user.userType,
+                                    inviteAccepted: false,
+                                }
+                                await removeOrganizationUser(userRemove, userCurrent!);
+                            } catch (err) {
+                                console.error(`Erro ao adicionar ${user.username}`, err);
+                            }
+                        }
+
+                        for (const user of toUpdate) {
+                            try {
+                                const resultUser = await getByUserName(user.username, userCurrent);
+                                const userUpdate: UserOrganization = {
+                                    userId: resultUser.user.userId,
+                                    organizationId: organization.organizationId,
+                                    username: user.username,
+                                    userType: user.userType,
+                                    inviteAccepted: false,
+                                }
+                                await updateOrganizationUser(userUpdate, userCurrent!);
+                            } catch (err) {
+                                console.error(`Erro ao adicionar ${user.username}`, err);
+                            }
+                        }
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    alterOrganizationForm(false);
+                }
+            } catch (error) {
+                setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
             }
         }
     }
@@ -383,19 +535,43 @@ const OrganizationForm: React.FC = () => {
                                             py: 1,
                                         }}
                                     >
-                                        <Box sx={{ display: 'flex', width: '70%', justifyContent: 'space-between', gap: 1 }}>
+                                        <Box sx={{ display: 'flex', width: '70%', alignItems: 'center', justifyContent: 'space-between', gap: 1 }}>
                                             <CustomTypography
                                                 text={user.username}
                                                 variant="body1"
                                                 sx={{ fontWeight: 'bold', color: theme.palette.text.primary }}
                                             />
-                                            <CustomTypography
-                                                text={`${user.type}`}
-                                                variant="body2"
-                                                sx={{ color: theme.palette.text.secondary }}
-                                            />
+                                            {user.username === userCurrent?.username ? (
+                                                <CustomTypography
+                                                    text={getUserTypeLabel(user.userType)}
+                                                    variant="body2"
+                                                    sx={{ color: theme.palette.text.secondary }}
+                                                />
+                                            ) : (
+                                                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flex: 0.6 }}>
+                                                    <CustomComboBox
+                                                        name={`user-type-${user.username}`}
+                                                        label=""
+                                                        value={user.userType}
+                                                        onChange={(newValue) => {
+                                                            setUsers((prevUsers) =>
+                                                                prevUsers.map((u) =>
+                                                                    u.username === user.username
+                                                                        ? { ...u, userType: newValue as userType }
+                                                                        : u
+                                                                )
+                                                            );
+                                                        }}
+                                                        options={userTypeOptionsNoOwner}
+                                                        focusedColor="primary"
+                                                        hoverColor="info"
+                                                        marginBottom={0}
+                                                        sx={{marginTop: 0}}
+                                                    />
+                                                </Box>
+                                            )}
                                         </Box>
-                                        {user.type !== "Proprietário" && (
+                                        {user.username !== userCurrent?.username && (
                                             <Close
                                                 onClick={() => removeUser(user.username)}
                                                 sx={{
@@ -417,10 +593,10 @@ const OrganizationForm: React.FC = () => {
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'end', gap: 4 }}>
                         <CustomButton
-                            text="Salvar"
+                            text={organization?.name == '' ? "Salvar" : "Atualizar"}
                             type="button"
                             colorType="primary"
-                            onClick={handleSave}
+                            onClick={() => organization?.name == '' ? handleSave() : handleUpdate()}
                             hoverColorType="primary"
                             fullWidth={false}
                             paddingY={1}
