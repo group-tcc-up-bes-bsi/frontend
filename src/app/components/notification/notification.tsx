@@ -1,15 +1,43 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { Box, List, ListItem, ListItemText, Backdrop } from '@mui/material';
 import { useNotificationStore } from '@/app/state/notificationState';
 import { Close } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
 import { useAuth } from '../useAuth';
+import { useUserStore } from '@/app/state/userState';
+import { MessageObj } from '@/app/models/MessageObj';
+import { getInvites } from '@/app/services/Organizations/getInvites';
+import { UserOrganization } from '@/app/models/UserObj';
+import CustomAlert from '../customAlert';
 
 const Notification: React.FC = () => {
     useAuth();
     const { theme } = useTheme();
     const alterNotification = useNotificationStore((state) => state.alter);
+    const userCurrent = useUserStore((state) => state.userCurrent)
+    const [message, setMessage] = useState<MessageObj>(
+        new MessageObj('info', 'Tela Principal', '', 'info')
+    );
+    const [showMessage, setShowMessage] = useState(false);
+    const [/*invites*/, setInvites] = useState<UserOrganization[]>([]);
+
+    useEffect(() => {
+        if (message) {
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 5000);
+        }
+    }, [message]);
+
+    useEffect(() => {
+        if (userCurrent != undefined) {
+            (async () => {
+                const result = await getInvites(userCurrent, theme);
+                setInvites(result.users)
+                setMessage(result.message);
+            })();
+        }
+    }, [userCurrent, theme]);
 
     return (
         <Box className="flex items-center justify-center">
@@ -102,6 +130,28 @@ const Notification: React.FC = () => {
                     </List>
                 </Box>
             </Box>
+            {showMessage && message && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        bottom: '10%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        zIndex: 1500,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 2,
+                        textAlign: 'left',
+                    }}>
+                    <CustomAlert
+                        severity={message.severity}
+                        colorType={message.colorType}
+                        title={message.title}
+                        description={message.description}
+                    />
+                </Box>
+            )}
         </Box>
     );
 };
