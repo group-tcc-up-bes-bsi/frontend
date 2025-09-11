@@ -9,7 +9,7 @@ import { MoreVert, Star } from '@mui/icons-material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
 import OrganizationForm from './organizationForm';
 import { organizationType, organizationsTypeOptions } from '../../services/ConstantsTypes';
-import { getMyOrganizations } from '@/app/services/Organizations/organizationsServices';
+import { getMyOrganizations, getOrganizationUsers } from '@/app/services/Organizations/organizationsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { OrganizationObj } from '@/app/models/OrganizationObj';
 import { useOrganizationStateStore } from '@/app/state/organizationState';
@@ -18,6 +18,8 @@ import MsgConfirm from '../notification/msgConfirm';
 import { useAuth } from '../useAuth';
 import { useUserStore } from '@/app/state/userState';
 import { deleteOrganization } from '@/app/services/Organizations/deleteOrganization';
+import { MessageObj } from '@/app/models/MessageObj';
+import CustomAlert from '../customAlert';
 
 const Organization: React.FC = () => {
     useAuth();
@@ -35,6 +37,17 @@ const Organization: React.FC = () => {
     const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
     const userCurrent = useUserStore((state) => state.userCurrent);
     const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState<MessageObj>(
+        new MessageObj('info', 'Criação de Organização', 'Preencha os dados da Organização', 'info')
+    );
+    const [showMessage, setShowMessage] = useState(false);
+
+    useEffect(() => {
+        if (message) {
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 5000);
+        }
+    }, [message]);
 
     useEffect(() => {
         if (userCurrent != undefined) {
@@ -84,10 +97,26 @@ const Organization: React.FC = () => {
         return result;
     }, [organizations, filter, selectedOrganizationType]);
 
-    const handleOrganizationAlter = () => {
+    const handleOrganizationAlter = async () => {
         if (selectedOrganization) {
-            alterOrganization(selectedOrganization);
-            toggleOrganizationForm();
+            if (userCurrent != undefined) {
+                try {
+                    const result = await getOrganizationUsers(selectedOrganization.organizationId, userCurrent)
+                    const users = result.users;
+                    for (const user of users) {
+                        if (user.username == userCurrent.username) {
+                            if (user.userType.toString() == 'OWNER') {
+                                alterOrganization(selectedOrganization);
+                                toggleOrganizationForm();
+                            } else {
+                                setMessage(new MessageObj('warning', 'Não Permitido', 'Somente o proprietario pode realizar alterações', 'warning'));
+                            }
+                        }
+                    }
+                } catch (error) {
+                    setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
+                }
+            }
         }
         setAnchorEl(null);
     };
@@ -260,6 +289,27 @@ const Organization: React.FC = () => {
                 {organizationForm && <OrganizationForm />}
                 {openConfirm && <MsgConfirm />}
             </Box>
+            {showMessage && message && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        bottom: '0%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 2,
+                        textAlign: 'left',
+                    }}>
+                    <CustomAlert
+                        severity={message.severity}
+                        colorType={message.colorType}
+                        title={message.title}
+                        description={message.description}
+                    />
+                </Box>
+            )}
         </Box>
     );
 };
