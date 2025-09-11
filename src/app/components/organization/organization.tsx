@@ -12,7 +12,7 @@ import { organizationType, organizationsTypeOptions } from '../../services/Const
 import { getMyOrganizations, getOrganizationUsers } from '@/app/services/Organizations/organizationsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { OrganizationObj } from '@/app/models/OrganizationObj';
-import { useOrganizationStateStore } from '@/app/state/organizationState';
+import { useOrganizationStore } from '@/app/state/organizationState';
 import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
 import MsgConfirm from '../notification/msgConfirm';
 import { useAuth } from '../useAuth';
@@ -20,6 +20,7 @@ import { useUserStore } from '@/app/state/userState';
 import { deleteOrganization } from '@/app/services/Organizations/deleteOrganization';
 import { MessageObj } from '@/app/models/MessageObj';
 import CustomAlert from '../customAlert';
+import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
 
 const Organization: React.FC = () => {
     useAuth();
@@ -30,7 +31,7 @@ const Organization: React.FC = () => {
     const organizationForm = useOrganizationFormStore((state) => state.organizationForm);
     const alterOrganizationForm = useOrganizationFormStore((state) => state.alter);
     const [selectedOrganization, setSelectedOrganization] = useState<OrganizationObj | null>(null);
-    const alterOrganization = useOrganizationStateStore((state) => state.alter);
+    const alterOrganization = useOrganizationStore((state) => state.alter);
     const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
     const alterConfirm = useMsgConfirmStore((state) => state.alter);
     const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
@@ -41,6 +42,8 @@ const Organization: React.FC = () => {
         new MessageObj('info', 'Criação de Organização', 'Preencha os dados da Organização', 'info')
     );
     const [showMessage, setShowMessage] = useState(false);
+    const alterOrg = useOrganizationStore((state) => state.alter);
+    const alterOption = useOptionsDashboardStore((state) => state.alter);
 
     useEffect(() => {
         if (message) {
@@ -148,6 +151,11 @@ const Organization: React.FC = () => {
         });
     };
 
+    const handleEstatisticasClick = (organization: OrganizationObj) => {
+        alterOption('StatsOrganization');
+        alterOrg(organization);
+        setAnchorEl(null);
+    };
 
     return (
         <Box sx={{ maxWidth: '100%' }}>
@@ -278,6 +286,7 @@ const Organization: React.FC = () => {
                                     >
                                         <MenuItem onClick={() => ({})}>Abrir</MenuItem>
                                         <MenuItem onClick={handleOrganizationAlter}>Alterar</MenuItem>
+                                        <MenuItem onClick={() => { handleEstatisticasClick(org) }}>Estatísticas</MenuItem>
                                         <MenuItem onClick={() => { toggleConfirm(org) }}>Excluir</MenuItem>
                                     </Menu>
                                 </Box>

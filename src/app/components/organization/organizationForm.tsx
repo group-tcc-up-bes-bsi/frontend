@@ -9,7 +9,7 @@ import CustomButton from '../customButton';
 import CustomTypography from '../customTypography';
 import { getUserTypeLabel, organizationsTypeOptionsNoAll, userType, userTypeOptionsNoOwner } from '../../services/ConstantsTypes';
 import { getOrganizationUsers } from '@/app/services/Organizations/organizationsServices';
-import { useOrganizationStateStore } from '@/app/state/organizationState';
+import { useOrganizationStore } from '@/app/state/organizationState';
 import { getByUserName } from '@/app/services/User/getByUserName';
 import { MessageObj } from '@/app/models/MessageObj';
 import CustomAlert from '../customAlert';
@@ -25,7 +25,7 @@ import { updateOrganization } from '@/app/services/Organizations/updateOrganizat
 const OrganizationForm: React.FC = () => {
     useAuth();
     const { theme } = useTheme();
-    const organization = useOrganizationStateStore((state) => state.organization);
+    const organization = useOrganizationStore((state) => state.organization);
     const alterOrganizationForm = useOrganizationFormStore((state) => state.alter);
     const [selectedOrganizationType, setSelectedOrganizationType] = useState('');
     const [selectedUserType, setSelectedUserType] = useState('');

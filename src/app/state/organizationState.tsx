@@ -6,7 +6,7 @@ interface OrganizationState {
   alter: (by: OrganizationObj) => void;
 }
 
-export const useOrganizationStateStore = create<OrganizationState>()((set) => ({
+export const useOrganizationStore = create<OrganizationState>()((set) => ({
   organization: undefined,
   alter: (by) => set(() => ({ organization: by })),
 }));

@@ -12,6 +12,7 @@ import { useUserStore } from '@/app/state/userState';
 import { useDocumentStore } from '@/app/state/documentState';
 import { MessageObj } from '@/app/models/MessageObj';
 import { useTheme } from '@/app/theme/ThemeContext';
+import { formatDate } from '@/app/services/Documents/DocumentsServices';
 
 const DocumentForm: React.FC = () => {
     const { theme } = useTheme();
@@ -20,7 +21,7 @@ const DocumentForm: React.FC = () => {
     const [name, setName] = useState(document?.name || '');
     const [type, setType] = useState(document?.type || '');
     const [description, setDescription] = useState(document?.description || '');
-    const [organizationId, /*setOrganizationId*/] = useState(document?.organization || null);
+    const [organization, setOrganization] = useState(document?.organization || null);
     const [showMessage, setShowMessage] = useState(false);
     const [message, setMessage] = useState<MessageObj>(
         document?.documentId == 0 ? new MessageObj('info', 'Criação de Documento', 'Preencha os dados do Documento', 'info')
@@ -28,8 +29,6 @@ const DocumentForm: React.FC = () => {
     );
     const alterDocumentForm = useDocumentFormStore((state) => state.alter);
     const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
-    const selectedOrganizationValue = organizationId ? organizationId.toString() : "";
-    const [/*selectedOrganization*/, setSelectedOrganization] = useState<OrganizationObj | null>(null);
     const [/*file*/, setFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -43,21 +42,27 @@ const DocumentForm: React.FC = () => {
     useEffect(() => {
         if (userCurrent != undefined) {
             (async () => {
-
                 try {
                     const result = await getMyOrganizations(userCurrent, theme);
                     setOrganizations(result.organizations);
                 } finally {
-
                 }
             })();
         }
     }, [userCurrent, theme]);
 
-    const organizationsOptions = organizations.map(org => ({
-        label: org.name,
-        value: org.organizationId.toString()
-    }));
+    const isValidOrganization = organization && 
+        organizations.some(org => org.organizationId === organization.organizationId);
+
+    const selectedOrganizationValue = isValidOrganization ? 
+        organization.organizationId.toString() : '';
+
+    const organizationsOptions = [
+        ...organizations.map(org => ({
+            label: org.name,
+            value: org.organizationId.toString()
+        }))
+    ];
 
     const handleAttachFile = () => {
         fileInputRef.current?.click();
@@ -110,7 +115,7 @@ const DocumentForm: React.FC = () => {
             >
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
                     <CustomTypography
-                        text={document ? "Editar Documento" : "Criar Documento"}
+                        text={document ? 'Editar Documento' : 'Criar Documento'}
                         component="h2"
                         variant="h6"
                         sx={{
@@ -153,7 +158,7 @@ const DocumentForm: React.FC = () => {
                         value={selectedOrganizationValue}
                         onChange={(value) => {
                             const org = organizations.find(org => org.organizationId.toString() === value);
-                            setSelectedOrganization(org || null)
+                            setOrganization(org || null);
                         }}
                         options={organizationsOptions}
                         focusedColor="primary"
@@ -187,7 +192,7 @@ const DocumentForm: React.FC = () => {
                     width: '100%'
                 }}>
                     <CustomTypography
-                        text={"Criado em: " + document?.creationDate}
+                        text={"Criado em: " + formatDate(document?.creationDate ? new Date(document.creationDate) : new Date())}
                         component="p"
                         variant="h6"
                         sx={{
@@ -196,7 +201,7 @@ const DocumentForm: React.FC = () => {
                         }}
                     />
                     <CustomTypography
-                        text={"Ultima modificação em: " + document?.lastModifiedDate}
+                        text={"Ultima modificação em: " + formatDate(document?.lastModifiedDate ? new Date(document.lastModifiedDate) : new Date())}
                         component="p"
                         variant="h6"
                         sx={{

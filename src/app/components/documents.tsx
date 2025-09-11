@@ -51,7 +51,7 @@ const Documents: React.FC = () => {
   }, [allDocuments, filter]);
 
   const handleEstatisticasClick = () => {
-    alterOption('Stats');
+    alterOption('StatsDocument');
     if (selectedDoc) {
       alterDoc(selectedDoc);
     }
