@@ -112,7 +112,39 @@ const Organization: React.FC = () => {
                                 alterOrganization(selectedOrganization);
                                 toggleOrganizationForm();
                             } else {
-                                setMessage(new MessageObj('warning', 'Não Permitido', 'Somente o proprietario pode realizar alterações', 'warning'));
+                                setMessage(new MessageObj('warning', 'Não Permitido', 'Somente o proprietario pode realizar Alterações', 'warning'));
+                            }
+                        }
+                    }
+                } catch (error) {
+                    setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
+                }
+            }
+        }
+        setAnchorEl(null);
+    };
+
+    const handleOrganizationDelete = async () => {
+        if (selectedOrganization) {
+            if (userCurrent != undefined) {
+                try {
+                    const result = await getOrganizationUsers(selectedOrganization.organizationId, userCurrent)
+                    const users = result.users;
+                    for (const user of users) {
+                        if (user.username == userCurrent.username) {
+                            if (user.userType.toString() == 'OWNER') {
+                                alterMsgConfirm(`excluir a organização ${selectedOrganization.name}?`);
+                                alterConfirm(true);
+                                useMsgConfirmStore.getState().setOnConfirm(async () => {
+                                    if (userCurrent) {
+                                        await deleteOrganization(selectedOrganization.organizationId, userCurrent);
+                                        setOrganizations((prev) =>
+                                            prev.filter((org) => org.organizationId !== selectedOrganization.organizationId)
+                                        );
+                                    }
+                                });
+                            } else {
+                                setMessage(new MessageObj('warning', 'Não Permitido', 'Somente o proprietario realizar Exclusão', 'warning'));
                             }
                         }
                     }
@@ -137,19 +169,6 @@ const Organization: React.FC = () => {
         alterOrganization(orgNull);
         toggleOrganizationForm();
     }
-
-    const toggleConfirm = (organization: OrganizationObj) => {
-        alterMsgConfirm(`excluir a organização ${organization.name}?`);
-        alterConfirm(true);
-        useMsgConfirmStore.getState().setOnConfirm(async () => {
-            if (userCurrent) {
-                await deleteOrganization(organization.organizationId, userCurrent);
-                setOrganizations((prev) =>
-                    prev.filter((org) => org.organizationId !== organization.organizationId)
-                );
-            }
-        });
-    };
 
     const handleEstatisticasClick = (organization: OrganizationObj) => {
         alterOption('StatsOrganization');
@@ -287,7 +306,7 @@ const Organization: React.FC = () => {
                                         <MenuItem onClick={() => ({})}>Abrir</MenuItem>
                                         <MenuItem onClick={handleOrganizationAlter}>Alterar</MenuItem>
                                         <MenuItem onClick={() => { handleEstatisticasClick(org) }}>Estatísticas</MenuItem>
-                                        <MenuItem onClick={() => { toggleConfirm(org) }}>Excluir</MenuItem>
+                                        <MenuItem onClick={handleOrganizationDelete}>Excluir</MenuItem>
                                     </Menu>
                                 </Box>
                             </Box>
