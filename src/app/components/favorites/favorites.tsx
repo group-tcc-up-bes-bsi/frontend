@@ -8,12 +8,12 @@ import {
 import CustomTypography from '../customTypography';
 import CustomTextField from '../customTextField';
 import { Star } from '@mui/icons-material';
-import { getMyOrganizations } from '@/app/services/Organizations/organizationsServices';
 import { getDocuments } from '@/app/services/Documents/DocumentsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { useAuth } from '../useAuth';
 import { useUserStore } from '@/app/state/userState';
 import { OrganizationObj } from '@/app/models/OrganizationObj';
+import { getOrganizations } from '@/app/services/Organizations/getOrganizations';
 
 const Favorites: React.FC = () => {
     useAuth();
@@ -26,7 +26,7 @@ const Favorites: React.FC = () => {
     useEffect(() => {
         if (userCurrent != undefined) {
             (async () => {
-                const result = await getMyOrganizations(userCurrent, theme);
+                const result = await getOrganizations(userCurrent, theme);
                 setOrganizations(result.organizations);
             })();
         }

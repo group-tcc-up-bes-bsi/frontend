@@ -7,12 +7,12 @@ import CustomTypography from '../customTypography';
 import CustomAlert from '../customAlert';
 import { useDocumentFormStore } from '@/app/state/documentFormState';
 import { OrganizationObj } from '@/app/models/OrganizationObj';
-import { getMyOrganizations } from '@/app/services/Organizations/organizationsServices';
 import { useUserStore } from '@/app/state/userState';
 import { useDocumentStore } from '@/app/state/documentState';
 import { MessageObj } from '@/app/models/MessageObj';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { formatDate } from '@/app/services/Documents/DocumentsServices';
+import { getOrganizations } from '@/app/services/Organizations/getOrganizations';
 
 const DocumentForm: React.FC = () => {
     const { theme } = useTheme();
@@ -43,7 +43,7 @@ const DocumentForm: React.FC = () => {
         if (userCurrent != undefined) {
             (async () => {
                 try {
-                    const result = await getMyOrganizations(userCurrent, theme);
+                    const result = await getOrganizations(userCurrent, theme);
                     setOrganizations(result.organizations);
                 } finally {
                 }

@@ -23,7 +23,6 @@ export async function createOrganization(Name: string, Description: string, Orga
 
         if (!response.ok) {
             if (responseData.message == 'Organization already exists') {
-                console.log(responseData)
                 return {
                     message: new MessageObj(
                         'error',

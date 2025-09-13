@@ -9,7 +9,7 @@ import { MoreVert, Star } from '@mui/icons-material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
 import OrganizationForm from './organizationForm';
 import { organizationType, organizationsTypeOptions } from '../../services/ConstantsTypes';
-import { getMyOrganizations, getOrganizationUsers } from '@/app/services/Organizations/organizationsServices';
+import { getOrganizationUsers } from '@/app/services/Organizations/organizationsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { OrganizationObj } from '@/app/models/OrganizationObj';
 import { useOrganizationStore } from '@/app/state/organizationState';
@@ -21,6 +21,7 @@ import { deleteOrganization } from '@/app/services/Organizations/deleteOrganizat
 import { MessageObj } from '@/app/models/MessageObj';
 import CustomAlert from '../customAlert';
 import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
+import { getOrganizations } from '@/app/services/Organizations/getOrganizations';
 
 const Organization: React.FC = () => {
     useAuth();
@@ -57,7 +58,7 @@ const Organization: React.FC = () => {
             (async () => {
                 setLoading(true);
                 try {
-                    const result = await getMyOrganizations(userCurrent, theme);
+                    const result = await getOrganizations(userCurrent, theme);
                     setOrganizations(result.organizations);
                 } finally {
                     setLoading(false);
@@ -170,8 +171,8 @@ const Organization: React.FC = () => {
         toggleOrganizationForm();
     }
 
-    const handleEstatisticasClick = (organization: OrganizationObj) => {
-        alterOption('StatsOrganization');
+    const handleOpen= (organization: OrganizationObj) => {
+        alterOption('Open Organization');
         alterOrg(organization);
         setAnchorEl(null);
     };
@@ -191,7 +192,7 @@ const Organization: React.FC = () => {
                             marginTop={0.5}
                         />
                     </Box>
-                    <Box sx={{ width: '60%' }}>
+                    <Box sx={{ width: '55%' }}>
                         <CustomTextField
                             name="filter"
                             label="Informe um detalhe da organização"
@@ -303,9 +304,8 @@ const Organization: React.FC = () => {
                                         open={Boolean(anchorEl) && selectedOrganization?.organizationId === org.organizationId}
                                         onClose={() => setAnchorEl(null)}
                                     >
-                                        <MenuItem onClick={() => ({})}>Abrir</MenuItem>
+                                        <MenuItem onClick={() => {handleOpen(org)}}>Abrir</MenuItem>
                                         <MenuItem onClick={handleOrganizationAlter}>Alterar</MenuItem>
-                                        <MenuItem onClick={() => { handleEstatisticasClick(org) }}>Estatísticas</MenuItem>
                                         <MenuItem onClick={handleOrganizationDelete}>Excluir</MenuItem>
                                     </Menu>
                                 </Box>

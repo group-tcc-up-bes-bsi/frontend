@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import {
     Box,
@@ -7,16 +7,46 @@ import {
     RadioGroup,
     FormControlLabel,
     Radio,
-    IconButton,
 } from '@mui/material';
 import CustomTypography from '../customTypography';
-import { AccountCircleRounded, CachedRounded } from '@mui/icons-material';
 import CustomButton from '../customButton';
 import { useAuth } from '../useAuth';
+import { useUserStore } from '@/app/state/userState';
+import { countOrganizations, getOrganizations } from '@/app/services/Organizations/getOrganizations';
+import { useThemeStore } from '@/app/state/themeState';
+import { useNotificationStore } from '@/app/state/notificationState';
+import { useTermFormStore } from '@/app/state/termFormState';
+import TermsViewer from './termsViewer';
+import { useAdminPassStore } from '@/app/state/adminPassState';
+import PasswordModal from '../admin/passwordModal';
 
 const SettingsComponent: React.FC = () => {
     useAuth();
     const { theme } = useTheme();
+    const [countOrgs, setCountOrgs] = useState(0);
+    const userCurrent = useUserStore((state) => state.userCurrent)
+    const isDarkMode = useThemeStore((state) => state.theme);
+    const setIsDarkMode = useThemeStore((state) => state.alter);
+    const openNotification = useNotificationStore((state) => state.openNotification);
+    const termForm = useTermFormStore((state) => state.termForm);
+    const alterTermForm = useTermFormStore((state) => state.alter);
+    const showAdminRequest = useAdminPassStore((state) => state.showAdminRequest);
+    const alterAdminPass = useAdminPassStore((state) => state.alter);
+
+    useEffect(() => {
+        if (!userCurrent) return;
+
+        (async () => {
+            const result = await getOrganizations(userCurrent, theme);
+            setCountOrgs(countOrganizations(result.organizations));
+        })();
+    }, [userCurrent, theme, openNotification]);
+
+    const handleSubmitUserName = async () => {
+        if (userCurrent != undefined) {
+            alterAdminPass(true);
+        }
+    }
 
     return (
         <Box sx={{
@@ -32,41 +62,14 @@ const SettingsComponent: React.FC = () => {
                 padding: 2,
                 width: '70%'
             }}>
-                <Box sx={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-around',
-                    marginBottom: 3
-                }}>
-
-                    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-                        <AccountCircleRounded sx={{
-                            color: theme.palette.text.primary,
-                            fontSize: 100
-                        }} />
-
-                    </Box>
-                    <CustomTypography
-                        text='Usuário'
-                        component="h5"
-                        variant='h5'
-                        align="center"
-                        className="font-bold"
-                        sx={{ color: theme.palette.text.primary }}
-                    />
-                </Box>
-                <Divider sx={{
-                    backgroundColor: theme.palette.text.primary,
-                    marginBottom: 3
-                }} />
                 <Box sx={{ display: 'flex' }}>
                     <Box sx={{
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'start',
                         ml: 10,
-                        mr: 10
+                        mr: 10,
+                        paddingY: 5
                     }}>
 
                         <CustomTypography
@@ -78,19 +81,16 @@ const SettingsComponent: React.FC = () => {
                             sx={{ color: theme.palette.text.primary, mb: 2 }} />
                         <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between', alignItems: 'center' }}>
                             <CustomTypography
-                                text='Nome: Teste'
+                                text={'Nome: ' + userCurrent?.username}
                                 component="h5"
                                 variant='h6'
                                 align="center"
                                 className="font-bold"
                                 sx={{ color: theme.palette.text.primary, ml: 2 }}
                             />
-                            <IconButton aria-label="more">
-                                <CachedRounded sx={{ color: theme.palette.text.primary }} />
-                            </IconButton>
                         </Box>
                         <CustomTypography
-                            text='Arquivos: 210'
+                            text='Documentos: 210'
                             component="h5"
                             variant='h6'
                             align="center"
@@ -98,7 +98,7 @@ const SettingsComponent: React.FC = () => {
                             sx={{ color: theme.palette.text.primary, ml: 2 }}
                         />
                         <CustomTypography
-                            text='Organizações: 5'
+                            text={'Organizações: ' + countOrgs}
                             component="h5"
                             variant='h6'
                             align="center"
@@ -124,19 +124,21 @@ const SettingsComponent: React.FC = () => {
                         <FormControl sx={{ marginLeft: 10 }}>
                             <RadioGroup
                                 aria-labelledby="tema-radio-label"
-                                defaultValue="claro"
+                                value={isDarkMode ? 'Escuro' : 'Claro'}
                                 name="tema-radio-group"
                             >
                                 <FormControlLabel
-                                    value="claro"
+                                    value="Claro"
                                     control={<Radio sx={{ color: theme.palette.text.primary, '&.Mui-checked': { color: theme.palette.primary.main } }} />}
                                     label="Claro"
+                                    onChange={() => setIsDarkMode(false)}
                                     sx={{ color: theme.palette.text.primary }}
                                 />
                                 <FormControlLabel
-                                    value="escuro"
+                                    value="Escuro"
                                     control={<Radio sx={{ color: theme.palette.text.primary, '&.Mui-checked': { color: theme.palette.primary.main } }} />}
                                     label="Escuro"
+                                    onChange={() => setIsDarkMode(true)}
                                     sx={{ color: theme.palette.text.primary }}
                                 />
                             </RadioGroup>
@@ -173,6 +175,7 @@ const SettingsComponent: React.FC = () => {
                             text="Visualizar"
                             fullWidth={false}
                             type="button"
+                            onClick={() => alterTermForm(true)}
                             colorType="primary"
                             hoverColorType="primary"
                             paddingY={2}
@@ -197,6 +200,7 @@ const SettingsComponent: React.FC = () => {
                             text="Visualizar"
                             fullWidth={false}
                             type="button"
+                            onClick={() => alterTermForm(true)}
                             colorType="primary"
                             hoverColorType="primary"
                             paddingY={2}
@@ -214,6 +218,7 @@ const SettingsComponent: React.FC = () => {
                         text="Alterar senha"
                         fullWidth={false}
                         type="button"
+                        onClick={handleSubmitUserName}
                         colorType="primary"
                         hoverColorType="primary"
                         paddingY={2}
@@ -222,6 +227,13 @@ const SettingsComponent: React.FC = () => {
                     />
                 </Box>
             </Box>
+            {termForm && (
+                <TermsViewer />
+            )
+            }
+            {showAdminRequest && (
+                <PasswordModal />
+            )}
         </Box >
     );
 };

@@ -36,18 +36,20 @@ const Documents: React.FC = () => {
   const allDocuments = getDocuments();
 
   const filteredDocuments = useMemo(() => {
-    if (!filter.trim()) {
-      return allDocuments;
+    let docs = [...allDocuments];
+
+    if (filter.trim()) {
+      const searchTerm = filter.toLowerCase().trim();
+
+      docs = docs.filter((doc) =>
+        doc.name.toLowerCase().includes(searchTerm) ||
+        doc.type.toLowerCase().includes(searchTerm) ||
+        formatDate(doc.creationDate).toLowerCase().includes(searchTerm) ||
+        doc.version.toLowerCase().includes(searchTerm)
+      );
     }
 
-    const searchTerm = filter.toLowerCase().trim();
-
-    return allDocuments.filter((doc) =>
-      doc.name.toLowerCase().includes(searchTerm) ||
-      doc.type.toLowerCase().includes(searchTerm) ||
-      formatDate(doc.creationDate).toLowerCase().includes(searchTerm) ||
-      doc.version.toLowerCase().includes(searchTerm)
-    );
+    return docs.sort((a, b) => b.lastModifiedDate.getTime() - a.lastModifiedDate.getTime());
   }, [allDocuments, filter]);
 
   const handleEstatisticasClick = () => {
@@ -74,7 +76,7 @@ const Documents: React.FC = () => {
       gap={2}
       flexWrap="wrap"
       justifyContent='center'
-      p={2}
+      p={1}
       sx={{ backgroundColor: theme.palette.background.default }}
     >{filteredDocuments.length === 0 ? (
       <CustomTypography
@@ -109,7 +111,7 @@ const Documents: React.FC = () => {
               Tipo: {doc.type}
             </Box>
             <Box fontSize="0.8rem" mb={1} sx={{ color: theme.palette.text.primary }}>
-              Versão: {doc.version}
+              Versões: {doc.documentId}
             </Box>
           </Box>
           <Box mt={0.5}>
@@ -148,7 +150,7 @@ const Documents: React.FC = () => {
         </Box>
         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <Box fontSize="0.75rem" mt={1} sx={{ color: theme.palette.text.primary }}>
-            Alterado em {formatDate(doc.creationDate)}
+            Alterado em {formatDate(doc.lastModifiedDate)}
           </Box>
         </Box>
       </Box>

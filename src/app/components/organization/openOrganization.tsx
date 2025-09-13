@@ -4,7 +4,6 @@ import { Box, Divider, } from '@mui/material';
 import CustomTypography from '../customTypography';
 import Menu from '@mui/icons-material/Menu';
 import SpaceDashboard from '@mui/icons-material/SpaceDashboard';
-import TableDocuments from '../tableDocuments';
 import Documents from '../documents';
 import CustomButton from '../customButton';
 import CustomTextField from '../customTextField';
@@ -12,12 +11,15 @@ import { useDocumentViewerStore } from '@/app/state/documentViewerState';
 import { useFilterStore } from '@/app/state/filterState';
 import { useAuth } from '../useAuth';
 import { useDocumentFormStore } from '@/app/state/documentFormState';
-import DocumentForm from './documentForm';
+import DocumentForm from '../documents/documentForm';
 import { useDocumentStore } from '@/app/state/documentState';
 import { DocumentObj } from '@/app/models/DocumentObj';
 import { organizationType } from '@/app/services/ConstantsTypes';
+import TableDocuments from '../tableDocuments';
+import { useOrganizationStore } from '@/app/state/organizationState';
+import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
 
-const DocumentsComponent: React.FC = () => {
+const OpenOrganization: React.FC = () => {
     useAuth();
     const { theme } = useTheme();
     const { filter, setFilter } = useFilterStore();
@@ -28,6 +30,9 @@ const DocumentsComponent: React.FC = () => {
     const documentForm = useDocumentFormStore((state) => state.documentForm);
     const alterDocumentForm = useDocumentFormStore((state) => state.alter);
     const alterDoc = useDocumentStore((state) => state.alter);
+    const organization = useOrganizationStore((state) => state.organization);
+    const alterOrg = useOrganizationStore((state) => state.alter);
+    const alterOption = useOptionsDashboardStore((state) => state.alter);
 
     const toggleModeViewer = (mode: number) => {
         alterModeViewer(mode)
@@ -71,38 +76,53 @@ const DocumentsComponent: React.FC = () => {
         alterDocumentForm(!documentForm);
     }
 
+    const handleEstatisticasClick = () => {
+        if (organization != undefined) {
+            alterOption('StatsOrganization');
+            alterOrg(organization);
+        }
+    };
+
     return (
         <Box sx={{ maxWidth: '100%' }}>
             <Box sx={{ display: 'flex', gap: 4, alignItems: 'center', justifyContent: 'space-between' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <CustomButton
-                        text="+ Novo Documento"
+                        text="Adicionar Documento"
                         type="button"
                         colorType="primary"
                         hoverColorType="primary"
                         onClick={toggleDocumentForm}
                         paddingY={2}
-                        marginTop={0.5}
                     />
                 </Box>
                 <Box
-                    sx={{ width: '65%' }}>
+                    sx={{ width: '55%' }}>
                     <CustomTextField
                         name="filter"
-                        label="Informe um detalhe do documento"
+                        label="Informe um detalhe"
                         type="text"
                         value={filter}
                         onChange={(e) => setFilter(e.target.value)}
                         focusedColor="primary"
                         hoverColor="info"
+                        marginBottom={2}
+                    />
+                </Box>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <CustomButton
+                        text="Estatísticas"
+                        type="button"
+                        colorType="primary"
+                        hoverColorType="primary"
+                        onClick={handleEstatisticasClick}
+                        paddingY={2}
                     />
                 </Box>
                 <Box sx={{
                     backgroundColor: theme.palette.background.default,
                     padding: 1,
                     display: 'flex',
-                    marginBottom: 1,
-                    alignItems: 'center',
                 }}>
                     <Menu onClick={() => { toggleModeViewer(1) }} sx={{ color: colorMode1, fontSize: 32 }} />
                     <Divider
@@ -125,7 +145,7 @@ const DocumentsComponent: React.FC = () => {
                 paddingLeft: 2
             }}>
                 <CustomTypography
-                    text="Documentos"
+                    text="Documentos da Organização: 10"
                     component="h2"
                     variant="h5"
                     sx={{
@@ -181,4 +201,4 @@ const DocumentsComponent: React.FC = () => {
     );
 };
 
-export default DocumentsComponent;
+export default OpenOrganization;

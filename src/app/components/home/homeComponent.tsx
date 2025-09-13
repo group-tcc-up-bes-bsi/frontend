@@ -7,12 +7,15 @@ import SpaceDashboard from '@mui/icons-material/SpaceDashboard';
 import TableDocuments from '../tableDocuments';
 import Documents from '../documents';
 import { useDocumentViewerStore } from '@/app/state/documentViewerState';
-import { getMyOrganizations } from '@/app/services/Organizations/organizationsServices';
 import { useAuth } from '../useAuth';
 import { useUserStore } from '@/app/state/userState';
 import { OrganizationObj } from '@/app/models/OrganizationObj';
 import { MessageObj } from '@/app/models/MessageObj';
 import CustomAlert from '../customAlert';
+import { getOrganizations } from '@/app/services/Organizations/getOrganizations';
+import { useNotificationStore } from '@/app/state/notificationState';
+import { useOrganizationStore } from '@/app/state/organizationState';
+import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
 
 const HomeComponent: React.FC = () => {
     useAuth();
@@ -27,6 +30,9 @@ const HomeComponent: React.FC = () => {
     );
     const [showMessage, setShowMessage] = useState(false);
     const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
+    const openNotification = useNotificationStore((state) => state.openNotification);
+    const alterOrg = useOrganizationStore((state) => state.alter);
+    const alterOption = useOptionsDashboardStore((state) => state.alter);
 
     const toggleModeViewer = (mode: number) => {
         alterModeViewer(mode)
@@ -54,12 +60,17 @@ const HomeComponent: React.FC = () => {
     useEffect(() => {
         if (userCurrent != undefined) {
             (async () => {
-                const result = await getMyOrganizations(userCurrent, theme);
+                const result = await getOrganizations(userCurrent, theme);
                 setOrganizations(result.organizations);
                 setMessage(result.message);
             })();
         }
-    }, [userCurrent, theme]);
+    }, [userCurrent, theme, openNotification]);
+
+    const handleOpen = (organization: OrganizationObj) => {
+        alterOption('Open Organization');
+        alterOrg(organization);
+    };
 
     return (
         <Box sx={{ maxWidth: '100%' }}>
@@ -146,7 +157,7 @@ const HomeComponent: React.FC = () => {
                                 },
                                 transition: 'all 0.2s ease-in-out',
                             }}
-                            onClick={() => ({})}
+                            onClick={() => { handleOpen(org) }}
                         >
                             <Box sx={{
                                 display: 'flex',
@@ -201,7 +212,7 @@ const HomeComponent: React.FC = () => {
                 <Box sx={{
                     backgroundColor: theme.palette.background.default,
                     padding: 1,
-                    maxHeight: 'calc(80vh - 150px)',
+                    maxHeight: 'calc(85vh - 150px)',
                     overflowY: 'auto',
                     '&::-webkit-scrollbar': {
                         width: '6px',
@@ -222,7 +233,7 @@ const HomeComponent: React.FC = () => {
                 <Box sx={{
                     backgroundColor: theme.palette.background.default,
                     padding: 1,
-                    maxHeight: 'calc(80vh - 150px)',
+                    maxHeight: 'calc(85vh - 150px)',
                     overflowY: 'auto',
                     '&::-webkit-scrollbar': {
                         width: '6px',

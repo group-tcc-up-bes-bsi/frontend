@@ -67,31 +67,38 @@ const StatsOrganization: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: 3, background: theme.palette.background.default, height: '100%' }}>
+    <Box sx={{
+      p: 3, background: theme.palette.background.default, height: '100%',
+      backgroundColor: theme.palette.background.default,
+      maxHeight: 'calc(100vh - 50px)',
+      overflowY: 'auto',
+      '&::-webkit-scrollbar': {
+        width: '6px',
+      },
+      '&::-webkit-scrollbar-track': {
+        background: theme.palette.background.default,
+      },
+      '&::-webkit-scrollbar-thumb': {
+        backgroundColor: theme.palette.primary.main,
+        borderRadius: '3px',
+      }
+    }} >
       <Box sx={{ display: "flex", flexDirection: "row", justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box sx={{ display: "flex", flexDirection: "row", gap: 4, alignItems: 'center' }}>
-          <Close
-            onClick={() => { alterOption(lastOption); }}
-            sx={{
-              fontSize: 30,
-              color: theme.palette.text.primary,
-              cursor: 'pointer',
-              '&:hover': {
-                color: theme.palette.error.main,
-              }
-            }}
-          />
-        </Box>
-        <Box sx={{ width: '25%' }}>
-          <CustomComboBox
-            name="user-invite"
-            label="Tipo"
-            value={selectedUserInvite}
-            onChange={handleChangeUserInvite}
-            options={userInviteAcceptedOptions}
-            focusedColor="primary"
-            hoverColor="info"
-          />
+        <Box sx={{ width: '40%' }}>
+          <Typography variant="h6" gutterBottom sx={{ mb: 1 }}>
+            Filtro de Convite
+          </Typography>
+          <Box sx={{ width: '100%' }}>
+            <CustomComboBox
+              name="user-invite"
+              label="Tipo"
+              value={selectedUserInvite}
+              onChange={handleChangeUserInvite}
+              options={userInviteAcceptedOptions}
+              focusedColor="primary"
+              hoverColor="info"
+            />
+          </Box>
         </Box>
         {loading ? (
           <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
@@ -146,17 +153,31 @@ const StatsOrganization: React.FC = () => {
             </TableContainer>
           </Box>
         )}
+        <Box sx={{ display: "flex", flexDirection: "row", gap: 4, alignItems: 'center' }}>
+          <Close
+            onClick={() => { alterOption(lastOption); }}
+            sx={{
+              fontSize: 30,
+              color: theme.palette.text.primary,
+              cursor: 'pointer',
+              '&:hover': {
+                color: theme.palette.error.main,
+              }
+            }}
+          />
+        </Box>
       </Box>
 
-      <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 3, mt: 5 }}>
+      <Box sx={{ display: "flex", flexDirection: { xs: "row", md: "column" }, gap: 3, mt: 5 }}>
         <Box sx={{ flex: 1 }}>
-          <Typography variant="h6" gutterBottom sx={{ mb: 1 }}>
+          <Typography variant="h6" gutterBottom>
             Documentos por Tipo
           </Typography>
           <PieChart
             sx={{
               border: '1px dashed',
               borderColor: theme.palette.text.primary,
+              paddingX: 40,
             }}
             series={[
               {
@@ -164,11 +185,11 @@ const StatsOrganization: React.FC = () => {
                 highlightScope: { fade: "global", highlight: "item" },
                 innerRadius: 0,
                 outerRadius: 200,
-                paddingAngle: 1,
+                paddingAngle: 0,
               },
             ]}
             height={500}
-            margin={{ top: 20, right: 5, bottom: 20, left: 20 }}
+            margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
             colors={[
               "#8e24aa", "#039be5", "#fbc02d", "#fb8c00", "#d84315", "#6d4c41", "#757575",
               "#c62828", "#ad1457", "#4527a0", "#283593", "#0277bd", "#00838f", "#2e7d32",
@@ -185,6 +206,7 @@ const StatsOrganization: React.FC = () => {
             sx={{
               border: '1px dashed',
               borderColor: theme.palette.text.primary,
+              paddingX: 40,
             }}
             series={[
               {
@@ -192,11 +214,11 @@ const StatsOrganization: React.FC = () => {
                 highlightScope: { fade: "global", highlight: "item" },
                 innerRadius: 0,
                 outerRadius: 200,
-                paddingAngle: 1,
+                paddingAngle: 0,
               },
             ]}
             height={500}
-            margin={{ top: 20, right: 5, bottom: 20, left: 20 }}
+            margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
             colors={[
               "#8e24aa", "#039be5", "#fbc02d", "#fb8c00", "#d84315", "#6d4c41", "#757575",
               "#c62828", "#ad1457", "#4527a0", "#283593", "#0277bd", "#00838f", "#2e7d32",
@@ -205,7 +227,7 @@ const StatsOrganization: React.FC = () => {
           />
         </Box>
       </Box>
-    </Box>
+    </Box >
   );
 };
 

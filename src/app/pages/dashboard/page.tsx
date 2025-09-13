@@ -26,6 +26,7 @@ import { useUserStore } from '@/app/state/userState';
 import StatsOrganization from '@/app/components/statsOrganization';
 import { useOrganizationStore } from '@/app/state/organizationState';
 import { getInvitesCount } from '@/app/services/Organizations/getInvites';
+import OpenOrganization from '@/app/components/organization/openOrganization';
 
 const Dashboard = () => {
     useAuth();
@@ -90,6 +91,9 @@ const Dashboard = () => {
                 break;
             case 'Organizations':
                 setOptionMenu("Organizações");
+                break;
+            case 'Open Organization':
+                setOptionMenu("" +organization?.name);
                 break;
             case 'Favorites':
                 setOptionMenu("Favoritos");
@@ -300,6 +304,7 @@ const Dashboard = () => {
                 {option === "Home" && <HomeComponent />}
                 {option === "Documents" && <DocumentsComponent />}
                 {option === "Organizations" && <Organization />}
+                {option === "Open Organization" && <OpenOrganization />}
                 {option === "Favorites" && <Favorites />}
                 {option === "Recycle Bin" && <Trash />}
                 {option === "Settings" && <SettingsComponent />}

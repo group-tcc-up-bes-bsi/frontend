@@ -40,22 +40,43 @@ const TableDocuments = () => {
     const documentForm = useDocumentFormStore((state) => state.documentForm);
     const alterDocumentForm = useDocumentFormStore((state) => state.alter);
     const allDocuments = getDocuments();
+    const [orderBy, setOrderBy] = useState<keyof DocumentObj | null>(null);
+    const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+
 
     const filteredDocuments = useMemo(() => {
-        if (!filter.trim()) {
-            return allDocuments;
+        let docs = allDocuments;
+
+        if (filter.trim()) {
+            const searchTerm = filter.toLowerCase().trim();
+            docs = docs.filter((doc) =>
+                doc.name.toLowerCase().includes(searchTerm) ||
+                doc.type.toLowerCase().includes(searchTerm) ||
+                formatDate(doc.creationDate).toLowerCase().includes(searchTerm) ||
+                formatDate(doc.lastModifiedDate).toLowerCase().includes(searchTerm) ||
+                doc.version.toLowerCase().includes(searchTerm)
+            );
         }
 
-        const searchTerm = filter.toLowerCase().trim();
+        if (orderBy) {
+            docs = [...docs].sort((a, b) => {
+                let valueA = a[orderBy];
+                let valueB = b[orderBy];
 
-        return allDocuments.filter((doc) =>
-            doc.name.toLowerCase().includes(searchTerm) ||
-            doc.type.toLowerCase().includes(searchTerm) ||
-            formatDate(doc.creationDate).toLowerCase().includes(searchTerm) ||
-            formatDate(doc.lastModifiedDate).toLowerCase().includes(searchTerm) ||
-            doc.version.toLowerCase().includes(searchTerm)
-        );
-    }, [allDocuments, filter]);
+                if (orderBy === 'creationDate' || orderBy === 'lastModifiedDate') {
+                    valueA = new Date(valueA as Date).getTime();
+                    valueB = new Date(valueB as Date).getTime();
+                }
+
+                if (valueA < valueB) return order === 'asc' ? -1 : 1;
+                if (valueA > valueB) return order === 'asc' ? 1 : -1;
+                return 0;
+            });
+        }
+
+        return docs;
+    }, [allDocuments, filter, orderBy, order]);
+
 
     const handleEstatisticasClick = () => {
         alterOption('StatsDocument');
@@ -63,6 +84,12 @@ const TableDocuments = () => {
             alterDoc(selectedDoc);
         }
         setAnchorEl(null);
+    };
+
+    const handleSort = (property: keyof DocumentObj) => {
+        const isAsc = orderBy === property && order === 'asc';
+        setOrder(isAsc ? 'desc' : 'asc');
+        setOrderBy(property);
     };
 
     const toggleConfirm = (document: DocumentObj) => {
@@ -83,13 +110,26 @@ const TableDocuments = () => {
                         <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Documento</TableCell>
                         <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Tipo</TableCell>
                         <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>
-                            <TableSortLabel>Data de Criação</TableSortLabel>
+                            <TableSortLabel
+                                active={orderBy === 'creationDate'}
+                                direction={orderBy === 'creationDate' ? order : 'asc'}
+                                onClick={() => handleSort('creationDate')}
+                            >
+                                Data de Criação
+                            </TableSortLabel>
                         </TableCell>
                         <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>
-                            <TableSortLabel>Última Alteração</TableSortLabel>
+                            <TableSortLabel
+                                active={orderBy === 'lastModifiedDate'}
+                                direction={orderBy === 'lastModifiedDate' ? order : 'asc'}
+                                onClick={() => handleSort('lastModifiedDate')}
+                            >
+                                Última Alteração
+                            </TableSortLabel>
                         </TableCell>
+
                         <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Organização</TableCell>
-                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Versão</TableCell>
+                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Versão Atual</TableCell>
                         <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Ações</TableCell>
                     </TableRow>
                 </TableHead>

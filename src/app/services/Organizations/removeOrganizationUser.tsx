@@ -13,8 +13,7 @@ export async function removeOrganizationUser(user: UserOrganization, userCurrent
             },
         });
 
-        const responseData = await response.json().catch(() => null);
-        console.log(responseData)
+        await response.json().catch(() => null);
     } catch (error) {
         console.error(error)
         return {
