@@ -23,7 +23,6 @@ import { logoutUser } from '@/app/services/User/logoutUser';
 import { useAuth } from '@/app/components/useAuth';
 import { getMeAuth } from '@/app/services/User/GetAuthToken';
 import { useUserStore } from '@/app/state/userState';
-import StatsOrganization from '@/app/components/statsOrganization';
 import { useOrganizationStore } from '@/app/state/organizationState';
 import { getInvitesCount } from '@/app/services/Organizations/getInvites';
 import OpenOrganization from '@/app/components/organization/openOrganization';
@@ -106,9 +105,6 @@ const Dashboard = () => {
                 break;
             case 'StatsDocument':
                 setOptionMenu("Estatisticas do Documento");
-                break;
-            case 'StatsOrganization':
-                setOptionMenu("Estatisticas " + organization?.name);
                 break;
             default:
                 setOptionMenu("");
@@ -309,7 +305,6 @@ const Dashboard = () => {
                 {option === "Recycle Bin" && <Trash />}
                 {option === "Settings" && <SettingsComponent />}
                 {option === "StatsDocument" && <StatsDocument />}
-                {option === "StatsOrganization" && <StatsOrganization />}
             </main>
 
             <Backdrop
