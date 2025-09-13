@@ -17,7 +17,7 @@ import { useTheme } from '@/app/theme/ThemeContext';
 import React, { useState, useMemo } from 'react';
 import { useDocumentStore } from '../state/documentState';
 import { useOptionsDashboardStore } from '../state/optionsDashboard';
-import { formatDate, getDocuments } from '../services/Documents/DocumentsServices';
+import { getDocuments } from '../services/Documents/DocumentsServices';
 import { DocumentObj } from '../models/DocumentObj';
 import { useFilterStore } from '../state/filterState';
 import { useMsgConfirmStore } from '../state/msgConfirmState';
@@ -25,6 +25,7 @@ import MsgConfirm from './notification/msgConfirm';
 import { useAuth } from './useAuth';
 import { useDocumentFormStore } from '../state/documentFormState';
 import DocumentForm from './documents/documentForm';
+import { formatDate } from '../services/ConstantsTypes';
 
 const TableDocuments = () => {
     useAuth();
@@ -78,8 +79,8 @@ const TableDocuments = () => {
     }, [allDocuments, filter, orderBy, order]);
 
 
-    const handleEstatisticasClick = () => {
-        alterOption('StatsDocument');
+    const handleOpen = () => {
+        alterOption('Open Document');
         if (selectedDoc) {
             alterDoc(selectedDoc);
         }
@@ -191,9 +192,8 @@ const TableDocuments = () => {
                                         open={Boolean(anchorEl) && selectedDoc?.documentId === doc.documentId}
                                         onClose={() => setAnchorEl(null)}
                                     >
+                                        <MenuItem onClick={handleOpen}>Abrir</MenuItem>
                                         <MenuItem onClick={() => { toggleDocumentForm(doc) }}>Alterar</MenuItem>
-                                        <MenuItem onClick={() => { setAnchorEl(null); }}>Versões</MenuItem>
-                                        <MenuItem onClick={handleEstatisticasClick}>Estatísticas</MenuItem>
                                         <MenuItem onClick={() => toggleConfirm(doc)}>Excluir</MenuItem>
                                     </Menu>
                                 </TableCell>

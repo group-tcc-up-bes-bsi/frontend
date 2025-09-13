@@ -10,7 +10,7 @@ import { MoreVert } from '@mui/icons-material';
 import { useDocumentStore } from '../state/documentState';
 import { useOptionsDashboardStore } from '../state/optionsDashboard';
 import { DocumentObj } from '../models/DocumentObj';
-import { formatDate, getDocuments } from '../services/Documents/DocumentsServices';
+import { getDocuments } from '../services/Documents/DocumentsServices';
 import { useFilterStore } from '../state/filterState';
 import CustomTypography from './customTypography';
 import { useMsgConfirmStore } from '../state/msgConfirmState';
@@ -18,6 +18,7 @@ import MsgConfirm from './notification/msgConfirm';
 import { useAuth } from './useAuth';
 import { useDocumentFormStore } from '../state/documentFormState';
 import DocumentForm from './documents/documentForm';
+import { formatDate } from '../services/ConstantsTypes';
 
 const Documents: React.FC = () => {
   useAuth();
@@ -52,8 +53,8 @@ const Documents: React.FC = () => {
     return docs.sort((a, b) => b.lastModifiedDate.getTime() - a.lastModifiedDate.getTime());
   }, [allDocuments, filter]);
 
-  const handleEstatisticasClick = () => {
-    alterOption('StatsDocument');
+  const handleOpen = () => {
+    alterOption('Open Document');
     if (selectedDoc) {
       alterDoc(selectedDoc);
     }
@@ -129,9 +130,8 @@ const Documents: React.FC = () => {
               open={Boolean(anchorEl) && selectedDoc?.documentId === doc.documentId}
               onClose={() => setAnchorEl(null)}
             >
+              <MenuItem onClick={handleOpen}>Abrir</MenuItem>
               <MenuItem onClick={() => { toggleDocumentForm(doc) }}>Alterar</MenuItem>
-              <MenuItem onClick={() => { setAnchorEl(null); }}>Versões</MenuItem>
-              <MenuItem onClick={handleEstatisticasClick}>Estatísticas</MenuItem>
               <MenuItem onClick={() => toggleConfirm(doc)}>Excluir</MenuItem>
             </Menu>
           </Box>

@@ -44,3 +44,13 @@ export function getUserTypeLabel(value: string): string {
   );
   return option ? option.label : value;
 }
+
+export const formatDate = (date: Date) => {
+  return date.toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};

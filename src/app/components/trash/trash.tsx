@@ -11,11 +11,12 @@ import CustomTextField from '../customTextField';
 import { CachedRounded, Delete } from '@mui/icons-material';
 import CustomButton from '../customButton';
 import { DocumentObj } from '@/app/models/DocumentObj';
-import { formatDate, getDocumentsTrash } from '@/app/services/Documents/DocumentsServices';
+import { getDocumentsTrash } from '@/app/services/Documents/DocumentsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
 import MsgConfirm from '../notification/msgConfirm';
 import { useAuth } from '../useAuth';
+import { formatDate } from '@/app/services/ConstantsTypes';
 
 const Trash: React.FC = () => {
     useAuth();

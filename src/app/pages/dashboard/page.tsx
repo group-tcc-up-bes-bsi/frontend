@@ -17,7 +17,7 @@ import DocumentsComponent from '@/app/components/documents/documentsComponent';
 import Favorites from '@/app/components/favorites/favorites';
 import Trash from '@/app/components/trash/trash';
 import SettingsComponent from '@/app/components/settings/settingsComponent';
-import StatsDocument from '@/app/components/statsDocument';
+import OpenDocument from '@/app/components/documents/openDocument';
 import { useFilterStore } from '@/app/state/filterState';
 import { logoutUser } from '@/app/services/User/logoutUser';
 import { useAuth } from '@/app/components/useAuth';
@@ -26,6 +26,7 @@ import { useUserStore } from '@/app/state/userState';
 import { useOrganizationStore } from '@/app/state/organizationState';
 import { getInvitesCount } from '@/app/services/Organizations/getInvites';
 import OpenOrganization from '@/app/components/organization/openOrganization';
+import { useDocumentStore } from '@/app/state/documentState';
 
 const Dashboard = () => {
     useAuth();
@@ -39,6 +40,7 @@ const Dashboard = () => {
     const { setFilter } = useFilterStore();
     const alterUserCurrent = useUserStore((state) => state.alter);
     const organization = useOrganizationStore((state) => state.organization);
+    const document = useDocumentStore((state) => state.document);
     const userCurrent = useUserStore((state) => state.userCurrent);
     const [invites, setInvites] = useState(0);
 
@@ -92,7 +94,7 @@ const Dashboard = () => {
                 setOptionMenu("Organizações");
                 break;
             case 'Open Organization':
-                setOptionMenu("" +organization?.name);
+                setOptionMenu("Organização: " + organization?.name);
                 break;
             case 'Favorites':
                 setOptionMenu("Favoritos");
@@ -103,8 +105,8 @@ const Dashboard = () => {
             case 'Settings':
                 setOptionMenu("Configurações");
                 break;
-            case 'StatsDocument':
-                setOptionMenu("Estatisticas do Documento");
+            case 'Open Document':
+                setOptionMenu("Documento: " + document?.name);
                 break;
             default:
                 setOptionMenu("");
@@ -304,7 +306,7 @@ const Dashboard = () => {
                 {option === "Favorites" && <Favorites />}
                 {option === "Recycle Bin" && <Trash />}
                 {option === "Settings" && <SettingsComponent />}
-                {option === "StatsDocument" && <StatsDocument />}
+                {option === "Open Document" && <OpenDocument />}
             </main>
 
             <Backdrop

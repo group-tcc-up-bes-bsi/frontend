@@ -11,7 +11,7 @@ import { useUserStore } from '@/app/state/userState';
 import { useDocumentStore } from '@/app/state/documentState';
 import { MessageObj } from '@/app/models/MessageObj';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { formatDate } from '@/app/services/Documents/DocumentsServices';
+import { formatDate } from '@/app/services/ConstantsTypes';
 import { getOrganizations } from '@/app/services/Organizations/getOrganizations';
 
 const DocumentForm: React.FC = () => {
