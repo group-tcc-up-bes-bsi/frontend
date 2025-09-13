@@ -24,6 +24,7 @@ const SettingsComponent: React.FC = () => {
     useAuth();
     const { theme } = useTheme();
     const [countOrgs, setCountOrgs] = useState(0);
+    const [countDocs, setCountDocs] = useState(0);
     const userCurrent = useUserStore((state) => state.userCurrent)
     const isDarkMode = useThemeStore((state) => state.theme);
     const setIsDarkMode = useThemeStore((state) => state.alter);
@@ -39,6 +40,7 @@ const SettingsComponent: React.FC = () => {
         (async () => {
             const result = await getOrganizations(userCurrent, theme);
             setCountOrgs(countOrganizations(result.organizations));
+            setCountDocs(8 /*countDocs(docs})*/)
         })();
     }, [userCurrent, theme, openNotification]);
 
@@ -90,7 +92,7 @@ const SettingsComponent: React.FC = () => {
                             />
                         </Box>
                         <CustomTypography
-                            text='Documentos: 210'
+                            text={'Documentos: ' + countDocs}
                             component="h5"
                             variant='h6'
                             align="center"

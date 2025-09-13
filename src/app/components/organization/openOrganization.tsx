@@ -24,6 +24,8 @@ import { UserOrganization } from '@/app/models/UserObj';
 import CustomComboBox from '../customComboBox';
 import { Close } from '@mui/icons-material';
 import { PieChart } from '@mui/x-charts';
+import { buildPieDataDocumentsType, buildPieDataUser } from '@/app/services/Organizations/buildPieOrganization';
+import { getDocuments } from '@/app/services/Documents/DocumentsServices';
 
 
 const OpenOrganization: React.FC = () => {
@@ -41,20 +43,14 @@ const OpenOrganization: React.FC = () => {
     const alterOption = useOptionsDashboardStore((state) => state.alter);
     const lastOption = useOptionsDashboardStore((state) => state.lastOption);
     const [selectedUserInvite, setSelectedUserInvite] = useState('');
-    const [usersInvite, serUsersInvite] = useState<UserOrganization[]>([]);
+    const [usersInvite, setUsersInvite] = useState<UserOrganization[]>([]);
+    const [documents, /*setDocuments*/] = useState<DocumentObj[]>([]);
     const [loading, setLoading] = useState(false);
     const userCurrent = useUserStore((state) => state.userCurrent);
 
-    const pieDataDoc = [
-        { id: 0, value: 10, label: "PDF" },
-        { id: 1, value: 20, label: "Word" },
-        { id: 2, value: 30, label: "Excel" },
-    ];
+    const pieDataDoc = useMemo(() => buildPieDataDocumentsType(getDocuments()), [documents])
 
-    const pieDataUser = [
-        { id: 0, value: 10, label: "Visualizador" },
-        { id: 1, value: 20, label: "Editor" },
-    ];
+    const pieDataUser = useMemo(() => buildPieDataUser(usersInvite), [usersInvite]);
 
     const toggleModeViewer = (mode: number) => {
         alterModeViewer(mode)
@@ -103,7 +99,8 @@ const OpenOrganization: React.FC = () => {
             (async () => {
                 try {
                     const result = await getOrganizationUsers(organization.organizationId, userCurrent)
-                    serUsersInvite(result.users);
+                    setUsersInvite(result.users);
+                    buildPieDataUser(result.users);
                 } finally { }
             })();
         }
