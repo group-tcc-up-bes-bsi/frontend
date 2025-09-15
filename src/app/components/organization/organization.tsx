@@ -40,7 +40,7 @@ const Organization: React.FC = () => {
     const userCurrent = useUserStore((state) => state.userCurrent);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<MessageObj>(
-        new MessageObj('info', 'Criação de Organização', 'Preencha os dados da Organização', 'info')
+        new MessageObj('info', 'Tela das Organizações', '', 'info')
     );
     const [showMessage, setShowMessage] = useState(false);
     const alterOrg = useOrganizationStore((state) => state.alter);

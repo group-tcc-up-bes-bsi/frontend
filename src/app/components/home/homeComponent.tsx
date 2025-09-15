@@ -127,7 +127,7 @@ const HomeComponent: React.FC = () => {
                     sx={{
                         display: 'flex',
                         gap: 3,
-                        maxHeight: 'calc(85vh - 150px)',
+                        maxHeight: 'calc(80vh - 150px)',
                         overflowX: 'auto',
                         pr: 2,
                         '&::-webkit-scrollbar': {
@@ -212,7 +212,7 @@ const HomeComponent: React.FC = () => {
                 <Box sx={{
                     backgroundColor: theme.palette.background.default,
                     padding: 1,
-                    maxHeight: 'calc(85vh - 150px)',
+                    maxHeight: 'calc(80vh - 150px)',
                     overflowY: 'auto',
                     '&::-webkit-scrollbar': {
                         width: '6px',

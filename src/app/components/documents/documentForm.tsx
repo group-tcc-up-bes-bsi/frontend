@@ -13,6 +13,7 @@ import { MessageObj } from '@/app/models/MessageObj';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { formatDate } from '@/app/services/ConstantsTypes';
 import { getOrganizations } from '@/app/services/Organizations/getOrganizations';
+import PreviewDocument from './previewDocument';
 
 const DocumentForm: React.FC = () => {
     const { theme } = useTheme();
@@ -29,7 +30,8 @@ const DocumentForm: React.FC = () => {
     );
     const alterDocumentForm = useDocumentFormStore((state) => state.alter);
     const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
-    const [/*file*/, setFile] = useState<File | null>(null);
+    const [file, setFile] = useState<File | null>(null);
+    const [previewOpen, setPreviewOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -51,10 +53,10 @@ const DocumentForm: React.FC = () => {
         }
     }, [userCurrent, theme]);
 
-    const isValidOrganization = organization && 
+    const isValidOrganization = organization &&
         organizations.some(org => org.organizationId === organization.organizationId);
 
-    const selectedOrganizationValue = isValidOrganization ? 
+    const selectedOrganizationValue = isValidOrganization ?
         organization.organizationId.toString() : '';
 
     const organizationsOptions = [
@@ -212,6 +214,20 @@ const DocumentForm: React.FC = () => {
                 </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'end', gap: 4, marginTop: 2 }}>
+                    {file && (
+                        <CustomButton
+                            text={"Pré-visualizar"}
+                            type="button"
+                            colorType="secondary"
+                            onClick={() => setPreviewOpen(true)}
+                            hoverColorType="secondary"
+                            fullWidth={false}
+                            paddingY={1}
+                            paddingX={3.0}
+                            marginBottom={2}
+                            marginTop={2}
+                        />
+                    )}
                     <CustomButton
                         text={"Anexar Documento"}
                         type="button"
@@ -258,6 +274,10 @@ const DocumentForm: React.FC = () => {
                             description={message.description}
                         />
                     </Box>
+                )}
+
+                {previewOpen && file && (
+                    <PreviewDocument file={file} onClose={() => setPreviewOpen(false)} />
                 )}
             </Box>
         </Box>

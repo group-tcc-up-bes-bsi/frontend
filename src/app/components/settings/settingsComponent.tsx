@@ -31,6 +31,7 @@ const SettingsComponent: React.FC = () => {
     const openNotification = useNotificationStore((state) => state.openNotification);
     const termForm = useTermFormStore((state) => state.termForm);
     const alterTermForm = useTermFormStore((state) => state.alter);
+    const alterText = useTermFormStore((state) => state.alterText);
     const showAdminRequest = useAdminPassStore((state) => state.showAdminRequest);
     const alterAdminPass = useAdminPassStore((state) => state.alter);
 
@@ -49,6 +50,20 @@ const SettingsComponent: React.FC = () => {
             alterAdminPass(true);
         }
     }
+
+    const handleViewTerms = async () => {
+        const response = await fetch("/terms.txt");
+        const text = await response.text();
+        alterTermForm(true);
+        alterText(text);
+    };
+
+    const handleViewPrivacyPolicy = async () => {
+        const response = await fetch("/privacyPolicy.txt");
+        const text = await response.text();
+        alterTermForm(true);
+        alterText(text);
+    };
 
     return (
         <Box sx={{
@@ -177,7 +192,7 @@ const SettingsComponent: React.FC = () => {
                             text="Visualizar"
                             fullWidth={false}
                             type="button"
-                            onClick={() => alterTermForm(true)}
+                            onClick={handleViewTerms}
                             colorType="primary"
                             hoverColorType="primary"
                             paddingY={2}
@@ -202,7 +217,7 @@ const SettingsComponent: React.FC = () => {
                             text="Visualizar"
                             fullWidth={false}
                             type="button"
-                            onClick={() => alterTermForm(true)}
+                            onClick={handleViewPrivacyPolicy}
                             colorType="primary"
                             hoverColorType="primary"
                             paddingY={2}
