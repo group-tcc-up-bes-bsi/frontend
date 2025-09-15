@@ -237,7 +237,6 @@ const OrganizationForm: React.FC = () => {
                     `${error}`,
                     'error'
                 ));
-
             }
         }
     }

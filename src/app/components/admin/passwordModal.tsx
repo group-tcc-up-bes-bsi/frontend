@@ -22,6 +22,10 @@ const PasswordModal: React.FC = () => {
     const handleClose = () => alterAdminPass(false);
 
     const handleConfirm = async () => {
+        if (!password.trim() || password.length < 4) {
+            setMessage(new MessageObj('error', 'Erro', 'A senha menor que o permitido', 'error'));
+            return;
+        }
         try {
             if (userCurrent != undefined) {
                 const result = await updatePasswordUser(userCurrent.userId, userCurrent.username, password, 'doc_dash');

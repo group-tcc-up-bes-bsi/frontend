@@ -14,6 +14,7 @@ import { useTheme } from '@/app/theme/ThemeContext';
 import { formatDate } from '@/app/services/ConstantsTypes';
 import { getOrganizations } from '@/app/services/Organizations/getOrganizations';
 import PreviewDocument from './previewDocument';
+import { createDocument } from '@/app/services/Documents/createDocument';
 
 const DocumentForm: React.FC = () => {
     const { theme } = useTheme();
@@ -53,6 +54,7 @@ const DocumentForm: React.FC = () => {
         }
     }, [userCurrent, theme]);
 
+    console.log(document)
     const isValidOrganization = organization &&
         organizations.some(org => org.organizationId === organization.organizationId);
 
@@ -77,9 +79,75 @@ const DocumentForm: React.FC = () => {
 
             setMessage(new MessageObj('success', 'Arquivo Anexado', `Você anexou ${selectedFile.name}`, 'success'));
             setShowMessage(true);
-            setTimeout(() => setShowMessage(false), 5000);
+            setTimeout(() => setShowMessage(false), 2000);
         }
     };
+
+    const handleSave = async () => {
+        if (name.trim() === '') {
+            setMessage(new MessageObj(
+                'error',
+                'Nome obrigatório',
+                'Por favor, preencha o nome do documento.',
+                'error'
+            ));
+            return;
+        }
+        if (description.trim() === '') {
+            setMessage(new MessageObj(
+                'error',
+                'Descrição obrigatória',
+                'Por favor, preencha a descrição do documento.',
+                'error'
+            ));
+            return;
+        }
+        if (type.trim() === '') {
+            setMessage(new MessageObj(
+                'error',
+                'Tipo obrigatório',
+                'Por favor, selecione o tipo do documento.',
+                'error'
+            ));
+            return;
+        }
+        if (!file) {
+            setMessage(new MessageObj(
+                'error',
+                'Arquivo original obrigatório',
+                'Por favor, anexe o documento.',
+                'error'
+            ));
+            return;
+        }
+        if (!selectedOrganizationValue) {
+            setMessage(new MessageObj(
+                'error',
+                'Organização obrigatória',
+                'Por favor, selecione uma organização.',
+                'error'
+            ));
+            return;
+        }
+
+        if (userCurrent != undefined && organization) {
+            try {
+                const result = await createDocument(name, description, type, organization?.organizationId, userCurrent)
+                setMessage(result.message);
+
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                alterDocumentForm(false);
+
+            } catch (error) {
+                setMessage(new MessageObj(
+                    'error',
+                    'Erro inesperado',
+                    `${error}`,
+                    'error'
+                ));
+            }
+        }
+    }
 
     return (
         <Box>
@@ -117,7 +185,7 @@ const DocumentForm: React.FC = () => {
             >
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
                     <CustomTypography
-                        text={document ? 'Editar Documento' : 'Criar Documento'}
+                        text={document?.documentId == 0 ? 'Criar Documento' : 'Editar Documento'}
                         component="h2"
                         variant="h6"
                         sx={{
@@ -241,10 +309,10 @@ const DocumentForm: React.FC = () => {
                         marginTop={2}
                     />
                     <CustomButton
-                        text={document ? "Atualizar" : "Salvar"}
+                        text={document?.documentId == 0 ? "Salvar" : "Atualizar"}
                         type="button"
                         colorType="primary"
-                        onClick={() => { }}
+                        onClick={document?.documentId === 0 ? () => handleSave() : () => {}}
                         hoverColorType="primary"
                         fullWidth={false}
                         paddingY={1}

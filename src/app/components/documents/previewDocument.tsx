@@ -36,13 +36,13 @@ const PreviewDocument: React.FC<PreviewDocumentProps> = ({ file, onClose }) => {
           p: 2,
           borderRadius: "8px",
           width: "80%",
-          height: "80%",
+          height: "90%",
           display: "flex",
           flexDirection: "column",
         }}
       >
         <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-          <Typography variant="h6">Preview</Typography>
+          <Typography variant="h6">Pré-visualização</Typography>
           <Close
             onClick={onClose}
             sx={{
