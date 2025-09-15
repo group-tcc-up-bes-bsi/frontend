@@ -1,14 +1,21 @@
 import { useEffect } from "react";
-import { getAuthToken } from "../services/User/GetAuthToken";
+import { getMeAuth } from "../services/User/GetAuthToken";
 import { logoutUser } from "../services/User/logoutUser";
+import { useUserStore } from "../state/userState";
 
 export function useAuth() {
-
+  const alterUserCurrent = useUserStore((state) => state.alter);
+  
   useEffect(() => {
-    const token = getAuthToken();
-    if (token === "Usuário não autenticado") {
-      logoutUser();
-      return;
+    async function fetchUserData() {
+      const userCurrent = await getMeAuth();
+      console.log(userCurrent)
+      if (userCurrent) {
+        alterUserCurrent(userCurrent);
+      } else {
+        logoutUser();
+      }
     }
+    fetchUserData();
   }, []);
 }

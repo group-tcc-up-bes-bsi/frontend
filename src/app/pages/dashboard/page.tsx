@@ -21,7 +21,6 @@ import OpenDocument from '@/app/components/documents/openDocument';
 import { useFilterStore } from '@/app/state/filterState';
 import { logoutUser } from '@/app/services/User/logoutUser';
 import { useAuth } from '@/app/components/useAuth';
-import { getMeAuth } from '@/app/services/User/GetAuthToken';
 import { useUserStore } from '@/app/state/userState';
 import { useOrganizationStore } from '@/app/state/organizationState';
 import { getInvitesCount } from '@/app/services/Organizations/getInvites';
@@ -38,24 +37,10 @@ const Dashboard = () => {
     const alterOption = useOptionsDashboardStore((state) => state.alter);
     const [optionMenu, setOptionMenu] = React.useState('');
     const { setFilter } = useFilterStore();
-    const alterUserCurrent = useUserStore((state) => state.alter);
     const organization = useOrganizationStore((state) => state.organization);
     const document = useDocumentStore((state) => state.document);
     const userCurrent = useUserStore((state) => state.userCurrent);
     const [invites, setInvites] = useState(0);
-
-    useEffect(() => {
-        async function fetchUserData() {
-            const userCurrent = await getMeAuth();
-            if (userCurrent) {
-                alterUserCurrent(userCurrent);
-            } else {
-                logoutUser();
-            }
-        }
-        fetchUserData();
-    }, []);
-
 
     const loadInvitesCount = async () => {
         if (!userCurrent) return;

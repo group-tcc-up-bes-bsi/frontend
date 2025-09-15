@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { Box, Divider, IconButton, Menu, MenuItem, CircularProgress } from '@mui/material';
+import { Box, Divider, IconButton, Menu, MenuItem, CircularProgress, Typography, CardContent, Card } from '@mui/material';
 import CustomTypography from '../customTypography';
 import CustomComboBox from '../customComboBox';
 import CustomTextField from '../customTextField';
@@ -171,7 +171,7 @@ const Organization: React.FC = () => {
         toggleOrganizationForm();
     }
 
-    const handleOpen= (organization: OrganizationObj) => {
+    const handleOpen = (organization: OrganizationObj) => {
         alterOption('Open Organization');
         alterOrg(organization);
         setAnchorEl(null);
@@ -180,7 +180,7 @@ const Organization: React.FC = () => {
     return (
         <Box sx={{ maxWidth: '100%' }}>
             <Box>
-                <Box sx={{ display: 'flex', gap: 4, alignItems: 'center', justifyContent: 'center' }}>
+                <Box sx={{ display: 'flex', gap: 4, alignItems: 'center', justifyContent: 'space-between' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <CustomButton
                             text="+ Nova Organização"
@@ -239,77 +239,90 @@ const Organization: React.FC = () => {
                 ) : (
                     <Box
                         sx={{
-                            maxHeight: 'calc(85vh - 150px)',
-                            overflowY: 'auto',
-                            pr: 2,
-                            '&::-webkit-scrollbar': {
-                                width: '6px',
-                            },
-                            '&::-webkit-scrollbar-track': {
+                            maxHeight: "calc(85vh - 150px)",
+                            overflowY: "auto",
+                            p: 2,
+                            "&::-webkit-scrollbar": { width: "6px" },
+                            "&::-webkit-scrollbar-track": {
                                 background: theme.palette.background.default,
                             },
-                            '&::-webkit-scrollbar-thumb': {
+                            "&::-webkit-scrollbar-thumb": {
                                 backgroundColor: theme.palette.primary.main,
-                                borderRadius: '3px',
+                                borderRadius: "3px",
                             },
                         }}
                     >
                         {filteredOrganizations.map((org) => (
-                            <Box
+                            <Card
                                 key={org.organizationId}
+                                variant="outlined"
                                 sx={{
                                     mb: 2,
-                                    p: 2,
-                                    border: `1px solid ${org.borderColor}`,
+                                    borderColor: org.borderColor,
+                                    borderWidth: 1,
+                                    borderStyle: "solid",
+                                    borderRadius: 2,
+                                    boxShadow: 2,
                                 }}
                             >
-                                <Box sx={{ display: 'flex', gap: 4, justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Box sx={{ display: 'flex', gap: 4 }}>
-                                        <Star sx={{ color: theme.palette.text.primary }} />
-                                        <CustomTypography
-                                            text={org.name}
-                                            component="h2"
-                                            variant="h5"
-                                            sx={{
-                                                color: theme.palette.text.primary,
-                                                fontWeight: 'bold',
-                                            }}
-                                        />
-                                    </Box>
-                                    <CustomTypography
-                                        text={org.organizationType || ''}
-                                        component="p"
-                                        variant="h6"
-                                        sx={{ color: theme.palette.text.secondary, display: 'block' }}
-                                    />
-                                </Box>
-                                <Box sx={{ display: 'flex', gap: 4, justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <CustomTypography
-                                        text={org.description}
-                                        component="p"
-                                        variant="h6"
-                                        sx={{ color: theme.palette.text.secondary, mb: 1 }}
-                                    />
-                                    <IconButton
-                                        aria-label="more"
-                                        onClick={(event) => {
-                                            setAnchorEl(event.currentTarget);
-                                            setSelectedOrganization(org);
+                                <CardContent>
+                                    {/* Header */}
+                                    <Box
+                                        sx={{
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "center",
+                                            mb: 1,
                                         }}
                                     >
-                                        <MoreVert />
-                                    </IconButton>
-                                    <Menu
-                                        anchorEl={anchorEl}
-                                        open={Boolean(anchorEl) && selectedOrganization?.organizationId === org.organizationId}
-                                        onClose={() => setAnchorEl(null)}
+                                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                                            <Star sx={{ color: theme.palette.text.primary }} />
+                                            <CustomTypography
+                                                text={org.name}
+                                                component="h2"
+                                                variant="h6"
+                                                sx={{ color: theme.palette.text.primary, fontWeight: "bold" }}
+                                            />
+                                            <Typography
+                                                variant="body2"
+                                                sx={{ color: theme.palette.text.secondary }}
+                                            >
+                                                {org.organizationType || ""}
+                                            </Typography>
+                                        </Box>
+
+                                        <IconButton
+                                            aria-label="options"
+                                            onClick={(event) => {
+                                                setAnchorEl(event.currentTarget);
+                                                setSelectedOrganization(org);
+                                            }}
+                                        >
+                                            <MoreVert />
+                                        </IconButton>
+                                        <Menu
+                                            anchorEl={anchorEl}
+                                            open={
+                                                Boolean(anchorEl) &&
+                                                selectedOrganization?.organizationId === org.organizationId
+                                            }
+                                            onClose={() => setAnchorEl(null)}
+                                        >
+                                            <MenuItem onClick={() => handleOpen(org)}>Abrir</MenuItem>
+                                            <MenuItem onClick={handleOrganizationAlter}>Alterar</MenuItem>
+                                            <MenuItem onClick={handleOrganizationDelete}>Excluir</MenuItem>
+                                        </Menu>
+                                    </Box>
+
+                                    {/* Description */}
+                                    <Typography
+                                        variant="body2"
+                                        sx={{ color: theme.palette.text.secondary, whiteSpace: "pre-line" }}
                                     >
-                                        <MenuItem onClick={() => {handleOpen(org)}}>Abrir</MenuItem>
-                                        <MenuItem onClick={handleOrganizationAlter}>Alterar</MenuItem>
-                                        <MenuItem onClick={handleOrganizationDelete}>Excluir</MenuItem>
-                                    </Menu>
-                                </Box>
-                            </Box>
+                                        {org.description}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
                         ))}
                     </Box>
                 )}

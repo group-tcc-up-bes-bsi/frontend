@@ -16,6 +16,8 @@ import DocumentForm from './documentForm';
 import { useDocumentStore } from '@/app/state/documentState';
 import { DocumentObj } from '@/app/models/DocumentObj';
 import { organizationType } from '@/app/services/ConstantsTypes';
+import { MessageObj } from '@/app/models/MessageObj';
+import CustomAlert from '../customAlert';
 
 const DocumentsComponent: React.FC = () => {
     useAuth();
@@ -28,6 +30,18 @@ const DocumentsComponent: React.FC = () => {
     const documentForm = useDocumentFormStore((state) => state.documentForm);
     const alterDocumentForm = useDocumentFormStore((state) => state.alter);
     const alterDoc = useDocumentStore((state) => state.alter);
+    const [message] = useState<MessageObj>(
+        new MessageObj('info', 'Tela dos Documentos', '', 'info')
+    );
+    const [showMessage, setShowMessage] = useState(false);
+
+    useEffect(() => {
+        if (message) {
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 5000);
+        }
+    }, [message]);
+
 
     const toggleModeViewer = (mode: number) => {
         alterModeViewer(mode)
@@ -177,6 +191,27 @@ const DocumentsComponent: React.FC = () => {
                 </Box>
             )}
             {documentForm && <DocumentForm />}
+            {showMessage && message && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        bottom: '0%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 2,
+                        textAlign: 'left',
+                    }}>
+                    <CustomAlert
+                        severity={message.severity}
+                        colorType={message.colorType}
+                        title={message.title}
+                        description={message.description}
+                    />
+                </Box>
+            )}
         </Box >
     );
 };

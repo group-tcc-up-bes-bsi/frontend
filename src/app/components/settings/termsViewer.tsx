@@ -52,7 +52,6 @@ const TermsViewer: React.FC = () => {
                 }}
             >
                 {lines.map((line, index) => {
-                    // Checa se é título (começa com número + ".")
                     const isTitle = /^[0-9]+\./.test(line.trim());
 
                     return (

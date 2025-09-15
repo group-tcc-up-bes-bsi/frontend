@@ -20,8 +20,8 @@ const OpenDocument: React.FC = () => {
 
   const pieData = [
     { id: 0, value: 10, label: "Gregory" },
-    { id: 1, value: 20, label: "Lucas" },
-    { id: 2, value: 30, label: "Adam" },
+    { id: 1, value: 1, label: "Lucas" },
+    { id: 2, value: 1, label: "Adam" },
   ];
 
   const [monthsCount, setMonthsCount] = React.useState(6);

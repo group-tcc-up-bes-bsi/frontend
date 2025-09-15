@@ -69,6 +69,7 @@ const Documents: React.FC = () => {
   const toggleDocumentForm = (document: DocumentObj) => {
     alterDoc(document)
     alterDocumentForm(!documentForm);
+    setAnchorEl(null);
   }
 
   return (

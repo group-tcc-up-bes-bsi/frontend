@@ -38,6 +38,12 @@ export const userInviteAcceptedOptions = [
   { value: "false", label: "Pendente" },
 ];
 
+export const favoriteTypeOptions = [
+  { value: "all", label: "Todos" },
+  { value: "true", label: "Favoritos" },
+  { value: "false", label: "Não Favoritos" },
+]
+
 export function getUserTypeLabel(value: string): string {
   const option = userTypeOptions.find(
     (opt) => opt.value === value.toUpperCase()

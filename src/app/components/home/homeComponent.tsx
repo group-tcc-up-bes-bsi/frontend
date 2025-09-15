@@ -25,8 +25,8 @@ const HomeComponent: React.FC = () => {
     const [colorMode1, setColorMode1] = useState(theme.palette.button.primary);
     const [colorMode2, setColorMode2] = useState(theme.palette.text.primary);
     const userCurrent = useUserStore((state) => state.userCurrent)
-    const [message, setMessage] = useState<MessageObj>(
-        new MessageObj('info', 'Tela Principal', '', 'info')
+    const [message] = useState<MessageObj>(
+        new MessageObj('info', 'Tela Inicial', '', 'info')
     );
     const [showMessage, setShowMessage] = useState(false);
     const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
@@ -62,7 +62,6 @@ const HomeComponent: React.FC = () => {
             (async () => {
                 const result = await getOrganizations(userCurrent, theme);
                 setOrganizations(result.organizations);
-                setMessage(result.message);
             })();
         }
     }, [userCurrent, theme, openNotification]);
@@ -233,7 +232,7 @@ const HomeComponent: React.FC = () => {
                 <Box sx={{
                     backgroundColor: theme.palette.background.default,
                     padding: 1,
-                    maxHeight: 'calc(85vh - 150px)',
+                    maxHeight: 'calc(80vh - 150px)',
                     overflowY: 'auto',
                     '&::-webkit-scrollbar': {
                         width: '6px',

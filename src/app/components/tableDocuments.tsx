@@ -101,6 +101,7 @@ const TableDocuments = () => {
     const toggleDocumentForm = (document: DocumentObj) => {
         alterDoc(document)
         alterDocumentForm(!documentForm);
+        setAnchorEl(null);
     }
 
     return (
