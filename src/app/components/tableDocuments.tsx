@@ -10,11 +10,12 @@ import {
     IconButton,
     Menu,
     MenuItem,
-    Typography
+    Typography,
+    CircularProgress
 } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { useTheme } from '@/app/theme/ThemeContext';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useDocumentStore } from '../state/documentState';
 import { useOptionsDashboardStore } from '../state/optionsDashboard';
 import { getDocuments } from '../services/Documents/DocumentsServices';
@@ -26,6 +27,9 @@ import { useAuth } from './useAuth';
 import { useDocumentFormStore } from '../state/documentFormState';
 import DocumentForm from './documents/documentForm';
 import { formatDate } from '../services/ConstantsTypes';
+import { useUserStore } from '../state/userState';
+import { useOrganizationStore } from '../state/organizationState';
+import { getOrganizationDocuments } from '../services/Documents/getOrganizationDocuments';
 
 const TableDocuments = () => {
     useAuth();
@@ -40,13 +44,34 @@ const TableDocuments = () => {
     const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
     const documentForm = useDocumentFormStore((state) => state.documentForm);
     const alterDocumentForm = useDocumentFormStore((state) => state.alter);
-    const allDocuments = getDocuments();
     const [orderBy, setOrderBy] = useState<keyof DocumentObj | null>(null);
     const [order, setOrder] = useState<'asc' | 'desc'>('asc');
+    const userCurrent = useUserStore((state) => state.userCurrent);
+    const organization = useOrganizationStore((state) => state.organization);
+    const [allDocuments, setDocuments] = useState<DocumentObj[]>([]);
+    const [loading, setLoading] = useState(false);
 
+    useEffect(() => {
+        if (userCurrent != undefined) {
+            (async () => {
+                setLoading(true);
+                try {
+                    if (organization) {
+                        const result = await getOrganizationDocuments(userCurrent, organization);
+                        setDocuments(result.documents);
+                    } else {
+                        setDocuments(getDocuments())
+                    }
+                } finally {
+                    setLoading(false);
+                }
+            })();
+        }
+    }, [userCurrent, theme, documentForm]);
 
     const filteredDocuments = useMemo(() => {
         let docs = allDocuments;
+        setLoading(true);
 
         if (filter.trim()) {
             const searchTerm = filter.toLowerCase().trim();
@@ -57,6 +82,7 @@ const TableDocuments = () => {
                 formatDate(doc.lastModifiedDate).toLowerCase().includes(searchTerm) ||
                 doc.version.toLowerCase().includes(searchTerm)
             );
+            setTimeout(() => setLoading(false), 300);
         }
 
         if (orderBy) {
@@ -74,7 +100,7 @@ const TableDocuments = () => {
                 return 0;
             });
         }
-
+        setTimeout(() => setLoading(false), 300);
         return docs;
     }, [allDocuments, filter, orderBy, order]);
 
@@ -109,9 +135,9 @@ const TableDocuments = () => {
             <Table sx={{ minWidth: 650 }} aria-label="tabela de Documentos">
                 <TableHead>
                     <TableRow sx={{ backgroundColor: theme.palette.background.default }}>
-                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Documento</TableCell>
-                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Tipo</TableCell>
-                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>
+                        <TableCell>Documento</TableCell>
+                        <TableCell>Tipo</TableCell>
+                        <TableCell>
                             <TableSortLabel
                                 active={orderBy === 'creationDate'}
                                 direction={orderBy === 'creationDate' ? order : 'asc'}
@@ -120,7 +146,7 @@ const TableDocuments = () => {
                                 Data de Criação
                             </TableSortLabel>
                         </TableCell>
-                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>
+                        <TableCell>
                             <TableSortLabel
                                 active={orderBy === 'lastModifiedDate'}
                                 direction={orderBy === 'lastModifiedDate' ? order : 'asc'}
@@ -129,19 +155,22 @@ const TableDocuments = () => {
                                 Última Alteração
                             </TableSortLabel>
                         </TableCell>
-
-                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Organização</TableCell>
-                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Versão Atual</TableCell>
-                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Ações</TableCell>
+                        <TableCell>Organização</TableCell>
+                        <TableCell>Versão Atual</TableCell>
+                        <TableCell>Ações</TableCell>
                     </TableRow>
                 </TableHead>
+
                 <TableBody>
-                    {filteredDocuments.length === 0 ? (
+                    {loading ? (
                         <TableRow>
-                            <TableCell colSpan={6} align="center" sx={{
-                                backgroundColor: theme.palette.background.default,
-                                py: 4
-                            }}>
+                            <TableCell colSpan={7} align="center">
+                                <CircularProgress color="primary" />
+                            </TableCell>
+                        </TableRow>
+                    ) : filteredDocuments.length === 0 ? (
+                        <TableRow>
+                            <TableCell colSpan={7} align="center">
                                 <Typography variant="h6" color={theme.palette.text.primary}>
                                     {filter ? 'Nenhum documento encontrado para o filtro informado' : 'Nenhum documento disponível'}
                                 </Typography>
@@ -150,35 +179,17 @@ const TableDocuments = () => {
                     ) : (
                         filteredDocuments.map((doc) => (
                             <TableRow key={doc.documentId}>
-                                <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {doc.name}
-                                </TableCell>
-                                <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {doc.type}
-                                </TableCell>
-                                <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {formatDate(doc.creationDate)}
-                                </TableCell>
-                                <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {formatDate(doc.lastModifiedDate)}
-                                </TableCell>
-                                <TableCell sx={{ background: theme.palette.background.default }}>
-                                    {doc.organization.name}
-                                </TableCell>
-                                <TableCell sx={{ background: theme.palette.background.default }}>
-                                    <Box
-                                        sx={{
-                                            backgroundColor: theme.palette.background.paper,
-                                            color: theme.palette.text.primary,
-                                            px: 1,
-                                            borderRadius: 1,
-                                            display: 'inline-block'
-                                        }}
-                                    >
+                                <TableCell>{doc.name}</TableCell>
+                                <TableCell>{doc.type}</TableCell>
+                                <TableCell>{formatDate(doc.creationDate)}</TableCell>
+                                <TableCell>{formatDate(doc.lastModifiedDate)}</TableCell>
+                                <TableCell>{doc.organization.name}</TableCell>
+                                <TableCell>
+                                    <Box sx={{ px: 1, borderRadius: 1, display: 'inline-block', backgroundColor: theme.palette.background.paper }}>
                                         {doc.version}
                                     </Box>
                                 </TableCell>
-                                <TableCell sx={{ background: theme.palette.background.default }}>
+                                <TableCell>
                                     <IconButton
                                         aria-label="more"
                                         onClick={(event) => {
@@ -194,7 +205,7 @@ const TableDocuments = () => {
                                         onClose={() => setAnchorEl(null)}
                                     >
                                         <MenuItem onClick={handleOpen}>Abrir</MenuItem>
-                                        <MenuItem onClick={() => { toggleDocumentForm(doc) }}>Alterar</MenuItem>
+                                        <MenuItem onClick={() => toggleDocumentForm(doc)}>Alterar</MenuItem>
                                         <MenuItem onClick={() => toggleConfirm(doc)}>Excluir</MenuItem>
                                     </Menu>
                                 </TableCell>
@@ -203,11 +214,9 @@ const TableDocuments = () => {
                     )}
                 </TableBody>
             </Table>
-            {openConfirm && (
-                <MsgConfirm />
-            )
-            }
-            {documentForm && (<DocumentForm />)}
+
+            {openConfirm && <MsgConfirm />}
+            {documentForm && <DocumentForm />}
         </TableContainer>
     );
 };

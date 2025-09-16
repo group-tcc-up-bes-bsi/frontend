@@ -29,7 +29,7 @@ export function buildPieDataDocumentsType(documents: DocumentObj[]) {
   const counts: Record<string, number> = {};
 
   documents.forEach((doc) => {
-    const type = doc.type || "Desconhecido";
+    const type = (doc.type || "Desconhecido").toUpperCase();;
     counts[type] = (counts[type] || 0) + 1;
   });
 

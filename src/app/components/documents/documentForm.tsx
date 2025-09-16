@@ -54,7 +54,6 @@ const DocumentForm: React.FC = () => {
         }
     }, [userCurrent, theme]);
 
-    console.log(document)
     const isValidOrganization = organization &&
         organizations.some(org => org.organizationId === organization.organizationId);
 

@@ -25,7 +25,7 @@ import CustomComboBox from '../customComboBox';
 import { Close } from '@mui/icons-material';
 import { PieChart } from '@mui/x-charts';
 import { buildPieDataDocumentsType, buildPieDataUser } from '@/app/services/Organizations/buildPieOrganization';
-import { getDocuments } from '@/app/services/Documents/DocumentsServices';
+import { countOrganizationDocuments, getOrganizationDocuments } from '@/app/services/Documents/getOrganizationDocuments';
 
 
 const OpenOrganization: React.FC = () => {
@@ -44,11 +44,11 @@ const OpenOrganization: React.FC = () => {
     const lastOption = useOptionsDashboardStore((state) => state.lastOption);
     const [selectedUserInvite, setSelectedUserInvite] = useState('');
     const [usersInvite, setUsersInvite] = useState<UserOrganization[]>([]);
-    const [documents, /*setDocuments*/] = useState<DocumentObj[]>([]);
+    const [documents, setDocuments] = useState<DocumentObj[]>([]);
     const [loading, setLoading] = useState(false);
     const userCurrent = useUserStore((state) => state.userCurrent);
-
-    const pieDataDoc = useMemo(() => buildPieDataDocumentsType(getDocuments()), [documents])
+    const [documentsCount, setDocumentsCount] = useState(0);
+    const [pieDataDoc, setPieDataDoc] = useState(() => buildPieDataDocumentsType(documents));
 
     const pieDataUser = useMemo(() => buildPieDataUser(usersInvite), [usersInvite]);
 
@@ -95,16 +95,24 @@ const OpenOrganization: React.FC = () => {
     }
 
     useEffect(() => {
+        setDocumentsCount(countOrganizationDocuments(documents))
+        setPieDataDoc(buildPieDataDocumentsType(documents));
+    }, [documents])
+
+    useEffect(() => {
         if (organization?.organizationId !== 0 && organization != undefined && userCurrent != undefined) {
             (async () => {
                 try {
                     const result = await getOrganizationUsers(organization.organizationId, userCurrent)
                     setUsersInvite(result.users);
                     buildPieDataUser(result.users);
+                    const resultDocs = await getOrganizationDocuments(userCurrent, organization);
+                    setDocuments([...resultDocs.documents])
+                    await new Promise(resolve => setTimeout(resolve, 1000));
                 } finally { }
             })();
         }
-    }, [userCurrent, theme]);
+    }, [userCurrent, theme, documentForm]);
 
     const filteredUsersInvite = useMemo(() => {
         setLoading(true);
@@ -209,7 +217,7 @@ const OpenOrganization: React.FC = () => {
                 paddingLeft: 2
             }}>
                 <CustomTypography
-                    text="Documentos da Organização: 10"
+                    text={"Documentos da Organização: " + documentsCount}
                     component="h2"
                     variant="h5"
                     sx={{
