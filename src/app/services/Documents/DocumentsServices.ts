@@ -1,7 +1,61 @@
-import { DocumentObj } from "../../models/DocumentObj";
+import { MessageObj } from "@/app/models/MessageObj";
+import { UserObj } from "@/app/models/UserObj";
+import { DocumentObj } from "@/app/models/DocumentObj";
+import { getErrorTitle } from "../ErrorTitle";
+import { getMyOrganizations } from "../Organizations/organizationsServices";
+import { getOrganizationDocuments } from "./getOrganizationDocuments";
+import { Theme } from "@mui/material";
 import { organizationType } from "../ConstantsTypes";
 
-export function getDocuments(): DocumentObj[] {
+export async function getDocuments(
+  userCurrent: UserObj,
+  theme: Theme
+): Promise<{ message: MessageObj; documents: DocumentObj[] }> {
+  try {
+    const { message: orgMessage, organizations } = await getMyOrganizations(userCurrent, theme);
+
+    if (!organizations || organizations.length === 0) {
+      return {
+        message: new MessageObj(
+          "error",
+          orgMessage.title,
+          "Nenhuma organização encontrada para carregar documentos",
+          "error"
+        ),
+        documents: [],
+      };
+    }
+
+    const allDocuments: DocumentObj[] = [];
+    for (const org of organizations) {
+      const { documents } = await getOrganizationDocuments(userCurrent, org);
+      allDocuments.push(...documents);
+    }
+
+    return {
+      message: new MessageObj(
+        "success",
+        "Documentos carregados",
+        `Foram carregados ${allDocuments.length} documentos de ${organizations.length} organizações`,
+        "success"
+      ),
+      documents: allDocuments,
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      message: new MessageObj(
+        "error",
+        getErrorTitle(500),
+        "Erro ao carregar documentos das organizações",
+        "error"
+      ),
+      documents: [],
+    };
+  }
+}
+
+export function getDocumentsTrash(): DocumentObj[] {
   return [
     {
       documentId: 1,
@@ -66,137 +120,5 @@ export function getDocuments(): DocumentObj[] {
         icon: undefined,
       },
     },
-    {
-      documentId: 4,
-      name: "Presentation.pptx",
-      type: "PowerPoint",
-      creationDate: new Date("2023-08-05"),
-      lastModifiedDate: new Date("2023-10-15"),
-      description: "Apresentação",
-      favorite: false,
-      version: "1.5",
-      creator: "User D",
-      imagemSrc: "/login/img_fundo_1.png",
-      organization: {
-        organizationId: 2,
-        name: "Projeto Front",
-        description: "Projeto de frontend",
-        favorite: false,
-        organizationType: organizationType.COLLABORATIVE,
-        borderColor: undefined,
-        icon: undefined,
-      },
-    },
-    {
-      documentId: 5,
-      name: "Presentation.pptx",
-      type: "PowerPoint",
-      creationDate: new Date("2023-08-05"),
-      lastModifiedDate: new Date("2023-10-15"),
-      description: "Apresentação",
-      favorite: false,
-      version: "1.5",
-      creator: "User E",
-      imagemSrc: "/login/img_fundo_1.png",
-      organization: {
-        organizationId: 2,
-        name: "Projeto Front",
-        description: "Projeto de frontend",
-        favorite: false,
-        organizationType: organizationType.COLLABORATIVE,
-        borderColor: undefined,
-        icon: undefined,
-      },
-    },
-    {
-      documentId: 6,
-      name: "Presentation.pptx",
-      type: "PowerPoint",
-      creationDate: new Date("2023-08-05"),
-      lastModifiedDate: new Date("2023-10-15"),
-      description: "Apresentação",
-      favorite: false,
-      version: "1.5",
-      creator: "User F",
-      imagemSrc: "/login/img_fundo_1.png",
-      organization: {
-        organizationId: 2,
-        name: "Projeto Front",
-        description: "Projeto de frontend",
-        favorite: false,
-        organizationType: organizationType.COLLABORATIVE,
-        borderColor: undefined,
-        icon: undefined,
-      },
-    },
-    {
-      documentId: 7,
-      name: "Presentation.pptx",
-      type: "PowerPoint",
-      creationDate: new Date("2023-08-05"),
-      lastModifiedDate: new Date("2023-10-15"),
-      description: "Apresentação",
-      favorite: false,
-      version: "1.5",
-      creator: "User G",
-      imagemSrc: "/login/img_fundo_1.png",
-      organization: {
-        organizationId: 2,
-        name: "Projeto Front",
-        description: "Projeto de frontend",
-        favorite: false,
-        organizationType: organizationType.INDIVIDUAL,
-        borderColor: undefined,
-        icon: undefined,
-      },
-    },
-    {
-      documentId: 8,
-      name: "Presentation.pptx",
-      type: "PowerPoint",
-      creationDate: new Date("2023-08-05"),
-      lastModifiedDate: new Date("2023-10-15"),
-      description: "Apresentação",
-      favorite: false,
-      version: "1.5",
-      creator: "User H",
-      imagemSrc: "/login/img_fundo_1.png",
-      organization: {
-        organizationId: 2,
-        name: "Projeto Front",
-        description: "Projeto de frontend",
-        favorite: false,
-        organizationType: organizationType.INDIVIDUAL,
-        borderColor: undefined,
-        icon: undefined,
-      },
-    },
-    {
-      documentId: 9,
-      name: "Presentation.pptx",
-      type: "PowerPoint",
-      creationDate: new Date("2024-08-05"),
-      lastModifiedDate: new Date("2024-10-15"),
-      description: "Apresentação",
-      favorite: false,
-      version: "1.5",
-      creator: "User I",
-      imagemSrc: "/login/img_fundo_1.png",
-      organization: {
-        organizationId: 3,
-        name: "Projeto Backend Node Teste",
-        description: "Projeto de backend em Node.js para testes",
-        favorite: false,
-        organizationType: organizationType.INDIVIDUAL,
-        borderColor: undefined,
-        icon: undefined,
-      },
-    },
-  ];
-}
-
-export function getDocumentsTrash(): DocumentObj[] {
-  //Temporario apenas para testes visuais
-  const docs = getDocuments();
-  return docs.filter((doc) => doc.documentId < 5);
+  ]
 }

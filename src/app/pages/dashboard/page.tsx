@@ -26,6 +26,7 @@ import { useOrganizationStore } from '@/app/state/organizationState';
 import { getInvitesCount } from '@/app/services/Organizations/getInvites';
 import OpenOrganization from '@/app/components/organization/openOrganization';
 import { useDocumentStore } from '@/app/state/documentState';
+import { OrganizationObj } from '@/app/models/OrganizationObj';
 
 const Dashboard = () => {
     useAuth();
@@ -41,6 +42,7 @@ const Dashboard = () => {
     const document = useDocumentStore((state) => state.document);
     const userCurrent = useUserStore((state) => state.userCurrent);
     const [invites, setInvites] = useState(0);
+    const alterOrganization = useOrganizationStore((state) => state.alter);
 
     const loadInvitesCount = async () => {
         if (!userCurrent) return;
@@ -71,9 +73,29 @@ const Dashboard = () => {
         switch (option) {
             case 'Home':
                 setOptionMenu("Inicio");
+                const orgNull: OrganizationObj = {
+                    organizationId: 0,
+                    name: '',
+                    description: '',
+                    favorite: false,
+                    organizationType: undefined,
+                    borderColor: undefined,
+                    icon: undefined
+                };
+                alterOrganization(orgNull);
                 break;
             case 'Documents':
                 setOptionMenu("Meus Documentos");
+                const orgNullDocuments: OrganizationObj = {
+                    organizationId: 0,
+                    name: '',
+                    description: '',
+                    favorite: false,
+                    organizationType: undefined,
+                    borderColor: undefined,
+                    icon: undefined
+                };
+                alterOrganization(orgNullDocuments);
                 break;
             case 'Organizations':
                 setOptionMenu("Organizações");
@@ -100,7 +122,7 @@ const Dashboard = () => {
 
     React.useEffect(() => {
         optionMenuChoice();
-    },);
+    }, [option]);
 
     const toggleOption = (optionText: string) => {
         alterOption(optionText)

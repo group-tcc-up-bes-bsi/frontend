@@ -12,26 +12,30 @@ import { useAuth } from '../useAuth';
 import { VersionObj } from '@/app/models/VersionObj';
 import { useFilterStore } from '@/app/state/filterState';
 import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
-import { formatDate } from '@/app/services/ConstantsTypes';
+import { formatDate, organizationType } from '@/app/services/ConstantsTypes';
 import { getVersions } from '@/app/services/Versions/getVersions';
 import CustomTypography from '../customTypography';
 import MsgConfirm from '../notification/msgConfirm';
 import { useVersionFormStore } from '@/app/state/versionFormState';
 import { useVersionStore } from '@/app/state/versionState';
 import VersionForm from './versionsForm';
+import CustomButton from '../customButton';
+import { useUserStore } from '@/app/state/userState';
+import CustomTextField from '../customTextField';
 
 const Versions: React.FC = () => {
     useAuth();
     const { theme } = useTheme();
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [selectedVersion, setSelectedVersion] = useState<VersionObj | null>(null);
-    const { filter } = useFilterStore();
+    const { filter, setFilter } = useFilterStore();
     const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
     const alterConfirm = useMsgConfirmStore((state) => state.alter);
     const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
     const versionForm = useVersionFormStore((state) => state.versionForm);
     const alterVersionForm = useVersionFormStore((state) => state.alter);
     const alterVersion = useVersionStore((state) => state.alter);
+    const userCurrent = useUserStore((state) => state.userCurrent);
 
     const allVersions = getVersions();
 
@@ -48,7 +52,6 @@ const Versions: React.FC = () => {
                 version.document.name.toLowerCase().includes(searchTerm)
             );
         }
-
         return version.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     }, [allVersions, filter]);
 
@@ -63,6 +66,46 @@ const Versions: React.FC = () => {
         setAnchorEl(null);
     }
 
+    const toggleCreateVersionForm = () => {
+        if (userCurrent) {
+            const version: VersionObj = {
+                documentVersionId: 0,
+                versionName: '',
+                versionFilePath: '',
+                createdAt: new Date(),
+                document: {
+                    documentId: 0,
+                    name: '',
+                    type: '',
+                    description: '',
+                    creationDate: new Date(),
+                    lastModifiedDate: new Date(),
+                    organization: {
+                        organizationId: 0,
+                        name: '',
+                        description: '',
+                        favorite: false,
+                        organizationType: organizationType.ALL,
+                        borderColor: '',
+                        icon: null,
+                    },
+                    version: '',
+                    creator: '',
+                    imagemSrc: '',
+                    favorite: false,
+                },
+                user: {
+                    userId: userCurrent?.userId,
+                    username: userCurrent?.username,
+                    jwtToken: userCurrent?.jwtToken,
+                }
+            }
+            alterVersion(version);
+            alterVersionForm(!versionForm);
+            setAnchorEl(null);
+        }
+    }
+
     return (
         <Box
             display="flex"
@@ -73,9 +116,33 @@ const Versions: React.FC = () => {
             p={1}
             sx={{ backgroundColor: theme.palette.background.default }}
         >
-            <Typography variant="h4" gutterBottom sx={{ display: 'flex', width: '100%', justifyContent: 'center', padding: 1 }}>
+            <Box display={'flex'} justifyContent={'space-between'} paddingX={12} height={90} gap={6}>
+                <CustomButton
+                    text={"+ Nova Versão"}
+                    type="button"
+                    colorType="primary"
+                    onClick={toggleCreateVersionForm}
+                    hoverColorType="primary"
+                    fullWidth={false}
+                    paddingY={1}
+                    paddingX={3.0}
+                />
+                <Box sx={{ width: '85%' }}>
+                    <CustomTextField
+                        name="filter"
+                        label="Informe um detalhe da versão"
+                        type="text"
+                        value={filter}
+                        onChange={(e) => setFilter(e.target.value)}
+                        focusedColor="primary"
+                        hoverColor="info"
+                    />
+                </Box>
+            </Box>
+            <Typography variant="h4" gutterBottom sx={{ display: 'flex', width: '100%', justifyContent: 'center' }}>
                 Versões
             </Typography>
+
             <Box
                 display="flex"
                 gap={2}
@@ -98,6 +165,7 @@ const Versions: React.FC = () => {
                     },
                 }}
             >
+
                 {filteredVersions.length === 0 ? (
                     <CustomTypography
                         text='Nenhuma versão encontrada para o filtro informado'
@@ -157,7 +225,8 @@ const Versions: React.FC = () => {
                             </Box>
                         </Box>
                     </Box>
-                ))}
+                ))
+                }
             </Box>
             {openConfirm && (
                 <MsgConfirm />

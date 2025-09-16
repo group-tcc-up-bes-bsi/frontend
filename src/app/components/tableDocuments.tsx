@@ -56,11 +56,12 @@ const TableDocuments = () => {
             (async () => {
                 setLoading(true);
                 try {
-                    if (organization) {
+                    if (organization?.organizationId) {
                         const result = await getOrganizationDocuments(userCurrent, organization);
                         setDocuments(result.documents);
                     } else {
-                        setDocuments(getDocuments())
+                        const result = await getDocuments(userCurrent,theme);
+                        setDocuments(result.documents)
                     }
                 } finally {
                     setLoading(false);

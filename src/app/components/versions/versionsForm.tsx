@@ -78,7 +78,7 @@ const VersionForm: React.FC = () => {
             >
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
                     <CustomTypography
-                        text={version ? 'Editar Versão' : 'Criar Versão'}
+                        text={version?.documentVersionId ? 'Editar Versão' : 'Criar Versão'}
                         component="h2"
                         variant="h6"
                         sx={{
@@ -171,7 +171,7 @@ const VersionForm: React.FC = () => {
 
                 <Box sx={{ display: 'flex', justifyContent: 'end', gap: 4, marginTop: 2 }}>
                     <CustomButton
-                        text={version ? "Atualizar Versão" : "Salvar Versão"}
+                        text={version?.documentVersionId ? "Atualizar" : "Salvar"}
                         type="button"
                         colorType="primary"
                         onClick={() => { }}
