@@ -23,6 +23,9 @@ import { formatDate } from '../services/ConstantsTypes';
 import { useUserStore } from '../state/userState';
 import { useOrganizationStore } from '../state/organizationState';
 import { getOrganizationDocuments } from '../services/Documents/getOrganizationDocuments';
+import { getOrganizationUsers } from '../services/Organizations/organizationsServices';
+import { MessageObj } from '../models/MessageObj';
+import CustomAlert from './customAlert';
 
 const Documents: React.FC = () => {
   useAuth();
@@ -39,8 +42,18 @@ const Documents: React.FC = () => {
   const alterDocumentForm = useDocumentFormStore((state) => state.alter);
   const userCurrent = useUserStore((state) => state.userCurrent);
   const organization = useOrganizationStore((state) => state.organization);
+  const alterOrganization = useOrganizationStore((state) => state.alter);
   const [allDocuments, setDocuments] = useState<DocumentObj[]>([]);
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<MessageObj>();
+  const [showMessage, setShowMessage] = useState(false);
+
+  useEffect(() => {
+    if (message) {
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 5000);
+    }
+  }, [message]);
 
   useEffect(() => {
     if (userCurrent != undefined) {
@@ -82,6 +95,7 @@ const Documents: React.FC = () => {
     alterOption('Open Document');
     if (selectedDoc) {
       alterDoc(selectedDoc);
+      alterOrganization(selectedDoc.organization)
     }
     setAnchorEl(null);
   };
@@ -91,10 +105,42 @@ const Documents: React.FC = () => {
     alterConfirm(!openConfirm);
   }
 
-  const toggleDocumentForm = (document: DocumentObj) => {
-    alterDoc(document)
-    alterDocumentForm(!documentForm);
-    setAnchorEl(null);
+  const toggleDocumentForm = async (document: DocumentObj) => {
+    if (userCurrent != undefined) {
+      try {
+        if (organization?.organizationId) {
+          const result = await getOrganizationUsers(organization?.organizationId, userCurrent)
+          const users = result.users;
+          for (const user of users) {
+            if (user.username == userCurrent.username) {
+              if (user.userType.toString() == 'OWNER' || user.userType.toString() == 'WRITE') {
+                alterDoc(document)
+                alterDocumentForm(!documentForm);
+                setAnchorEl(null);
+              } else {
+                setMessage(new MessageObj('warning', 'Não Permitido', 'Usuário Visualizador não pode alterar', 'warning'));
+              }
+            }
+          }
+        } else {
+          const result = await getOrganizationUsers(document.organization.organizationId, userCurrent)
+          const users = result.users;
+          for (const user of users) {
+            if (user.username == userCurrent.username) {
+              if (user.userType.toString() == 'OWNER' || user.userType.toString() == 'WRITE') {
+                alterDoc(document)
+                alterDocumentForm(!documentForm);
+                setAnchorEl(null);
+              } else {
+                setMessage(new MessageObj('warning', 'Não Permitido', 'Usuário Visualizador não pode alterar', 'warning'));
+              }
+            }
+          }
+        }
+      } catch (error) {
+        setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
+      }
+    }
   }
 
   return (
@@ -178,6 +224,28 @@ const Documents: React.FC = () => {
       )}
       {openConfirm && <MsgConfirm />}
       {documentForm && <DocumentForm />}
+      {showMessage && message && (
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: '10%',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 1500,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 2,
+            textAlign: 'left',
+          }}>
+          <CustomAlert
+            severity={message.severity}
+            colorType={message.colorType}
+            title={message.title}
+            description={message.description}
+          />
+        </Box>
+      )}
     </Box>
   );
 };

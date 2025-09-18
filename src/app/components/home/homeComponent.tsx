@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { Box, Divider, } from '@mui/material';
+import { Box, Divider, Typography, } from '@mui/material';
 import CustomTypography from '../customTypography';
 import Menu from '@mui/icons-material/Menu';
 import SpaceDashboard from '@mui/icons-material/SpaceDashboard';
@@ -142,51 +142,66 @@ const HomeComponent: React.FC = () => {
                         },
                     }}
                 >
-                    {organizations.map((org) => (
+                    {organizations.length === 0 ? (
                         <Box
-                            key={org.organizationId}
                             sx={{
                                 mb: 1,
                                 p: 1,
                                 display: 'flex',
-                                cursor: 'pointer',
-                                '&:hover': {
-                                    backgroundColor: theme.palette.action.hover,
-                                    borderRadius: 1,
-                                },
-                                transition: 'all 0.2s ease-in-out',
-                            }}
-                            onClick={() => { handleOpen(org) }}
-                        >
-                            <Box sx={{
-                                display: 'flex',
-                                gap: 4,
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
+                                justifyContent: 'center',
                                 width: '100%'
-                            }}>
+                            }}
+                        >
+                            <Typography variant="h6" color={theme.palette.text.primary}>
+                                {'Nenhuma organização disponível'}
+                            </Typography>
+                        </Box>
+                    ) : (
+                        organizations.map((org) => (
+                            <Box
+                                key={org.organizationId}
+                                sx={{
+                                    mb: 1,
+                                    p: 1,
+                                    display: 'flex',
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                        backgroundColor: theme.palette.action.hover,
+                                        borderRadius: 1,
+                                    },
+                                    transition: 'all 0.2s ease-in-out',
+                                }}
+                                onClick={() => { handleOpen(org) }}
+                            >
                                 <Box sx={{
                                     display: 'flex',
-                                    gap: 1,
+                                    gap: 4,
+                                    justifyContent: 'space-between',
                                     alignItems: 'center',
-                                    justifyContent: 'center'
+                                    width: '100%'
                                 }}>
-                                    {org.icon}
-                                    <CustomTypography
-                                        text={org.name}
-                                        component="h2"
-                                        variant="h6"
-                                        sx={{
-                                            color: theme.palette.text.primary,
-                                            fontWeight: 'bold',
-                                            mb: 0,
-                                            whiteSpace: 'nowrap',
-                                        }}
-                                    />
+                                    <Box sx={{
+                                        display: 'flex',
+                                        gap: 1,
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}>
+                                        {org.icon}
+                                        <CustomTypography
+                                            text={org.name}
+                                            component="h2"
+                                            variant="h6"
+                                            sx={{
+                                                color: theme.palette.text.primary,
+                                                fontWeight: 'bold',
+                                                mb: 0,
+                                                whiteSpace: 'nowrap',
+                                            }}
+                                        />
+                                    </Box>
                                 </Box>
                             </Box>
-                        </Box>
-                    ))}
+                        )))}
                 </Box>
             </Box>
             <Box sx={{

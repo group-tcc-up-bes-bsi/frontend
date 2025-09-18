@@ -252,78 +252,95 @@ const Organization: React.FC = () => {
                             },
                         }}
                     >
-                        {filteredOrganizations.map((org) => (
-                            <Card
-                                key={org.organizationId}
-                                variant="outlined"
+
+                        {filteredOrganizations.length === 0 ? (
+                            <Box
                                 sx={{
-                                    mb: 2,
-                                    borderColor: org.borderColor,
-                                    borderWidth: 1,
-                                    borderStyle: "solid",
-                                    borderRadius: 2,
-                                    boxShadow: 2,
+                                    mb: 1,
+                                    p: 1,
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    width: '100%'
                                 }}
                             >
-                                <CardContent>
-                                    {/* Header */}
-                                    <Box
-                                        sx={{
-                                            display: "flex",
-                                            justifyContent: "space-between",
-                                            alignItems: "center",
-                                            mb: 1,
-                                        }}
-                                    >
-                                        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                                            <Star sx={{ color: theme.palette.text.primary }} />
-                                            <CustomTypography
-                                                text={org.name}
-                                                component="h2"
-                                                variant="h6"
-                                                sx={{ color: theme.palette.text.primary, fontWeight: "bold" }}
-                                            />
-                                            <Typography
-                                                variant="body2"
-                                                sx={{ color: theme.palette.text.secondary }}
-                                            >
-                                                {org.organizationType || ""}
-                                            </Typography>
-                                        </Box>
-
-                                        <IconButton
-                                            aria-label="options"
-                                            onClick={(event) => {
-                                                setAnchorEl(event.currentTarget);
-                                                setSelectedOrganization(org);
+                                <Typography variant="h6" color={theme.palette.text.primary}>
+                                    {'Nenhuma organização disponível'}
+                                </Typography>
+                            </Box>
+                        ) :
+                            filteredOrganizations.map((org) => (
+                                <Card
+                                    key={org.organizationId}
+                                    variant="outlined"
+                                    sx={{
+                                        mb: 2,
+                                        borderColor: org.borderColor,
+                                        borderWidth: 1,
+                                        borderStyle: "solid",
+                                        borderRadius: 2,
+                                        boxShadow: 2,
+                                    }}
+                                >
+                                    <CardContent>
+                                        {/* Header */}
+                                        <Box
+                                            sx={{
+                                                display: "flex",
+                                                justifyContent: "space-between",
+                                                alignItems: "center",
+                                                mb: 1,
                                             }}
                                         >
-                                            <MoreVert />
-                                        </IconButton>
-                                        <Menu
-                                            anchorEl={anchorEl}
-                                            open={
-                                                Boolean(anchorEl) &&
-                                                selectedOrganization?.organizationId === org.organizationId
-                                            }
-                                            onClose={() => setAnchorEl(null)}
-                                        >
-                                            <MenuItem onClick={() => handleOpen(org)}>Abrir</MenuItem>
-                                            <MenuItem onClick={handleOrganizationAlter}>Alterar</MenuItem>
-                                            <MenuItem onClick={handleOrganizationDelete}>Excluir</MenuItem>
-                                        </Menu>
-                                    </Box>
+                                            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                                                <Star sx={{ color: theme.palette.text.primary }} />
+                                                <CustomTypography
+                                                    text={org.name}
+                                                    component="h2"
+                                                    variant="h6"
+                                                    sx={{ color: theme.palette.text.primary, fontWeight: "bold" }}
+                                                />
+                                                <Typography
+                                                    variant="body2"
+                                                    sx={{ color: theme.palette.text.secondary }}
+                                                >
+                                                    {org.organizationType || ""}
+                                                </Typography>
+                                            </Box>
 
-                                    {/* Description */}
-                                    <Typography
-                                        variant="body2"
-                                        sx={{ color: theme.palette.text.secondary, whiteSpace: "pre-line" }}
-                                    >
-                                        {org.description}
-                                    </Typography>
-                                </CardContent>
-                            </Card>
-                        ))}
+                                            <IconButton
+                                                aria-label="options"
+                                                onClick={(event) => {
+                                                    setAnchorEl(event.currentTarget);
+                                                    setSelectedOrganization(org);
+                                                }}
+                                            >
+                                                <MoreVert />
+                                            </IconButton>
+                                            <Menu
+                                                anchorEl={anchorEl}
+                                                open={
+                                                    Boolean(anchorEl) &&
+                                                    selectedOrganization?.organizationId === org.organizationId
+                                                }
+                                                onClose={() => setAnchorEl(null)}
+                                            >
+                                                <MenuItem onClick={() => handleOpen(org)}>Abrir</MenuItem>
+                                                <MenuItem onClick={handleOrganizationAlter}>Alterar</MenuItem>
+                                                <MenuItem onClick={handleOrganizationDelete}>Excluir</MenuItem>
+                                            </Menu>
+                                        </Box>
+
+                                        {/* Description */}
+                                        <Typography
+                                            variant="body2"
+                                            sx={{ color: theme.palette.text.secondary, whiteSpace: "pre-line" }}
+                                        >
+                                            {org.description}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            ))
+                        }
                     </Box>
                 )}
 

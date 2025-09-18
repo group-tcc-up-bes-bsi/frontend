@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import {
     Box,
@@ -22,6 +22,10 @@ import VersionForm from './versionsForm';
 import CustomButton from '../customButton';
 import { useUserStore } from '@/app/state/userState';
 import CustomTextField from '../customTextField';
+import { getOrganizationUsers } from '@/app/services/Organizations/organizationsServices';
+import { useOrganizationStore } from '@/app/state/organizationState';
+import CustomAlert from '../customAlert';
+import { MessageObj } from '@/app/models/MessageObj';
 
 const Versions: React.FC = () => {
     useAuth();
@@ -36,9 +40,13 @@ const Versions: React.FC = () => {
     const alterVersionForm = useVersionFormStore((state) => state.alter);
     const alterVersion = useVersionStore((state) => state.alter);
     const userCurrent = useUserStore((state) => state.userCurrent);
+    const organization = useOrganizationStore((state) => state.organization);
+    const [message, setMessage] = useState<MessageObj>(
+        new MessageObj('info', 'Tela das Versões', '', 'info')
+    );
+    const [showMessage, setShowMessage] = useState(false);
 
     const allVersions = getVersions();
-
     const filteredVersions = useMemo(() => {
         let version = [...allVersions];
 
@@ -55,55 +63,117 @@ const Versions: React.FC = () => {
         return version.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     }, [allVersions, filter]);
 
+    useEffect(() => {
+        if (message) {
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 5000);
+        }
+    }, [message]);
+
     const toggleConfirm = (version: VersionObj) => {
         alterMsgConfirm(`Excluir a versão ${version.versionName}?`);
         alterConfirm(!openConfirm);
     }
 
-    const toggleVersionForm = (version: VersionObj) => {
-        alterVersion(version);
-        alterVersionForm(!versionForm);
+    const toggleVersionForm = async (version: VersionObj) => {
+        if (userCurrent != undefined) {
+            try {
+                if (organization) {
+                    const result = await getOrganizationUsers(organization?.organizationId, userCurrent)
+                    const users = result.users;
+                    for (const user of users) {
+                        if (user.username == userCurrent.username) {
+                            if (user.userType.toString() == 'OWNER' || user.userType.toString() == 'WRITE') {
+                                alterVersion(version);
+                                alterVersionForm(!versionForm);
+                            }
+                            else {
+                                setMessage(new MessageObj('warning', 'Não Permitido', 'Usuário Visualizador não pode adicionar versões', 'warning'));
+                            }
+                        }
+                    }
+                }
+
+            } catch (error) {
+                setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
+            }
+        }
         setAnchorEl(null);
     }
 
-    const toggleCreateVersionForm = () => {
+    const toggleCreateVersionForm = async () => {
         if (userCurrent) {
-            const version: VersionObj = {
-                documentVersionId: 0,
-                versionName: '',
-                versionFilePath: '',
-                createdAt: new Date(),
-                document: {
-                    documentId: 0,
-                    name: '',
-                    type: '',
-                    description: '',
-                    creationDate: new Date(),
-                    lastModifiedDate: new Date(),
-                    organization: {
-                        organizationId: 0,
-                        name: '',
-                        description: '',
-                        favorite: false,
-                        organizationType: organizationType.ALL,
-                        borderColor: '',
-                        icon: null,
-                    },
-                    version: '',
-                    creator: '',
-                    favorite: false,
-                },
-                user: {
-                    userId: userCurrent?.userId,
-                    username: userCurrent?.username,
-                    jwtToken: userCurrent?.jwtToken,
+            try {
+                if (organization) {
+                    const result = await getOrganizationUsers(
+                        organization?.organizationId,
+                        userCurrent
+                    );
+
+                    const users = result.users;
+
+                    for (const user of users) {
+                        if (user.username === userCurrent.username) {
+                            if (
+                                user.userType.toString() === "OWNER" ||
+                                user.userType.toString() === "WRITE"
+                            ) {
+                                const version: VersionObj = {
+                                    documentVersionId: 0,
+                                    versionName: "",
+                                    versionFilePath: "",
+                                    createdAt: new Date(),
+                                    document: {
+                                        documentId: 0,
+                                        name: "",
+                                        type: "",
+                                        description: "",
+                                        creationDate: new Date(),
+                                        lastModifiedDate: new Date(),
+                                        organization: {
+                                            organizationId: 0,
+                                            name: "",
+                                            description: "",
+                                            favorite: false,
+                                            organizationType: organizationType.ALL,
+                                            borderColor: "",
+                                            icon: null,
+                                        },
+                                        version: "",
+                                        creator: "",
+                                        favorite: false,
+                                    },
+                                    user: {
+                                        userId: userCurrent?.userId,
+                                        username: userCurrent?.username,
+                                        jwtToken: userCurrent?.jwtToken,
+                                    },
+                                };
+
+                                alterVersion(version);
+                                alterVersionForm(!versionForm);
+                            } else {
+                                setMessage(
+                                    new MessageObj(
+                                        "warning",
+                                        "Não Permitido",
+                                        "Usuário Visualizador não pode adicionar versões",
+                                        "warning"
+                                    )
+                                );
+                            }
+                        }
+                    }
                 }
+            } catch (error) {
+                setMessage(
+                    new MessageObj("error", "Erro inesperado", `${error}`, "error")
+                );
             }
-            alterVersion(version);
-            alterVersionForm(!versionForm);
             setAnchorEl(null);
         }
-    }
+    };
+
 
     return (
         <Box
@@ -229,6 +299,27 @@ const Versions: React.FC = () => {
             )
             }
             {versionForm && (<VersionForm />)}
+            {showMessage && message && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        bottom: '0%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 2,
+                        textAlign: 'left',
+                    }}>
+                    <CustomAlert
+                        severity={message.severity}
+                        colorType={message.colorType}
+                        title={message.title}
+                        description={message.description}
+                    />
+                </Box>
+            )}
         </Box>
     );
 };

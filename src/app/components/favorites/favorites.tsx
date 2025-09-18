@@ -4,6 +4,7 @@ import {
     Box, Divider, Table, TableBody, TableCell, TableContainer,
     TableHead, TableRow, Paper,
     IconButton,
+    Typography,
 } from '@mui/material';
 import CustomTypography from '../customTypography';
 import CustomTextField from '../customTextField';
@@ -177,23 +178,32 @@ const Favorites: React.FC = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {filteredDocuments.map((doc) => (
-                                            <TableRow key={doc.documentId}>
-                                                <TableCell>
-                                                    <IconButton aria-label="star" onClick={() => handleFavoriteToggle(doc)}>
-                                                        <Star sx={{
-                                                            color: doc.favorite ? theme.palette.button.star : theme.palette.text.primary,
-                                                            transition: 'color 0.2s ease-in-out',
-                                                            '&:hover': {
-                                                                transform: 'scale(1.1)'
-                                                            }
-                                                        }} />
-                                                    </IconButton>
+                                        {filteredDocuments.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={7} align="center">
+                                                    <Typography variant="h6" color={theme.palette.text.primary}>
+                                                        {filter ? 'Nenhum documento encontrado para o filtro informado' : 'Nenhum documento disponível'}
+                                                    </Typography>
                                                 </TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>{doc.name}</TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>{doc.organization.name}</TableCell>
                                             </TableRow>
-                                        ))}
+                                        ) :
+                                            filteredDocuments.map((doc) => (
+                                                <TableRow key={doc.documentId}>
+                                                    <TableCell>
+                                                        <IconButton aria-label="star" onClick={() => handleFavoriteToggle(doc)}>
+                                                            <Star sx={{
+                                                                color: doc.favorite ? theme.palette.button.star : theme.palette.text.primary,
+                                                                transition: 'color 0.2s ease-in-out',
+                                                                '&:hover': {
+                                                                    transform: 'scale(1.1)'
+                                                                }
+                                                            }} />
+                                                        </IconButton>
+                                                    </TableCell>
+                                                    <TableCell sx={{ color: theme.palette.text.primary }}>{doc.name}</TableCell>
+                                                    <TableCell sx={{ color: theme.palette.text.primary }}>{doc.organization.name}</TableCell>
+                                                </TableRow>
+                                            ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
@@ -251,23 +261,32 @@ const Favorites: React.FC = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {filteredOrganizations.map((org) => (
-                                            <TableRow key={org.organizationId}>
-                                                <TableCell>
-                                                    <IconButton aria-label="star" onClick={() => handleFavoriteOrganizationToggle(org)}>
-                                                        <Star sx={{
-                                                            color: org.favorite ? theme.palette.button.star : theme.palette.text.primary,
-                                                            transition: 'color 0.2s ease-in-out',
-                                                            '&:hover': {
-                                                                transform: 'scale(1.1)'
-                                                            }
-                                                        }} />
-                                                    </IconButton>
+                                        {filteredOrganizations.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={7} align="center">
+                                                    <Typography variant="h6" color={theme.palette.text.primary}>
+                                                        {filter ? 'Nenhuma organização encontrada para o filtro informado' : 'Nenhuma organização disponível'}
+                                                    </Typography>
                                                 </TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>{org.name}</TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>10</TableCell>
                                             </TableRow>
-                                        ))}
+                                        ) :
+                                            filteredOrganizations.map((org) => (
+                                                <TableRow key={org.organizationId}>
+                                                    <TableCell>
+                                                        <IconButton aria-label="star" onClick={() => handleFavoriteOrganizationToggle(org)}>
+                                                            <Star sx={{
+                                                                color: org.favorite ? theme.palette.button.star : theme.palette.text.primary,
+                                                                transition: 'color 0.2s ease-in-out',
+                                                                '&:hover': {
+                                                                    transform: 'scale(1.1)'
+                                                                }
+                                                            }} />
+                                                        </IconButton>
+                                                    </TableCell>
+                                                    <TableCell sx={{ color: theme.palette.text.primary }}>{org.name}</TableCell>
+                                                    <TableCell sx={{ color: theme.palette.text.primary }}>10</TableCell>
+                                                </TableRow>
+                                            ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>

@@ -3,10 +3,11 @@ import { MessageObj } from "@/app/models/MessageObj";
 import { UserObj } from "@/app/models/UserObj";
 import { getErrorTitle } from "../ErrorTitle";
 import { OrganizationObj } from "@/app/models/OrganizationObj";
+import { getOrganizationUsers } from "../Organizations/organizationsServices";
 
 export async function getOrganizationDocuments(
   userCurrent: UserObj,
-  organization: OrganizationObj,
+  organization: OrganizationObj
 ): Promise<{ message: MessageObj; documents: DocumentObj[] }> {
   const url = `${process.env.NEXT_PUBLIC_BACKEND}/documents/organization/${organization.organizationId}`;
 
@@ -36,30 +37,50 @@ export async function getOrganizationDocuments(
       };
     }
 
-    const documents: DocumentObj[] = responseData.map((item) => ({
-      documentId: item.documentId,
-      name: item.name,
-      type: item.type,
-      description: item.description,
-      creationDate: new Date(item.creationDate),
-      lastModifiedDate: new Date(item.lastModifiedDate),
-      organization: organization,
+    let documents: DocumentObj[];
 
-      version: item.version || "1.0",
-      creator: item.creator || "Desconhecido",
-      imagemSrc: item.imagemSrc || "",
-      favorite: item.favorite ?? false,
-    }));
-      
+    const orgUsersResponse = await getOrganizationUsers(
+      organization.organizationId,
+      userCurrent
+    );
+
+    const myUser = orgUsersResponse.users.find(
+      (user) => user.username === userCurrent.username
+    );
+    if (myUser?.inviteAccepted !== false) {
+      documents = responseData.map((item) => ({
+        documentId: item.documentId,
+        name: item.name,
+        type: item.type,
+        description: item.description,
+        creationDate: new Date(item.creationDate),
+        lastModifiedDate: new Date(item.lastModifiedDate),
+        organization: organization,
+
+        version: item.version || "1.0",
+        creator: item.creator || "Desconhecido",
+        imagemSrc: item.imagemSrc || "",
+        favorite: item.favorite ?? false,
+      }));
+      return {
+        message: new MessageObj(
+          "success",
+          "Documentos carregados",
+          "Documentos carregados com sucesso",
+          "success"
+        ),
+        documents,
+      };
+    }
 
     return {
       message: new MessageObj(
-        "success",
-        "Documentos carregados",
-        "Documentos carregados com sucesso",
-        "success"
+        "error",
+        "Não encontrado",
+        "Nenhuma documento encontrado",
+        "error"
       ),
-      documents,
+      documents: [],
     };
   } catch (error) {
     console.error(error);
@@ -75,9 +96,7 @@ export async function getOrganizationDocuments(
   }
 }
 
-export function countOrganizationDocuments(
-    documents: DocumentObj[]
-): number {
-    if (!documents || documents.length === 0) return 0;
-    return documents.length;
+export function countOrganizationDocuments(documents: DocumentObj[]): number {
+  if (!documents || documents.length === 0) return 0;
+  return documents.length;
 }

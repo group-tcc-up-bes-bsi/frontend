@@ -51,6 +51,7 @@ const TableDocuments = () => {
     const [order, setOrder] = useState<'asc' | 'desc'>('asc');
     const userCurrent = useUserStore((state) => state.userCurrent);
     const organization = useOrganizationStore((state) => state.organization);
+    const alterOrganization = useOrganizationStore((state) => state.alter);
     const [allDocuments, setDocuments] = useState<DocumentObj[]>([]);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<MessageObj>();
@@ -122,6 +123,7 @@ const TableDocuments = () => {
         alterOption('Open Document');
         if (selectedDoc) {
             alterDoc(selectedDoc);
+            alterOrganization(selectedDoc.organization)
         }
         setAnchorEl(null);
     };
@@ -140,7 +142,7 @@ const TableDocuments = () => {
     const toggleDocumentForm = async (document: DocumentObj) => {
         if (userCurrent != undefined) {
             try {
-                if (organization) {
+                if (organization?.organizationId) {
                     const result = await getOrganizationUsers(organization?.organizationId, userCurrent)
                     const users = result.users;
                     for (const user of users) {
@@ -150,7 +152,21 @@ const TableDocuments = () => {
                                 alterDocumentForm(!documentForm);
                                 setAnchorEl(null);
                             } else {
-                                setMessage(new MessageObj('warning', 'Não Permitido', 'Usuário leitor não pode alterar', 'warning'));
+                                setMessage(new MessageObj('warning', 'Não Permitido', 'Usuário Visualizador não pode alterar', 'warning'));
+                            }
+                        }
+                    }
+                }else{
+                    const result = await getOrganizationUsers(document.organization.organizationId, userCurrent)
+                    const users = result.users;
+                    for (const user of users) {
+                        if (user.username == userCurrent.username) {
+                            if (user.userType.toString() == 'OWNER' || user.userType.toString() == 'WRITE') {
+                                alterDoc(document)
+                                alterDocumentForm(!documentForm);
+                                setAnchorEl(null);
+                            } else {
+                                setMessage(new MessageObj('warning', 'Não Permitido', 'Usuário Visualizador não pode alterar', 'warning'));
                             }
                         }
                     }

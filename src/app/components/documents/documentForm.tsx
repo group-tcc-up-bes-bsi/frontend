@@ -14,6 +14,7 @@ import { useTheme } from '@/app/theme/ThemeContext';
 import { formatDate } from '@/app/services/ConstantsTypes';
 import { getOrganizations } from '@/app/services/Organizations/getOrganizations';
 import { createDocument } from '@/app/services/Documents/createDocument';
+import { updateDocument } from '@/app/services/Documents/updateDocument';
 
 const DocumentForm: React.FC = () => {
     const { theme } = useTheme();
@@ -63,7 +64,7 @@ const DocumentForm: React.FC = () => {
         }))
     ];
 
-   
+
     const handleSave = async () => {
         if (name.trim() === '') {
             setMessage(new MessageObj(
@@ -110,6 +111,54 @@ const DocumentForm: React.FC = () => {
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 alterDocumentForm(false);
 
+            } catch (error) {
+                setMessage(new MessageObj(
+                    'error',
+                    'Erro inesperado',
+                    `${error}`,
+                    'error'
+                ));
+            }
+        }
+    }
+
+    const handleUpdate = async () => {
+        if (name.trim() === '') {
+            setMessage(new MessageObj(
+                'error',
+                'Nome obrigatório',
+                'Por favor, preencha o nome do documento.',
+                'error'
+            ));
+            return;
+        }
+        if (description.trim() === '') {
+            setMessage(new MessageObj(
+                'error',
+                'Descrição obrigatória',
+                'Por favor, preencha a descrição do documento.',
+                'error'
+            ));
+            return;
+        }
+        if (type.trim() === '') {
+            setMessage(new MessageObj(
+                'error',
+                'Tipo obrigatório',
+                'Por favor, selecione o tipo do documento.',
+                'error'
+            ));
+            return;
+        }
+        if (userCurrent != undefined && organization) {
+            try {
+                if (document?.documentId) {
+                    const result = await updateDocument(document?.documentId, name, description, type, userCurrent)
+                    setMessage(result.message);
+
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    alterDocumentForm(false);
+                }
             } catch (error) {
                 setMessage(new MessageObj(
                     'error',
@@ -197,6 +246,7 @@ const DocumentForm: React.FC = () => {
                             setOrganization(org || null);
                         }}
                         options={organizationsOptions}
+                        disabled={document?.documentId == 0 ? false : true}
                         focusedColor="primary"
                         hoverColor="info"
                         marginBottom={2}
@@ -252,7 +302,7 @@ const DocumentForm: React.FC = () => {
                         text={document?.documentId == 0 ? "Salvar" : "Atualizar"}
                         type="button"
                         colorType="primary"
-                        onClick={document?.documentId === 0 ? () => handleSave() : () => {}}
+                        onClick={document?.documentId === 0 ? () => handleSave() : () => handleUpdate()}
                         hoverColorType="primary"
                         fullWidth={false}
                         paddingY={1}

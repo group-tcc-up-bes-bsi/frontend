@@ -112,7 +112,7 @@ const OpenOrganization: React.FC = () => {
                                 alterDoc(document)
                                 alterDocumentForm(!documentForm);
                             } else {
-                                setMessage(new MessageObj('warning', 'Não Permitido', 'Usuário leitor não pode alterar', 'warning'));
+                                setMessage(new MessageObj('warning', 'Não Permitido', 'Usuário Visualizador não pode adicionar documentos', 'warning'));
                             }
                         }
                     }
