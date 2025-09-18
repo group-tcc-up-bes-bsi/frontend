@@ -18,13 +18,14 @@ import { MessageObj } from '@/app/models/MessageObj';
 import CustomAlert from '../customAlert';
 import CustomComboBox from '../customComboBox';
 import { favoriteTypeOptions } from '@/app/services/ConstantsTypes';
+import { DocumentObj } from '@/app/models/DocumentObj';
 
 const Favorites: React.FC = () => {
     useAuth();
     const { theme } = useTheme();
     const { filter, setFilter } = useFilterStore();
     const userCurrent = useUserStore((state) => state.userCurrent)
-    const [documents, setDocuments] = useState(getDocuments());
+    const [documents, setDocuments] = useState<DocumentObj[]>([]);
     const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
     const [message] = useState<MessageObj>(
         new MessageObj('info', 'Tela dos Favoritos', '', 'info')
@@ -45,6 +46,8 @@ const Favorites: React.FC = () => {
             (async () => {
                 const result = await getOrganizations(userCurrent, theme);
                 setOrganizations(result.organizations);
+                const resultDocuments = await getDocuments(userCurrent, theme);
+                setDocuments(resultDocuments.documents)
             })();
         }
     }, [userCurrent, theme]);

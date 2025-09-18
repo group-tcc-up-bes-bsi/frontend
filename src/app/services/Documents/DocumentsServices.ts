@@ -67,7 +67,6 @@ export function getDocumentsTrash(): DocumentObj[] {
       favorite: true,
       version: "Test",
       creator: "User A",
-      imagemSrc: "/login/img_fundo_1.png",
       organization: {
         organizationId: 1,
         name: "Projeto Inovação",
@@ -88,7 +87,6 @@ export function getDocumentsTrash(): DocumentObj[] {
       favorite: false,
       version: "2.0",
       creator: "User B",
-      imagemSrc: "/login/img_fundo_1.png",
       organization: {
         organizationId: 1,
         name: "TCC",
@@ -109,7 +107,6 @@ export function getDocumentsTrash(): DocumentObj[] {
       favorite: false,
       version: "1.5",
       creator: "User C",
-      imagemSrc: "/login/img_fundo_1.png",
       organization: {
         organizationId: 1,
         name: "TCC",

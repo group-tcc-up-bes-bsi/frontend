@@ -1,16 +1,13 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Box, Backdrop } from '@mui/material';
 import CustomTextField from '../customTextField';
-import CustomComboBox from '../customComboBox';
 import CustomButton from '../customButton';
 import CustomTypography from '../customTypography';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { formatDate } from '@/app/services/ConstantsTypes';
 import { useAuth } from '../useAuth';
 import { useVersionFormStore } from '@/app/state/versionFormState';
 import { useVersionStore } from '@/app/state/versionState';
-import { DocumentObj } from '@/app/models/DocumentObj';
-import { UserObj } from '@/app/models/UserObj';
+import PreviewVersion from './previewVersion';
 
 const VersionForm: React.FC = () => {
     useAuth();
@@ -18,38 +15,30 @@ const VersionForm: React.FC = () => {
     const alterVersionForm = useVersionFormStore((state) => state.alter);
     const version = useVersionStore((state) => state.version);
     const [versionName, setVersionName] = useState(version?.versionName || '');
-    const [filePath, setFilePath] = useState(version?.versionFilePath || '');
-    const [document, setDocument] = useState<DocumentObj | null>(version?.document || null);
-    const [documents, /*setDocuments*/] = useState<DocumentObj[]>([]);
-    const [user, setUser] = useState<UserObj | null>(version?.user || null);
-    const [users, /*setUsers*/] = useState<UserObj[]>([]);
+    const [file, setFile] = useState<File | null>(null);
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const isValidDocument = document &&
-        documents.some(d => d.documentId === document.documentId);
+    const handleAttachFile = () => {
+        fileInputRef.current?.click();
+    };
 
-    const selectedDocumentValue = isValidDocument ?
-        document.documentId.toString() : '';
-
-    const documentsOptions = documents.map(d => ({
-        label: d.name,
-        value: d.documentId.toString()
-    }));
-
-
-    const isValidUser = user &&
-        users.some(u => u.userId === user.userId);
-
-    const selectedUserValue = isValidUser ?
-        user.userId.toString() : '';
-
-    const usersOptions = users.map(u => ({
-        label: u.username,
-        value: u.userId.toString()
-    }));
+    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (event.target.files && event.target.files.length > 0) {
+            const selectedFile = event.target.files[0];
+            setFile(selectedFile);
+        }
+    };
 
 
     return (
         <Box>
+            <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+            />
             <Backdrop
                 open={true}
                 onClick={() => alterVersionForm(false)}
@@ -103,73 +92,35 @@ const VersionForm: React.FC = () => {
                         hoverColor="info"
                         marginBottom={2}
                     />
-
-                    <CustomComboBox
-                        name="Document"
-                        label="Documento Base"
-                        value={selectedDocumentValue}
-                        onChange={(value) => {
-                            const doc = documents.find(d => d.documentId.toString() === value);
-                            setDocument(doc || null);
-                        }}
-                        options={documentsOptions}
-                        focusedColor="primary"
-                        hoverColor="info"
-                        marginBottom={2}
-                    />
-                </Box>
-
-                <Box sx={{ width: '100%', display: 'flex', gap: 4, marginTop: 2 }}>
-                    <CustomComboBox
-                        name="User"
-                        label="Usuário Criador"
-                        value={selectedUserValue}
-                        onChange={(value) => {
-                            const usr = users.find(u => u.userId.toString() === value);
-                            setUser(usr || null);
-                        }}
-                        options={usersOptions}
-                        focusedColor="primary"
-                        hoverColor="info"
-                        marginBottom={2}
-                    />
-                </Box>
-
-                <Box sx={{ width: '100%', marginTop: 2 }}>
-                    <CustomTextField
-                        name="FilePath"
-                        label="Caminho do Arquivo"
-                        placeholder="/files/version_x.pdf"
-                        type="text"
-                        value={filePath}
-                        onChange={(e) => setFilePath(e.target.value)}
-                        focusedColor="primary"
-                        hoverColor="info"
-                        fullWidth
-                    />
-                </Box>
-
-                <Box sx={{
-                    display: 'flex',
-                    flexDirection: "column",
-                    justifyContent: 'start',
-                    alignItems: 'start',
-                    gap: 1,
-                    width: '100%',
-                    marginTop: 2
-                }}>
-                    <CustomTypography
-                        text={"Criado em: " + formatDate(version?.createdAt ? new Date(version.createdAt) : new Date())}
-                        component="p"
-                        variant="h6"
-                        sx={{
-                            color: theme.palette.text.primary,
-                            fontSize: '16px'
-                        }}
-                    />
                 </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'end', gap: 4, marginTop: 2 }}>
+                    {file && (
+                        <CustomButton
+                            text={"Pré-visualizar"}
+                            type="button"
+                            colorType="secondary"
+                            onClick={() => setPreviewOpen(true)}
+                            hoverColorType="secondary"
+                            fullWidth={false}
+                            paddingY={1}
+                            paddingX={3.0}
+                            marginBottom={2}
+                            marginTop={2}
+                        />
+                    )}
+                    <CustomButton
+                        text={"Anexar Documento"}
+                        type="button"
+                        colorType="primary"
+                        onClick={() => { handleAttachFile() }}
+                        hoverColorType="primary"
+                        fullWidth={false}
+                        paddingY={1}
+                        paddingX={3.0}
+                        marginBottom={2}
+                        marginTop={2}
+                    />
                     <CustomButton
                         text={version?.documentVersionId ? "Atualizar" : "Salvar"}
                         type="button"
@@ -184,6 +135,10 @@ const VersionForm: React.FC = () => {
                     />
                 </Box>
             </Box>
+
+            {previewOpen && file && (
+                <PreviewVersion file={file} onClose={() => setPreviewOpen(false)} />
+            )}
         </Box>
     );
 };

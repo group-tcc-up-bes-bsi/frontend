@@ -1,7 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import {
   Box,
+  CircularProgress,
   IconButton,
   Menu,
   MenuItem,
@@ -19,6 +20,9 @@ import { useAuth } from './useAuth';
 import { useDocumentFormStore } from '../state/documentFormState';
 import DocumentForm from './documents/documentForm';
 import { formatDate } from '../services/ConstantsTypes';
+import { useUserStore } from '../state/userState';
+import { useOrganizationStore } from '../state/organizationState';
+import { getOrganizationDocuments } from '../services/Documents/getOrganizationDocuments';
 
 const Documents: React.FC = () => {
   useAuth();
@@ -33,11 +37,32 @@ const Documents: React.FC = () => {
   const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
   const documentForm = useDocumentFormStore((state) => state.documentForm);
   const alterDocumentForm = useDocumentFormStore((state) => state.alter);
+  const userCurrent = useUserStore((state) => state.userCurrent);
+  const organization = useOrganizationStore((state) => state.organization);
+  const [allDocuments, setDocuments] = useState<DocumentObj[]>([]);
+  const [loading, setLoading] = useState(false);
 
-  const allDocuments = getDocuments();
+  useEffect(() => {
+    if (userCurrent != undefined) {
+      (async () => {
+        setLoading(true);
+        try {
+          if (organization?.organizationId) {
+            const result = await getOrganizationDocuments(userCurrent, organization);
+            setDocuments(result.documents);
+          } else {
+            const result = await getDocuments(userCurrent, theme);
+            setDocuments(result.documents)
+          }
+        } finally {
+          setLoading(false);
+        }
+      })();
+    }
+  }, [userCurrent, theme, documentForm]);
 
   const filteredDocuments = useMemo(() => {
-    let docs = [...allDocuments];
+    let docs = allDocuments;
 
     if (filter.trim()) {
       const searchTerm = filter.toLowerCase().trim();
@@ -77,90 +102,82 @@ const Documents: React.FC = () => {
       display="flex"
       gap={2}
       flexWrap="wrap"
-      justifyContent='center'
+      justifyContent="center"
       p={1}
       sx={{ backgroundColor: theme.palette.background.default }}
-    >{filteredDocuments.length === 0 ? (
-      <CustomTypography
-        text='Nenhum documento encontrado para o filtro informado'
-        component="h6"
-        variant="h6"
-        sx={{
-          color: theme.palette.text.primary,
-          mt: 1,
-        }}
-      />
-    ) : filteredDocuments.map((doc) => (
-      <Box
-        key={doc.documentId}
-        width={240}
-        borderRadius={2}
-        p={2}
-        sx={{
-          backgroundColor: theme.palette.background.paper,
-          boxShadow: 3,
-        }}
-      >
-        <Box fontWeight="bold" fontSize="0.9rem">
-          {doc.name}
+    >
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+          <CircularProgress color="primary" />
         </Box>
-        <Box fontWeight="bold" fontSize="0.9rem" mb={1}>
-          Organização: {doc.organization.name}
-        </Box>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Box sx={{ display: 'flex', flexDirection: 'column', }}>
-            <Box fontSize="0.8rem" mt={1} sx={{ color: theme.palette.text.primary }}>
-              Tipo: {doc.type}
-            </Box>
-            <Box fontSize="0.8rem" mb={1} sx={{ color: theme.palette.text.primary }}>
-              Versões: {doc.documentId}
-            </Box>
-          </Box>
-          <Box mt={0.5}>
-            <IconButton
-              aria-label="more"
-              onClick={(event) => {
-                setAnchorEl(event.currentTarget);
-                setSelectedDoc(doc);
-              }}
-            >
-              <MoreVert />
-            </IconButton>
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl) && selectedDoc?.documentId === doc.documentId}
-              onClose={() => setAnchorEl(null)}
-            >
-              <MenuItem onClick={handleOpen}>Abrir</MenuItem>
-              <MenuItem onClick={() => { toggleDocumentForm(doc) }}>Alterar</MenuItem>
-              <MenuItem onClick={() => toggleConfirm(doc)}>Excluir</MenuItem>
-            </Menu>
-          </Box>
-        </Box>
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      ) : filteredDocuments.length === 0 ? (
+        <CustomTypography
+          text="Nenhum documento encontrado para o filtro informado"
+          component="h6"
+          variant="h6"
+          sx={{
+            color: theme.palette.text.primary,
+            mt: 1,
+          }}
+        />
+      ) : (
+        filteredDocuments.map((doc) => (
           <Box
-            component="img"
-            src={doc.imagemSrc}
-            alt="imagem de fundo"
+            key={doc.documentId}
+            width={240}
+            borderRadius={2}
+            p={2}
             sx={{
-              height: 150,
-              width: 170,
-              objectFit: 'cover'
+              backgroundColor: theme.palette.background.paper,
+              boxShadow: 3,
             }}
-          />
-        </Box>
-        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <Box fontSize="0.75rem" mt={1} sx={{ color: theme.palette.text.primary }}>
-            Alterado em {formatDate(doc.lastModifiedDate)}
+          >
+            <Box fontWeight="bold" fontSize="0.9rem">
+              {doc.name}
+            </Box>
+            <Box fontWeight="bold" fontSize="0.9rem" mb={1}>
+              Organização: {doc.organization.name}
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                <Box fontSize="0.8rem" mt={1} sx={{ color: theme.palette.text.primary }}>
+                  Tipo: {doc.type.toUpperCase()}
+                </Box>
+                <Box fontSize="0.8rem" mb={1} sx={{ color: theme.palette.text.primary }}>
+                  Versões: {doc.documentId}
+                </Box>
+              </Box>
+              <Box mt={0.5}>
+                <IconButton
+                  aria-label="more"
+                  onClick={(event) => {
+                    setAnchorEl(event.currentTarget);
+                    setSelectedDoc(doc);
+                  }}
+                >
+                  <MoreVert />
+                </IconButton>
+                <Menu
+                  anchorEl={anchorEl}
+                  open={Boolean(anchorEl) && selectedDoc?.documentId === doc.documentId}
+                  onClose={() => setAnchorEl(null)}
+                >
+                  <MenuItem onClick={handleOpen}>Abrir</MenuItem>
+                  <MenuItem onClick={() => toggleDocumentForm(doc)}>Alterar</MenuItem>
+                  <MenuItem onClick={() => toggleConfirm(doc)}>Excluir</MenuItem>
+                </Menu>
+              </Box>
+            </Box>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <Box fontSize="0.75rem" mt={1} sx={{ color: theme.palette.text.primary }}>
+                Alterado em {formatDate(doc.lastModifiedDate)}
+              </Box>
+            </Box>
           </Box>
-        </Box>
-      </Box>
-    ))}
-      {openConfirm && (
-        <MsgConfirm />
-      )
-      }
-      {documentForm && (<DocumentForm />)}
+        ))
+      )}
+      {openConfirm && <MsgConfirm />}
+      {documentForm && <DocumentForm />}
     </Box>
   );
 };

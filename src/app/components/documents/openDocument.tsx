@@ -84,7 +84,7 @@ const OpenDocument: React.FC = () => {
           {"Data criação: " + document?.creationDate?.toLocaleDateString("pt-BR", {})}
         </Typography>
         <Typography variant="h6" gutterBottom>
-          {"Criado por " + document?.creator}
+          {"Organização: " + document?.organization.name}
         </Typography>
       </Box>
       <Versions />

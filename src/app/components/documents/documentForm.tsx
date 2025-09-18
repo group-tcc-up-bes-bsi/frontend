@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Box, Backdrop } from '@mui/material';
 import CustomTextField from '../customTextField';
 import CustomComboBox from '../customComboBox';
@@ -13,7 +13,6 @@ import { MessageObj } from '@/app/models/MessageObj';
 import { useTheme } from '@/app/theme/ThemeContext';
 import { formatDate } from '@/app/services/ConstantsTypes';
 import { getOrganizations } from '@/app/services/Organizations/getOrganizations';
-import PreviewDocument from './previewDocument';
 import { createDocument } from '@/app/services/Documents/createDocument';
 
 const DocumentForm: React.FC = () => {
@@ -31,9 +30,6 @@ const DocumentForm: React.FC = () => {
     );
     const alterDocumentForm = useDocumentFormStore((state) => state.alter);
     const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
-    const [file, setFile] = useState<File | null>(null);
-    const [previewOpen, setPreviewOpen] = useState(false);
-    const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         if (message) {
@@ -67,21 +63,7 @@ const DocumentForm: React.FC = () => {
         }))
     ];
 
-    const handleAttachFile = () => {
-        fileInputRef.current?.click();
-    };
-
-    const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (event.target.files && event.target.files.length > 0) {
-            const selectedFile = event.target.files[0];
-            setFile(selectedFile);
-
-            setMessage(new MessageObj('success', 'Arquivo Anexado', `Você anexou ${selectedFile.name}`, 'success'));
-            setShowMessage(true);
-            setTimeout(() => setShowMessage(false), 2000);
-        }
-    };
-
+   
     const handleSave = async () => {
         if (name.trim() === '') {
             setMessage(new MessageObj(
@@ -106,15 +88,6 @@ const DocumentForm: React.FC = () => {
                 'error',
                 'Tipo obrigatório',
                 'Por favor, selecione o tipo do documento.',
-                'error'
-            ));
-            return;
-        }
-        if (!file) {
-            setMessage(new MessageObj(
-                'error',
-                'Arquivo original obrigatório',
-                'Por favor, anexe o documento.',
                 'error'
             ));
             return;
@@ -150,12 +123,6 @@ const DocumentForm: React.FC = () => {
 
     return (
         <Box>
-            <input
-                type="file"
-                ref={fileInputRef}
-                style={{ display: 'none' }}
-                onChange={handleFileChange}
-            />
             <Backdrop
                 open={true}
                 onClick={() => alterDocumentForm(false)}
@@ -281,32 +248,6 @@ const DocumentForm: React.FC = () => {
                 </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'end', gap: 4, marginTop: 2 }}>
-                    {file && (
-                        <CustomButton
-                            text={"Pré-visualizar"}
-                            type="button"
-                            colorType="secondary"
-                            onClick={() => setPreviewOpen(true)}
-                            hoverColorType="secondary"
-                            fullWidth={false}
-                            paddingY={1}
-                            paddingX={3.0}
-                            marginBottom={2}
-                            marginTop={2}
-                        />
-                    )}
-                    <CustomButton
-                        text={"Anexar Documento"}
-                        type="button"
-                        colorType="primary"
-                        onClick={() => { handleAttachFile() }}
-                        hoverColorType="primary"
-                        fullWidth={false}
-                        paddingY={1}
-                        paddingX={3.0}
-                        marginBottom={2}
-                        marginTop={2}
-                    />
                     <CustomButton
                         text={document?.documentId == 0 ? "Salvar" : "Atualizar"}
                         type="button"
@@ -341,10 +282,6 @@ const DocumentForm: React.FC = () => {
                             description={message.description}
                         />
                     </Box>
-                )}
-
-                {previewOpen && file && (
-                    <PreviewDocument file={file} onClose={() => setPreviewOpen(false)} />
                 )}
             </Box>
         </Box>

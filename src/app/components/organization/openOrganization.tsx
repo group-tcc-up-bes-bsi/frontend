@@ -26,6 +26,8 @@ import { Close } from '@mui/icons-material';
 import { PieChart } from '@mui/x-charts';
 import { buildPieDataDocumentsType, buildPieDataUser } from '@/app/services/Organizations/buildPieOrganization';
 import { countOrganizationDocuments, getOrganizationDocuments } from '@/app/services/Documents/getOrganizationDocuments';
+import { MessageObj } from '@/app/models/MessageObj';
+import CustomAlert from '../customAlert';
 
 
 const OpenOrganization: React.FC = () => {
@@ -49,8 +51,18 @@ const OpenOrganization: React.FC = () => {
     const userCurrent = useUserStore((state) => state.userCurrent);
     const [documentsCount, setDocumentsCount] = useState(0);
     const [pieDataDoc, setPieDataDoc] = useState(() => buildPieDataDocumentsType(documents));
-
+    const [message, setMessage] = useState<MessageObj>(
+        new MessageObj('info', 'Tela das Organizações', '', 'info')
+    );
+    const [showMessage, setShowMessage] = useState(false);
     const pieDataUser = useMemo(() => buildPieDataUser(usersInvite), [usersInvite]);
+
+    useEffect(() => {
+        if (message) {
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 5000);
+        }
+    }, [message]);
 
     const toggleModeViewer = (mode: number) => {
         alterModeViewer(mode)
@@ -68,31 +80,49 @@ const OpenOrganization: React.FC = () => {
         toggleModeViewer(modeViewer)
     },);
 
-    const toggleDocumentForm = () => {
-        const document: DocumentObj = {
-            documentId: 0,
-            name: '',
-            type: '',
-            description: '',
-            creationDate: new Date(),
-            lastModifiedDate: new Date(),
-            version: '',
-            creator: '',
-            imagemSrc: '',
-            organization: {
-                organizationId: 0,
-                name: '',
-                description: '',
-                favorite: false,
-                organizationType: organizationType.INDIVIDUAL,
-                borderColor: undefined,
-                icon: undefined,
-            },
-            favorite: false,
+    const toggleDocumentForm = async () => {
+        if (userCurrent != undefined) {
+            try {
+                if (organization) {
+                    const result = await getOrganizationUsers(organization?.organizationId, userCurrent)
+                    const users = result.users;
+                    for (const user of users) {
+                        if (user.username == userCurrent.username) {
+                            if (user.userType.toString() == 'OWNER' || user.userType.toString() == 'WRITE') {
+                                const document: DocumentObj = {
+                                    documentId: 0,
+                                    name: '',
+                                    type: '',
+                                    description: '',
+                                    creationDate: new Date(),
+                                    lastModifiedDate: new Date(),
+                                    version: '',
+                                    creator: '',
+                                    organization: {
+                                        organizationId: 0,
+                                        name: '',
+                                        description: '',
+                                        favorite: false,
+                                        organizationType: organizationType.INDIVIDUAL,
+                                        borderColor: undefined,
+                                        icon: undefined,
+                                    },
+                                    favorite: false,
+                                }
+                                alterDoc(document)
+                                alterDocumentForm(!documentForm);
+                            } else {
+                                setMessage(new MessageObj('warning', 'Não Permitido', 'Usuário leitor não pode alterar', 'warning'));
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
+            }
         }
-        alterDoc(document)
-        alterDocumentForm(!documentForm);
     }
+
 
     useEffect(() => {
         setDocumentsCount(countOrganizationDocuments(documents))
@@ -410,6 +440,27 @@ const OpenOrganization: React.FC = () => {
                     />
                 </Box>
             </Box>
+            {showMessage && message && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        bottom: '0%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 2,
+                        textAlign: 'left',
+                    }}>
+                    <CustomAlert
+                        severity={message.severity}
+                        colorType={message.colorType}
+                        title={message.title}
+                        description={message.description}
+                    />
+                </Box>
+            )}
         </Box >
     );
 };

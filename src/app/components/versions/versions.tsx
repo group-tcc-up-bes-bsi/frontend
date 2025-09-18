@@ -91,7 +91,6 @@ const Versions: React.FC = () => {
                     },
                     version: '',
                     creator: '',
-                    imagemSrc: '',
                     favorite: false,
                 },
                 user: {
@@ -188,15 +187,12 @@ const Versions: React.FC = () => {
                         }}
                     >
                         <Box fontWeight="bold" fontSize="0.9rem">
-                            {version.versionName}
-                        </Box>
-                        <Box fontWeight="bold" fontSize="0.9rem" mb={1}>
-                            Documento: {version.document.name}
+                            Versão: {version.versionName}
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', }}>
                                 <Box fontSize="0.8rem" mt={1} sx={{ color: theme.palette.text.primary }}>
-                                    Path: {version.versionFilePath}
+                                    Criador: {version.user.username}
                                 </Box>
                             </Box>
                             <Box mt={0.5}>

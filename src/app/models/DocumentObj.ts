@@ -11,6 +11,5 @@ export interface DocumentObj {
   
   version: string;
   creator: string;
-  imagemSrc: string;
   favorite: boolean;
 }

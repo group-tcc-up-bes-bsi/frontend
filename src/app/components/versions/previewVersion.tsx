@@ -7,7 +7,7 @@ interface PreviewDocumentProps {
   onClose: () => void;
 }
 
-const PreviewDocument: React.FC<PreviewDocumentProps> = ({ file, onClose }) => {
+const PreviewVersion: React.FC<PreviewDocumentProps> = ({ file, onClose }) => {
   const [url, setUrl] = useState("");
   const theme = useTheme();
 
@@ -86,4 +86,4 @@ const PreviewDocument: React.FC<PreviewDocumentProps> = ({ file, onClose }) => {
   );
 };
 
-export default PreviewDocument;
+export default PreviewVersion;

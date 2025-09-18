@@ -30,6 +30,9 @@ import { formatDate } from '../services/ConstantsTypes';
 import { useUserStore } from '../state/userState';
 import { useOrganizationStore } from '../state/organizationState';
 import { getOrganizationDocuments } from '../services/Documents/getOrganizationDocuments';
+import { MessageObj } from '../models/MessageObj';
+import { getOrganizationUsers } from '../services/Organizations/organizationsServices';
+import CustomAlert from './customAlert';
 
 const TableDocuments = () => {
     useAuth();
@@ -50,6 +53,15 @@ const TableDocuments = () => {
     const organization = useOrganizationStore((state) => state.organization);
     const [allDocuments, setDocuments] = useState<DocumentObj[]>([]);
     const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState<MessageObj>();
+    const [showMessage, setShowMessage] = useState(false);
+
+    useEffect(() => {
+        if (message) {
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 5000);
+        }
+    }, [message]);
 
     useEffect(() => {
         if (userCurrent != undefined) {
@@ -60,7 +72,7 @@ const TableDocuments = () => {
                         const result = await getOrganizationDocuments(userCurrent, organization);
                         setDocuments(result.documents);
                     } else {
-                        const result = await getDocuments(userCurrent,theme);
+                        const result = await getDocuments(userCurrent, theme);
                         setDocuments(result.documents)
                     }
                 } finally {
@@ -125,10 +137,28 @@ const TableDocuments = () => {
         alterConfirm(!openConfirm);
     }
 
-    const toggleDocumentForm = (document: DocumentObj) => {
-        alterDoc(document)
-        alterDocumentForm(!documentForm);
-        setAnchorEl(null);
+    const toggleDocumentForm = async (document: DocumentObj) => {
+        if (userCurrent != undefined) {
+            try {
+                if (organization) {
+                    const result = await getOrganizationUsers(organization?.organizationId, userCurrent)
+                    const users = result.users;
+                    for (const user of users) {
+                        if (user.username == userCurrent.username) {
+                            if (user.userType.toString() == 'OWNER' || user.userType.toString() == 'WRITE') {
+                                alterDoc(document)
+                                alterDocumentForm(!documentForm);
+                                setAnchorEl(null);
+                            } else {
+                                setMessage(new MessageObj('warning', 'Não Permitido', 'Usuário leitor não pode alterar', 'warning'));
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
+            }
+        }
     }
 
     return (
@@ -136,9 +166,9 @@ const TableDocuments = () => {
             <Table sx={{ minWidth: 650 }} aria-label="tabela de Documentos">
                 <TableHead>
                     <TableRow sx={{ backgroundColor: theme.palette.background.default }}>
-                        <TableCell>Documento</TableCell>
-                        <TableCell>Tipo</TableCell>
-                        <TableCell>
+                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Documento</TableCell>
+                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Tipo</TableCell>
+                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>
                             <TableSortLabel
                                 active={orderBy === 'creationDate'}
                                 direction={orderBy === 'creationDate' ? order : 'asc'}
@@ -147,7 +177,7 @@ const TableDocuments = () => {
                                 Data de Criação
                             </TableSortLabel>
                         </TableCell>
-                        <TableCell>
+                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>
                             <TableSortLabel
                                 active={orderBy === 'lastModifiedDate'}
                                 direction={orderBy === 'lastModifiedDate' ? order : 'asc'}
@@ -156,9 +186,9 @@ const TableDocuments = () => {
                                 Última Alteração
                             </TableSortLabel>
                         </TableCell>
-                        <TableCell>Organização</TableCell>
-                        <TableCell>Versão Atual</TableCell>
-                        <TableCell>Ações</TableCell>
+                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Organização</TableCell>
+                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Versão Atual</TableCell>
+                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Ações</TableCell>
                     </TableRow>
                 </TableHead>
 
@@ -181,7 +211,7 @@ const TableDocuments = () => {
                         filteredDocuments.map((doc) => (
                             <TableRow key={doc.documentId}>
                                 <TableCell>{doc.name}</TableCell>
-                                <TableCell>{doc.type}</TableCell>
+                                <TableCell>{doc.type.toUpperCase()}</TableCell>
                                 <TableCell>{formatDate(doc.creationDate)}</TableCell>
                                 <TableCell>{formatDate(doc.lastModifiedDate)}</TableCell>
                                 <TableCell>{doc.organization.name}</TableCell>
@@ -218,6 +248,28 @@ const TableDocuments = () => {
 
             {openConfirm && <MsgConfirm />}
             {documentForm && <DocumentForm />}
+            {showMessage && message && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        bottom: '10%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        zIndex: 1500,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 2,
+                        textAlign: 'left',
+                    }}>
+                    <CustomAlert
+                        severity={message.severity}
+                        colorType={message.colorType}
+                        title={message.title}
+                        description={message.description}
+                    />
+                </Box>
+            )}
         </TableContainer>
     );
 };
