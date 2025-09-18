@@ -8,7 +8,7 @@ import CustomButton from '../customButton';
 import { MoreVert, Star } from '@mui/icons-material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
 import OrganizationForm from './organizationForm';
-import { organizationType, organizationsTypeOptions } from '../../services/ConstantsTypes';
+import { favoriteTypeOptions, organizationType, organizationsTypeOptions } from '../../services/ConstantsTypes';
 import { getOrganizationUsers } from '@/app/services/Organizations/organizationsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { OrganizationObj } from '@/app/models/OrganizationObj';
@@ -45,6 +45,7 @@ const Organization: React.FC = () => {
     const [showMessage, setShowMessage] = useState(false);
     const alterOrg = useOrganizationStore((state) => state.alter);
     const alterOption = useOptionsDashboardStore((state) => state.alter);
+    const [selectedFavorite, setSelectedFavorite] = useState('');
 
     useEffect(() => {
         if (message) {
@@ -80,26 +81,31 @@ const Organization: React.FC = () => {
 
         let filtered = organizations;
 
-        if (selectedOrganizationType == 'COLLABORATIVE') {
+        if (selectedOrganizationType === 'COLLABORATIVE') {
             filtered = filtered.filter((org) => org.organizationType === organizationType.COLLABORATIVE);
-        } else if (selectedOrganizationType == 'INDIVIDUAL') {
+        } else if (selectedOrganizationType === 'INDIVIDUAL') {
             filtered = filtered.filter((org) => org.organizationType === organizationType.INDIVIDUAL);
         }
 
-        if (!filter.trim()) {
-            setTimeout(() => setLoading(false), 500);
-            return filtered;
+        if (selectedFavorite === 'true') {
+            filtered = filtered.filter((org) => org.favorite === true);
+        } else if (selectedFavorite === 'false') {
+            filtered = filtered.filter((org) => org.favorite === false);
         }
 
-        const searchTerm = filter.toLowerCase().trim();
-        const result = filtered.filter((org) =>
-            org.name.toLowerCase().includes(searchTerm) ||
-            org.description.toLowerCase().includes(searchTerm)
-        );
+        if (filter.trim()) {
+            const searchTerm = filter.toLowerCase().trim();
+            filtered = filtered.filter(
+                (org) =>
+                    org.name.toLowerCase().includes(searchTerm) ||
+                    org.description.toLowerCase().includes(searchTerm)
+            );
+        }
 
         setTimeout(() => setLoading(false), 300);
-        return result;
-    }, [organizations, filter, selectedOrganizationType]);
+        return filtered;
+    }, [organizations, filter, selectedOrganizationType, selectedFavorite]);
+
 
     const handleOrganizationAlter = async () => {
         if (selectedOrganization) {
@@ -177,6 +183,16 @@ const Organization: React.FC = () => {
         setAnchorEl(null);
     };
 
+    const handleFavoriteOrganizationToggle = (org: typeof organizations[number]) => {
+        org.favorite = !org.favorite;
+        setOrganizations([...organizations]);
+    };
+
+    const handleChangeFavorite = (value: string) => {
+        setSelectedFavorite(value);
+    };
+
+
     return (
         <Box sx={{ maxWidth: '100%' }}>
             <Box>
@@ -192,7 +208,7 @@ const Organization: React.FC = () => {
                             marginTop={0.5}
                         />
                     </Box>
-                    <Box sx={{ width: '55%' }}>
+                    <Box sx={{ width: '50%' }}>
                         <CustomTextField
                             name="filter"
                             label="Informe um detalhe da organização"
@@ -203,7 +219,7 @@ const Organization: React.FC = () => {
                             hoverColor="info"
                         />
                     </Box>
-                    <Box sx={{ width: '25%' }}>
+                    <Box sx={{ width: '15%' }}>
                         <CustomComboBox
                             name="organization-type"
                             label="Tipo"
@@ -213,6 +229,19 @@ const Organization: React.FC = () => {
                             focusedColor="primary"
                             hoverColor="info"
                         />
+                    </Box>
+                    <Box sx={{ width: '15%' }}>
+                        <Box sx={{ width: '100%' }}>
+                            <CustomComboBox
+                                name="user-invite"
+                                label="Favorito?"
+                                value={selectedFavorite}
+                                onChange={handleChangeFavorite}
+                                options={favoriteTypeOptions}
+                                focusedColor="primary"
+                                hoverColor="info"
+                            />
+                        </Box>
                     </Box>
                 </Box>
             </Box>
@@ -274,7 +303,7 @@ const Organization: React.FC = () => {
                                     variant="outlined"
                                     sx={{
                                         mb: 2,
-                                        borderColor: org.borderColor,
+                                        borderColor: org.favorite ? theme.palette.button.star : theme.palette.text.primary,
                                         borderWidth: 1,
                                         borderStyle: "solid",
                                         borderRadius: 2,
@@ -282,7 +311,6 @@ const Organization: React.FC = () => {
                                     }}
                                 >
                                     <CardContent>
-                                        {/* Header */}
                                         <Box
                                             sx={{
                                                 display: "flex",
@@ -292,19 +320,36 @@ const Organization: React.FC = () => {
                                             }}
                                         >
                                             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                                                <Star sx={{ color: theme.palette.text.primary }} />
+                                                <IconButton aria-label="star" onClick={() => handleFavoriteOrganizationToggle(org)}>
+                                                    <Star sx={{
+                                                        color: org.favorite ? theme.palette.button.star : theme.palette.text.primary,
+                                                        transition: 'color 0.2s ease-in-out',
+                                                        '&:hover': {
+                                                            transform: 'scale(1.1)'
+                                                        }
+                                                    }} />
+                                                </IconButton>
                                                 <CustomTypography
                                                     text={org.name}
                                                     component="h2"
                                                     variant="h6"
                                                     sx={{ color: theme.palette.text.primary, fontWeight: "bold" }}
                                                 />
+
                                                 <Typography
-                                                    variant="body2"
-                                                    sx={{ color: theme.palette.text.secondary }}
+                                                    variant="body1"
+                                                    sx={{
+                                                        fontWeight: "bold",
+                                                        color:
+                                                            org.organizationType?.toString() === "Colaborativo"
+                                                                ? theme.palette.button.star
+                                                                : theme.palette.primary.main,
+                                                        textShadow: "0px 0px 2px rgba(0,0,0,0.3)",
+                                                    }}
                                                 >
                                                     {org.organizationType || ""}
                                                 </Typography>
+
                                             </Box>
 
                                             <IconButton
