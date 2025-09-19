@@ -3,58 +3,95 @@ import { useTheme } from '@/app/theme/ThemeContext';
 import {
     Box, Divider, Table, TableBody, TableCell, TableContainer,
     TableHead, TableRow, Paper,
-    IconButton
+    IconButton,
+    Typography,
 } from '@mui/material';
 import CustomTypography from '../customTypography';
 import CustomTextField from '../customTextField';
 import { Star } from '@mui/icons-material';
-import { getMyOrganizations } from '@/app/services/Organizations/organizationsServices';
 import { getDocuments } from '@/app/services/Documents/DocumentsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { useAuth } from '../useAuth';
 import { useUserStore } from '@/app/state/userState';
 import { OrganizationObj } from '@/app/models/OrganizationObj';
+import { getOrganizations } from '@/app/services/Organizations/getOrganizations';
+import { MessageObj } from '@/app/models/MessageObj';
+import CustomAlert from '../customAlert';
+import CustomComboBox from '../customComboBox';
+import { favoriteTypeOptions } from '@/app/services/ConstantsTypes';
+import { DocumentObj } from '@/app/models/DocumentObj';
 
 const Favorites: React.FC = () => {
     useAuth();
     const { theme } = useTheme();
     const { filter, setFilter } = useFilterStore();
     const userCurrent = useUserStore((state) => state.userCurrent)
-    const [documents, setDocuments] = useState(getDocuments());
+    const [documents, setDocuments] = useState<DocumentObj[]>([]);
     const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
+    const [message] = useState<MessageObj>(
+        new MessageObj('info', 'Tela dos Favoritos', '', 'info')
+    );
+    const [showMessage, setShowMessage] = useState(false);
+    const [selectedFavorite, setSelectedFavorite] = useState('');
+
+    useEffect(() => {
+        if (message) {
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 5000);
+        }
+    }, [message]);
+
 
     useEffect(() => {
         if (userCurrent != undefined) {
             (async () => {
-                const result = await getMyOrganizations(userCurrent, theme);
+                const result = await getOrganizations(userCurrent, theme);
                 setOrganizations(result.organizations);
+                const resultDocuments = await getDocuments(userCurrent, theme);
+                setDocuments(resultDocuments.documents)
             })();
         }
     }, [userCurrent, theme]);
 
     const filteredDocuments = useMemo(() => {
-        if (!filter.trim()) {
-            return documents;
+        let filtered = documents;
+
+        if (filter.trim()) {
+            const searchTerm = filter.toLowerCase().trim();
+            filtered = filtered.filter((doc) =>
+                doc.name.toLowerCase().includes(searchTerm) ||
+                doc.organization.name.toLowerCase().includes(searchTerm)
+            );
         }
 
-        const searchTerm = filter.toLowerCase().trim();
+        if (selectedFavorite === 'true') {
+            filtered = filtered.filter((doc) => doc.favorite === true);
+        } else if (selectedFavorite === 'false') {
+            filtered = filtered.filter((doc) => doc.favorite === false);
+        }
 
-        return documents.filter((doc) =>
-            doc.name.toLowerCase().includes(searchTerm) ||
-            doc.organization.name.toLowerCase().includes(searchTerm)
-        );
-    }, [documents, filter]);
+        return filtered;
+    }, [documents, filter, selectedFavorite]);
 
     const filteredOrganizations = useMemo(() => {
-        if (!filter.trim()) {
-            return organizations;
+        let filtered = organizations;
+
+        if (filter.trim()) {
+            const searchTerm = filter.toLowerCase().trim();
+            filtered = filtered.filter((org) =>
+                org.name.toLowerCase().includes(searchTerm)
+            );
         }
 
-        const searchTerm = filter.toLowerCase().trim();
-        return organizations.filter((org) =>
-            org.name.toLowerCase().includes(searchTerm)
-        );
-    }, [organizations, filter]);
+        if (selectedFavorite === 'true') {
+            filtered = filtered.filter((org) => org.favorite === true);
+        } else if (selectedFavorite === 'false') {
+            filtered = filtered.filter((org) => org.favorite === false);
+        }
+
+        return filtered;
+    }, [organizations, filter, selectedFavorite]);
+
 
     const handleFavoriteToggle = (doc: typeof documents[number]) => {
         doc.favorite = !doc.favorite;
@@ -66,10 +103,14 @@ const Favorites: React.FC = () => {
         setOrganizations([...organizations]);
     };
 
+    const handleChangeFavorite = (value: string) => {
+        setSelectedFavorite(value);
+    };
+
     return (
         <Box sx={{ maxWidth: '100%' }}>
             <Box>
-                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
                     <Box sx={{ width: '100%' }}>
                         <CustomTextField
                             name="filter"
@@ -80,6 +121,19 @@ const Favorites: React.FC = () => {
                             focusedColor="primary"
                             hoverColor="info"
                         />
+                    </Box>
+                    <Box sx={{ width: '40%' }}>
+                        <Box sx={{ width: '100%' }}>
+                            <CustomComboBox
+                                name="user-invite"
+                                label="Favorito?"
+                                value={selectedFavorite}
+                                onChange={handleChangeFavorite}
+                                options={favoriteTypeOptions}
+                                focusedColor="primary"
+                                hoverColor="info"
+                            />
+                        </Box>
                     </Box>
                 </Box>
             </Box>
@@ -124,23 +178,32 @@ const Favorites: React.FC = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {filteredDocuments.map((doc) => (
-                                            <TableRow key={doc.documentId}>
-                                                <TableCell>
-                                                    <IconButton aria-label="star" onClick={() => handleFavoriteToggle(doc)}>
-                                                        <Star sx={{
-                                                            color: doc.favorite ? theme.palette.button.star : theme.palette.text.primary,
-                                                            transition: 'color 0.2s ease-in-out',
-                                                            '&:hover': {
-                                                                transform: 'scale(1.1)'
-                                                            }
-                                                        }} />
-                                                    </IconButton>
+                                        {filteredDocuments.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={7} align="center">
+                                                    <Typography variant="h6" color={theme.palette.text.primary}>
+                                                        {filter ? 'Nenhum documento encontrado para o filtro informado' : 'Nenhum documento disponível'}
+                                                    </Typography>
                                                 </TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>{doc.name}</TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>{doc.organization.name}</TableCell>
                                             </TableRow>
-                                        ))}
+                                        ) :
+                                            filteredDocuments.map((doc) => (
+                                                <TableRow key={doc.documentId}>
+                                                    <TableCell>
+                                                        <IconButton aria-label="star" onClick={() => handleFavoriteToggle(doc)}>
+                                                            <Star sx={{
+                                                                color: doc.favorite ? theme.palette.button.star : theme.palette.text.primary,
+                                                                transition: 'color 0.2s ease-in-out',
+                                                                '&:hover': {
+                                                                    transform: 'scale(1.1)'
+                                                                }
+                                                            }} />
+                                                        </IconButton>
+                                                    </TableCell>
+                                                    <TableCell sx={{ color: theme.palette.text.primary }}>{doc.name}</TableCell>
+                                                    <TableCell sx={{ color: theme.palette.text.primary }}>{doc.organization.name}</TableCell>
+                                                </TableRow>
+                                            ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
@@ -198,23 +261,32 @@ const Favorites: React.FC = () => {
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {filteredOrganizations.map((org) => (
-                                            <TableRow key={org.organizationId}>
-                                                <TableCell>
-                                                    <IconButton aria-label="star" onClick={() => handleFavoriteOrganizationToggle(org)}>
-                                                        <Star sx={{
-                                                            color: org.favorite ? theme.palette.button.star : theme.palette.text.primary,
-                                                            transition: 'color 0.2s ease-in-out',
-                                                            '&:hover': {
-                                                                transform: 'scale(1.1)'
-                                                            }
-                                                        }} />
-                                                    </IconButton>
+                                        {filteredOrganizations.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={7} align="center">
+                                                    <Typography variant="h6" color={theme.palette.text.primary}>
+                                                        {filter ? 'Nenhuma organização encontrada para o filtro informado' : 'Nenhuma organização disponível'}
+                                                    </Typography>
                                                 </TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>{org.name}</TableCell>
-                                                <TableCell sx={{ color: theme.palette.text.primary }}>10</TableCell>
                                             </TableRow>
-                                        ))}
+                                        ) :
+                                            filteredOrganizations.map((org) => (
+                                                <TableRow key={org.organizationId}>
+                                                    <TableCell>
+                                                        <IconButton aria-label="star" onClick={() => handleFavoriteOrganizationToggle(org)}>
+                                                            <Star sx={{
+                                                                color: org.favorite ? theme.palette.button.star : theme.palette.text.primary,
+                                                                transition: 'color 0.2s ease-in-out',
+                                                                '&:hover': {
+                                                                    transform: 'scale(1.1)'
+                                                                }
+                                                            }} />
+                                                        </IconButton>
+                                                    </TableCell>
+                                                    <TableCell sx={{ color: theme.palette.text.primary }}>{org.name}</TableCell>
+                                                    <TableCell sx={{ color: theme.palette.text.primary }}>10</TableCell>
+                                                </TableRow>
+                                            ))}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
@@ -222,6 +294,27 @@ const Favorites: React.FC = () => {
                     </Box>
                 </Box>
             </Box>
+            {showMessage && message && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        bottom: '0%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 2,
+                        textAlign: 'left',
+                    }}>
+                    <CustomAlert
+                        severity={message.severity}
+                        colorType={message.colorType}
+                        title={message.title}
+                        description={message.description}
+                    />
+                </Box>
+            )}
         </Box>
     );
 };

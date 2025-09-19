@@ -1,13 +1,16 @@
 import { MessageObj } from "@/app/models/MessageObj";
-import { UserObj, UserOrganization } from "@/app/models/UserObj";
+import { UserObj } from "@/app/models/UserObj";
 import { Theme } from "@mui/material";
 import { getMyOrganizations, getOrganizationUsers } from "./organizationsServices";
 import { getErrorTitle } from "../ErrorTitle";
+import { OrganizationObj } from "@/app/models/OrganizationObj";
+import { organizationType } from "../ConstantsTypes";
+import { Folder } from "@mui/icons-material";
 
-export async function getInvites(
+export async function getOrganizations(
     userCurrent: UserObj,
     theme: Theme
-): Promise<{ message: MessageObj; users: UserOrganization[]; organizationsInvite: { organizationId: number; name: string }[] }> {
+): Promise<{ message: MessageObj; organizations: OrganizationObj[] }> {
     try {
         const myOrgsResponse = await getMyOrganizations(userCurrent, theme);
 
@@ -16,16 +19,14 @@ export async function getInvites(
                 message: new MessageObj(
                     "error",
                     getErrorTitle(404),
-                    "Você não possui organizações",
+                    "Você não participa de organizações",
                     "error"
                 ),
-                users: [],
-                organizationsInvite: [],
+                organizations: [],
             };
         }
 
-        const users: UserOrganization[] = [];
-        const organizationsInvite: { organizationId: number; name: string }[] = [];
+        const organizations: OrganizationObj[] = [];
 
         for (const org of myOrgsResponse.organizations) {
             const orgUsersResponse = await getOrganizationUsers(org.organizationId, userCurrent);
@@ -33,13 +34,20 @@ export async function getInvites(
             const myUser = orgUsersResponse.users.find(
                 (user) => user.username === userCurrent.username
             );
-            
-            if (myUser && myUser.userType.toString() !== "OWNER" && myUser.inviteAccepted === false) {
-                users.push(myUser);
 
-                organizationsInvite.push({
+            if (myUser?.inviteAccepted !== false && org.organizationType != undefined) {
+                organizations.push({
                     organizationId: org.organizationId,
                     name: org.name,
+                    description: org.description,
+                    organizationType: org.organizationType === 'Colaborativo' ?
+                        organizationType.COLLABORATIVE
+                        : organizationType.INDIVIDUAL,
+                    favorite: false,
+                    borderColor: theme.palette.text.primary,
+                    icon: org.organizationType === 'Colaborativo'
+                        ? <Folder sx={{ color: theme.palette.button.star }} />
+                        : <Folder sx={{ color: theme.palette.button.primary }} />
                 });
             }
         }
@@ -51,8 +59,7 @@ export async function getInvites(
                 "Lista de organizações que você participa carregada com sucesso",
                 "success"
             ),
-            users,
-            organizationsInvite,
+            organizations,
         };
     } catch (error) {
         console.error(error);
@@ -63,19 +70,14 @@ export async function getInvites(
                 "Erro: Servidor inoperante",
                 "error"
             ),
-            users: [],
-            organizationsInvite: [],
+            organizations: [],
         };
     }
 }
 
-export async function getInvitesCount(
-  userCurrent: UserObj,
-  theme: Theme
-): Promise<{ count: number }> {
-  const result = await getInvites(userCurrent, theme);
-
-  return {
-    count: result.users.length, 
-  };
+export function countOrganizations(
+    organizations: OrganizationObj[]
+): number {
+    if (!organizations || organizations.length === 0) return 0;
+    return organizations.length;
 }

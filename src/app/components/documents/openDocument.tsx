@@ -3,14 +3,15 @@ import { PieChart, BarChart } from "@mui/x-charts";
 import { useTheme } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
-import { useDocumentStore } from "../state/documentState";
+import { useDocumentStore } from "../../state/documentState";
 import { Close } from '@mui/icons-material';
-import { useOptionsDashboardStore } from "../state/optionsDashboard";
-import CustomButton from "./customButton";
-import MonthsSelector from "./monthsSelector";
-import { useAuth } from "./useAuth";
+import { useOptionsDashboardStore } from "../../state/optionsDashboard";
+import CustomButton from "../customButton";
+import MonthsSelector from "../monthsSelector";
+import { useAuth } from "../useAuth";
+import Versions from "../versions/versions";
 
-const StatsDocument: React.FC = () => {
+const OpenDocument: React.FC = () => {
   useAuth();
   const theme = useTheme();
   const document = useDocumentStore((state) => state.document);
@@ -19,8 +20,8 @@ const StatsDocument: React.FC = () => {
 
   const pieData = [
     { id: 0, value: 10, label: "Gregory" },
-    { id: 1, value: 20, label: "Lucas" },
-    { id: 2, value: 30, label: "Adam" },
+    { id: 1, value: 1, label: "Lucas" },
+    { id: 2, value: 1, label: "Adam" },
   ];
 
   const [monthsCount, setMonthsCount] = React.useState(6);
@@ -39,13 +40,22 @@ const StatsDocument: React.FC = () => {
   const barData = getLastMonths(monthsCount);
 
   return (
-    <Box sx={{ p: 3, background: theme.palette.background.default, height: '100%' }}>
+    <Box sx={{
+      p: 3, background: theme.palette.background.paper, height: '100%',
+      maxHeight: 'calc(100vh - 50px)',
+      overflowY: 'auto',
+      '&::-webkit-scrollbar': {
+        width: '6px',
+      },
+      '&::-webkit-scrollbar-track': {
+        background: theme.palette.background.default,
+      },
+      '&::-webkit-scrollbar-thumb': {
+        backgroundColor: theme.palette.primary.main,
+        borderRadius: '3px',
+      }
+    }}>
       <Box sx={{ display: "flex", flexDirection: "row", justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4" gutterBottom>
-          {document?.name}
-        </Typography>
-
-
         <Box sx={{ display: "flex", flexDirection: "row", gap: 4, alignItems: 'center' }}>
           <CustomButton
             text="Visualizar log"
@@ -74,11 +84,17 @@ const StatsDocument: React.FC = () => {
           {"Data criação: " + document?.creationDate?.toLocaleDateString("pt-BR", {})}
         </Typography>
         <Typography variant="h6" gutterBottom>
-          {"Criado por " + document?.creator}
+          {"Organização: " + document?.organization.name}
         </Typography>
       </Box>
-
-      <Box sx={{ display: "flex", flexDirection: { xs: "column", md: "row" }, gap: 3, mt: 5 }}>
+      <Versions />
+      <Box sx={{ 
+        display: "flex", 
+        flexDirection: { xs: "column", md: "row" }, 
+        gap: 3, 
+        mt: 5, 
+        background: theme.palette.background.default,
+        padding: 5 }}>
         <Box sx={{ flex: 1 }}>
           <Typography variant="h6" gutterBottom sx={{ mb: 7 }}>
             Alterações por usuário
@@ -87,6 +103,7 @@ const StatsDocument: React.FC = () => {
             sx={{
               border: '1px dashed',
               borderColor: theme.palette.text.primary,
+              paddingX: 10,
             }}
             series={[
               {
@@ -94,11 +111,11 @@ const StatsDocument: React.FC = () => {
                 highlightScope: { fade: "global", highlight: "item" },
                 innerRadius: 0,
                 outerRadius: 200,
-                paddingAngle: 1,
+                paddingAngle: 0,
               },
             ]}
             height={500}
-            margin={{ top: 20, right: 5, bottom: 20, left: 20 }}
+            margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
             colors={[
               "#8e24aa", "#039be5", "#fbc02d", "#fb8c00", "#d84315", "#6d4c41", "#757575",
               "#c62828", "#ad1457", "#4527a0", "#283593", "#0277bd", "#00838f", "#2e7d32",
@@ -141,4 +158,4 @@ const StatsDocument: React.FC = () => {
   );
 };
 
-export default StatsDocument;
+export default OpenDocument;

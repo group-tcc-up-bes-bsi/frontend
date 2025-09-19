@@ -1,18 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { Box, Divider, } from '@mui/material';
+import { Box, Divider, Typography, } from '@mui/material';
 import CustomTypography from '../customTypography';
 import Menu from '@mui/icons-material/Menu';
 import SpaceDashboard from '@mui/icons-material/SpaceDashboard';
 import TableDocuments from '../tableDocuments';
 import Documents from '../documents';
 import { useDocumentViewerStore } from '@/app/state/documentViewerState';
-import { getMyOrganizations } from '@/app/services/Organizations/organizationsServices';
 import { useAuth } from '../useAuth';
 import { useUserStore } from '@/app/state/userState';
 import { OrganizationObj } from '@/app/models/OrganizationObj';
 import { MessageObj } from '@/app/models/MessageObj';
 import CustomAlert from '../customAlert';
+import { getOrganizations } from '@/app/services/Organizations/getOrganizations';
+import { useNotificationStore } from '@/app/state/notificationState';
+import { useOrganizationStore } from '@/app/state/organizationState';
+import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
 
 const HomeComponent: React.FC = () => {
     useAuth();
@@ -22,11 +25,14 @@ const HomeComponent: React.FC = () => {
     const [colorMode1, setColorMode1] = useState(theme.palette.button.primary);
     const [colorMode2, setColorMode2] = useState(theme.palette.text.primary);
     const userCurrent = useUserStore((state) => state.userCurrent)
-    const [message, setMessage] = useState<MessageObj>(
-        new MessageObj('info', 'Tela Principal', '', 'info')
+    const [message] = useState<MessageObj>(
+        new MessageObj('info', 'Tela Inicial', '', 'info')
     );
     const [showMessage, setShowMessage] = useState(false);
     const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
+    const openNotification = useNotificationStore((state) => state.openNotification);
+    const alterOrg = useOrganizationStore((state) => state.alter);
+    const alterOption = useOptionsDashboardStore((state) => state.alter);
 
     const toggleModeViewer = (mode: number) => {
         alterModeViewer(mode)
@@ -54,12 +60,16 @@ const HomeComponent: React.FC = () => {
     useEffect(() => {
         if (userCurrent != undefined) {
             (async () => {
-                const result = await getMyOrganizations(userCurrent, theme);
+                const result = await getOrganizations(userCurrent, theme);
                 setOrganizations(result.organizations);
-                setMessage(result.message);
             })();
         }
-    }, [userCurrent, theme]);
+    }, [userCurrent, theme, openNotification]);
+
+    const handleOpen = (organization: OrganizationObj) => {
+        alterOption('Open Organization');
+        alterOrg(organization);
+    };
 
     return (
         <Box sx={{ maxWidth: '100%' }}>
@@ -116,7 +126,7 @@ const HomeComponent: React.FC = () => {
                     sx={{
                         display: 'flex',
                         gap: 3,
-                        maxHeight: 'calc(85vh - 150px)',
+                        maxHeight: 'calc(80vh - 150px)',
                         overflowX: 'auto',
                         pr: 2,
                         '&::-webkit-scrollbar': {
@@ -132,51 +142,66 @@ const HomeComponent: React.FC = () => {
                         },
                     }}
                 >
-                    {organizations.map((org) => (
+                    {organizations.length === 0 ? (
                         <Box
-                            key={org.organizationId}
                             sx={{
                                 mb: 1,
                                 p: 1,
                                 display: 'flex',
-                                cursor: 'pointer',
-                                '&:hover': {
-                                    backgroundColor: theme.palette.action.hover,
-                                    borderRadius: 1,
-                                },
-                                transition: 'all 0.2s ease-in-out',
-                            }}
-                            onClick={() => ({})}
-                        >
-                            <Box sx={{
-                                display: 'flex',
-                                gap: 4,
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
+                                justifyContent: 'center',
                                 width: '100%'
-                            }}>
+                            }}
+                        >
+                            <Typography variant="h6" color={theme.palette.text.primary}>
+                                {'Nenhuma organização disponível'}
+                            </Typography>
+                        </Box>
+                    ) : (
+                        organizations.map((org) => (
+                            <Box
+                                key={org.organizationId}
+                                sx={{
+                                    mb: 1,
+                                    p: 1,
+                                    display: 'flex',
+                                    cursor: 'pointer',
+                                    '&:hover': {
+                                        backgroundColor: theme.palette.action.hover,
+                                        borderRadius: 1,
+                                    },
+                                    transition: 'all 0.2s ease-in-out',
+                                }}
+                                onClick={() => { handleOpen(org) }}
+                            >
                                 <Box sx={{
                                     display: 'flex',
-                                    gap: 1,
+                                    gap: 4,
+                                    justifyContent: 'space-between',
                                     alignItems: 'center',
-                                    justifyContent: 'center'
+                                    width: '100%'
                                 }}>
-                                    {org.icon}
-                                    <CustomTypography
-                                        text={org.name}
-                                        component="h2"
-                                        variant="h6"
-                                        sx={{
-                                            color: theme.palette.text.primary,
-                                            fontWeight: 'bold',
-                                            mb: 0,
-                                            whiteSpace: 'nowrap',
-                                        }}
-                                    />
+                                    <Box sx={{
+                                        display: 'flex',
+                                        gap: 1,
+                                        alignItems: 'center',
+                                        justifyContent: 'center'
+                                    }}>
+                                        {org.icon}
+                                        <CustomTypography
+                                            text={org.name}
+                                            component="h2"
+                                            variant="h6"
+                                            sx={{
+                                                color: theme.palette.text.primary,
+                                                fontWeight: 'bold',
+                                                mb: 0,
+                                                whiteSpace: 'nowrap',
+                                            }}
+                                        />
+                                    </Box>
                                 </Box>
                             </Box>
-                        </Box>
-                    ))}
+                        )))}
                 </Box>
             </Box>
             <Box sx={{

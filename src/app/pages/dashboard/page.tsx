@@ -1,6 +1,6 @@
 "use client"
-import React, { useEffect } from 'react';
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box, Backdrop } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box, Backdrop, Badge } from '@mui/material';
 import { Settings, Star, Folder, Groups, Home, Delete } from '@mui/icons-material';
 import { useTheme } from '@/app/theme/ThemeContext';
 import CustomTypography from '@/app/components/customTypography';
@@ -17,14 +17,16 @@ import DocumentsComponent from '@/app/components/documents/documentsComponent';
 import Favorites from '@/app/components/favorites/favorites';
 import Trash from '@/app/components/trash/trash';
 import SettingsComponent from '@/app/components/settings/settingsComponent';
-import StatsDocument from '@/app/components/statsDocument';
+import OpenDocument from '@/app/components/documents/openDocument';
 import { useFilterStore } from '@/app/state/filterState';
 import { logoutUser } from '@/app/services/User/logoutUser';
 import { useAuth } from '@/app/components/useAuth';
-import { getMeAuth } from '@/app/services/User/GetAuthToken';
 import { useUserStore } from '@/app/state/userState';
-import StatsOrganization from '@/app/components/statsOrganization';
 import { useOrganizationStore } from '@/app/state/organizationState';
+import { getInvitesCount } from '@/app/services/Organizations/getInvites';
+import OpenOrganization from '@/app/components/organization/openOrganization';
+import { useDocumentStore } from '@/app/state/documentState';
+import { OrganizationObj } from '@/app/models/OrganizationObj';
 
 const Dashboard = () => {
     useAuth();
@@ -36,22 +38,26 @@ const Dashboard = () => {
     const alterOption = useOptionsDashboardStore((state) => state.alter);
     const [optionMenu, setOptionMenu] = React.useState('');
     const { setFilter } = useFilterStore();
-    const alterUserCurrent = useUserStore((state) => state.alter);
     const organization = useOrganizationStore((state) => state.organization);
+    const document = useDocumentStore((state) => state.document);
+    const userCurrent = useUserStore((state) => state.userCurrent);
+    const [invites, setInvites] = useState(0);
+    const alterOrganization = useOrganizationStore((state) => state.alter);
 
+    const loadInvitesCount = async () => {
+        if (!userCurrent) return;
+        try {
+            const result = await getInvitesCount(userCurrent, theme);
+            setInvites(result.count);
+        } catch (error) {
+            console.error("Erro ao carregar convites:", error);
+            setInvites(0);
+        }
+    };
 
     useEffect(() => {
-        async function fetchUserData() {
-            const userCurrent = await getMeAuth();
-            if (userCurrent) {
-                alterUserCurrent(userCurrent);
-            } else {
-                logoutUser();
-            }
-        }
-        fetchUserData();
-    }, []);
-
+        loadInvitesCount();
+    }, [userCurrent, theme, openNotification]);
 
     const toggleDrawer = () => {
         setOpen(!open);
@@ -67,12 +73,35 @@ const Dashboard = () => {
         switch (option) {
             case 'Home':
                 setOptionMenu("Inicio");
+                const orgNull: OrganizationObj = {
+                    organizationId: 0,
+                    name: '',
+                    description: '',
+                    favorite: false,
+                    organizationType: undefined,
+                    borderColor: undefined,
+                    icon: undefined
+                };
+                alterOrganization(orgNull);
                 break;
             case 'Documents':
                 setOptionMenu("Meus Documentos");
+                const orgNullDocuments: OrganizationObj = {
+                    organizationId: 0,
+                    name: '',
+                    description: '',
+                    favorite: false,
+                    organizationType: undefined,
+                    borderColor: undefined,
+                    icon: undefined
+                };
+                alterOrganization(orgNullDocuments);
                 break;
             case 'Organizations':
                 setOptionMenu("Organizações");
+                break;
+            case 'Open Organization':
+                setOptionMenu("Organização: " + organization?.name);
                 break;
             case 'Favorites':
                 setOptionMenu("Favoritos");
@@ -83,11 +112,8 @@ const Dashboard = () => {
             case 'Settings':
                 setOptionMenu("Configurações");
                 break;
-            case 'StatsDocument':
-                setOptionMenu("Estatisticas do Documento");
-                break;
-            case 'StatsOrganization':
-                setOptionMenu("Estatisticas " + organization?.name);
+            case 'Open Document':
+                setOptionMenu("Documento: " + document?.name);
                 break;
             default:
                 setOptionMenu("");
@@ -96,7 +122,7 @@ const Dashboard = () => {
 
     React.useEffect(() => {
         optionMenuChoice();
-    },);
+    }, [option]);
 
     const toggleOption = (optionText: string) => {
         alterOption(optionText)
@@ -129,7 +155,18 @@ const Dashboard = () => {
                     />
                 </Box>
                 <Box className="flex items-center justify-end w-full gap-8 p-8">
-                    <NotificationsIcon onClick={toggleNotification} sx={{ color: theme.palette.text.primary }} />
+                    <Box className="relative flex flex-col items-center">
+                        <Badge
+                            badgeContent={invites > 0 ? invites : null}
+                            color="info"
+                            overlap="circular"
+                        >
+                            <NotificationsIcon
+                                onClick={toggleNotification}
+                                sx={{ color: theme.palette.text.primary, cursor: 'pointer' }}
+                            />
+                        </Badge>
+                    </Box>
 
                     {isDarkMode ? (
                         <LightModeIcon onClick={toggleTheme} sx={{ color: theme.palette.text.primary }} />
@@ -272,11 +309,11 @@ const Dashboard = () => {
                 {option === "Home" && <HomeComponent />}
                 {option === "Documents" && <DocumentsComponent />}
                 {option === "Organizations" && <Organization />}
+                {option === "Open Organization" && <OpenOrganization />}
                 {option === "Favorites" && <Favorites />}
                 {option === "Recycle Bin" && <Trash />}
                 {option === "Settings" && <SettingsComponent />}
-                {option === "StatsDocument" && <StatsDocument />}
-                {option === "StatsOrganization" && <StatsOrganization />}
+                {option === "Open Document" && <OpenDocument />}
             </main>
 
             <Backdrop

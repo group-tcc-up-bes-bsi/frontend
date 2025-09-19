@@ -7,9 +7,9 @@ export interface DocumentObj {
   description: string;
   creationDate: Date;
   lastModifiedDate: Date;
+  organization: OrganizationObj;
+  
   version: string;
   creator: string;
-  imagemSrc: string;
-  organization: OrganizationObj;
   favorite: boolean;
 }

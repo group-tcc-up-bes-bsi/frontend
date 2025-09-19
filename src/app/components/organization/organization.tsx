@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { Box, Divider, IconButton, Menu, MenuItem, CircularProgress } from '@mui/material';
+import { Box, Divider, IconButton, Menu, MenuItem, CircularProgress, Typography, CardContent, Card } from '@mui/material';
 import CustomTypography from '../customTypography';
 import CustomComboBox from '../customComboBox';
 import CustomTextField from '../customTextField';
@@ -8,8 +8,8 @@ import CustomButton from '../customButton';
 import { MoreVert, Star } from '@mui/icons-material';
 import { useOrganizationFormStore } from '@/app/state/organizationFormState';
 import OrganizationForm from './organizationForm';
-import { organizationType, organizationsTypeOptions } from '../../services/ConstantsTypes';
-import { getMyOrganizations, getOrganizationUsers } from '@/app/services/Organizations/organizationsServices';
+import { favoriteTypeOptions, organizationType, organizationsTypeOptions } from '../../services/ConstantsTypes';
+import { getOrganizationUsers } from '@/app/services/Organizations/organizationsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { OrganizationObj } from '@/app/models/OrganizationObj';
 import { useOrganizationStore } from '@/app/state/organizationState';
@@ -21,6 +21,7 @@ import { deleteOrganization } from '@/app/services/Organizations/deleteOrganizat
 import { MessageObj } from '@/app/models/MessageObj';
 import CustomAlert from '../customAlert';
 import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
+import { getOrganizations } from '@/app/services/Organizations/getOrganizations';
 
 const Organization: React.FC = () => {
     useAuth();
@@ -39,11 +40,12 @@ const Organization: React.FC = () => {
     const userCurrent = useUserStore((state) => state.userCurrent);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<MessageObj>(
-        new MessageObj('info', 'Criação de Organização', 'Preencha os dados da Organização', 'info')
+        new MessageObj('info', 'Tela das Organizações', '', 'info')
     );
     const [showMessage, setShowMessage] = useState(false);
     const alterOrg = useOrganizationStore((state) => state.alter);
     const alterOption = useOptionsDashboardStore((state) => state.alter);
+    const [selectedFavorite, setSelectedFavorite] = useState('');
 
     useEffect(() => {
         if (message) {
@@ -57,7 +59,7 @@ const Organization: React.FC = () => {
             (async () => {
                 setLoading(true);
                 try {
-                    const result = await getMyOrganizations(userCurrent, theme);
+                    const result = await getOrganizations(userCurrent, theme);
                     setOrganizations(result.organizations);
                 } finally {
                     setLoading(false);
@@ -79,26 +81,31 @@ const Organization: React.FC = () => {
 
         let filtered = organizations;
 
-        if (selectedOrganizationType == 'COLLABORATIVE') {
+        if (selectedOrganizationType === 'COLLABORATIVE') {
             filtered = filtered.filter((org) => org.organizationType === organizationType.COLLABORATIVE);
-        } else if (selectedOrganizationType == 'INDIVIDUAL') {
+        } else if (selectedOrganizationType === 'INDIVIDUAL') {
             filtered = filtered.filter((org) => org.organizationType === organizationType.INDIVIDUAL);
         }
 
-        if (!filter.trim()) {
-            setTimeout(() => setLoading(false), 500);
-            return filtered;
+        if (selectedFavorite === 'true') {
+            filtered = filtered.filter((org) => org.favorite === true);
+        } else if (selectedFavorite === 'false') {
+            filtered = filtered.filter((org) => org.favorite === false);
         }
 
-        const searchTerm = filter.toLowerCase().trim();
-        const result = filtered.filter((org) =>
-            org.name.toLowerCase().includes(searchTerm) ||
-            org.description.toLowerCase().includes(searchTerm)
-        );
+        if (filter.trim()) {
+            const searchTerm = filter.toLowerCase().trim();
+            filtered = filtered.filter(
+                (org) =>
+                    org.name.toLowerCase().includes(searchTerm) ||
+                    org.description.toLowerCase().includes(searchTerm)
+            );
+        }
 
         setTimeout(() => setLoading(false), 300);
-        return result;
-    }, [organizations, filter, selectedOrganizationType]);
+        return filtered;
+    }, [organizations, filter, selectedOrganizationType, selectedFavorite]);
+
 
     const handleOrganizationAlter = async () => {
         if (selectedOrganization) {
@@ -112,7 +119,39 @@ const Organization: React.FC = () => {
                                 alterOrganization(selectedOrganization);
                                 toggleOrganizationForm();
                             } else {
-                                setMessage(new MessageObj('warning', 'Não Permitido', 'Somente o proprietario pode realizar alterações', 'warning'));
+                                setMessage(new MessageObj('warning', 'Não Permitido', 'Somente o proprietario pode realizar Alterações', 'warning'));
+                            }
+                        }
+                    }
+                } catch (error) {
+                    setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
+                }
+            }
+        }
+        setAnchorEl(null);
+    };
+
+    const handleOrganizationDelete = async () => {
+        if (selectedOrganization) {
+            if (userCurrent != undefined) {
+                try {
+                    const result = await getOrganizationUsers(selectedOrganization.organizationId, userCurrent)
+                    const users = result.users;
+                    for (const user of users) {
+                        if (user.username == userCurrent.username) {
+                            if (user.userType.toString() == 'OWNER') {
+                                alterMsgConfirm(`excluir a organização ${selectedOrganization.name}?`);
+                                alterConfirm(true);
+                                useMsgConfirmStore.getState().setOnConfirm(async () => {
+                                    if (userCurrent) {
+                                        await deleteOrganization(selectedOrganization.organizationId, userCurrent);
+                                        setOrganizations((prev) =>
+                                            prev.filter((org) => org.organizationId !== selectedOrganization.organizationId)
+                                        );
+                                    }
+                                });
+                            } else {
+                                setMessage(new MessageObj('warning', 'Não Permitido', 'Somente o proprietario realizar Exclusão', 'warning'));
                             }
                         }
                     }
@@ -138,29 +177,26 @@ const Organization: React.FC = () => {
         toggleOrganizationForm();
     }
 
-    const toggleConfirm = (organization: OrganizationObj) => {
-        alterMsgConfirm(`excluir a organização ${organization.name}?`);
-        alterConfirm(true);
-        useMsgConfirmStore.getState().setOnConfirm(async () => {
-            if (userCurrent) {
-                await deleteOrganization(organization.organizationId, userCurrent);
-                setOrganizations((prev) =>
-                    prev.filter((org) => org.organizationId !== organization.organizationId)
-                );
-            }
-        });
-    };
-
-    const handleEstatisticasClick = (organization: OrganizationObj) => {
-        alterOption('StatsOrganization');
+    const handleOpen = (organization: OrganizationObj) => {
+        alterOption('Open Organization');
         alterOrg(organization);
         setAnchorEl(null);
     };
 
+    const handleFavoriteOrganizationToggle = (org: typeof organizations[number]) => {
+        org.favorite = !org.favorite;
+        setOrganizations([...organizations]);
+    };
+
+    const handleChangeFavorite = (value: string) => {
+        setSelectedFavorite(value);
+    };
+
+
     return (
         <Box sx={{ maxWidth: '100%' }}>
             <Box>
-                <Box sx={{ display: 'flex', gap: 4, alignItems: 'center', justifyContent: 'center' }}>
+                <Box sx={{ display: 'flex', gap: 4, alignItems: 'center', justifyContent: 'space-between' }}>
                     <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <CustomButton
                             text="+ Nova Organização"
@@ -172,7 +208,7 @@ const Organization: React.FC = () => {
                             marginTop={0.5}
                         />
                     </Box>
-                    <Box sx={{ width: '60%' }}>
+                    <Box sx={{ width: '50%' }}>
                         <CustomTextField
                             name="filter"
                             label="Informe um detalhe da organização"
@@ -183,7 +219,7 @@ const Organization: React.FC = () => {
                             hoverColor="info"
                         />
                     </Box>
-                    <Box sx={{ width: '25%' }}>
+                    <Box sx={{ width: '15%' }}>
                         <CustomComboBox
                             name="organization-type"
                             label="Tipo"
@@ -193,6 +229,19 @@ const Organization: React.FC = () => {
                             focusedColor="primary"
                             hoverColor="info"
                         />
+                    </Box>
+                    <Box sx={{ width: '15%' }}>
+                        <Box sx={{ width: '100%' }}>
+                            <CustomComboBox
+                                name="user-invite"
+                                label="Favorito?"
+                                value={selectedFavorite}
+                                onChange={handleChangeFavorite}
+                                options={favoriteTypeOptions}
+                                focusedColor="primary"
+                                hoverColor="info"
+                            />
+                        </Box>
                     </Box>
                 </Box>
             </Box>
@@ -219,79 +268,124 @@ const Organization: React.FC = () => {
                 ) : (
                     <Box
                         sx={{
-                            maxHeight: 'calc(85vh - 150px)',
-                            overflowY: 'auto',
-                            pr: 2,
-                            '&::-webkit-scrollbar': {
-                                width: '6px',
-                            },
-                            '&::-webkit-scrollbar-track': {
+                            maxHeight: "calc(85vh - 150px)",
+                            overflowY: "auto",
+                            p: 2,
+                            "&::-webkit-scrollbar": { width: "6px" },
+                            "&::-webkit-scrollbar-track": {
                                 background: theme.palette.background.default,
                             },
-                            '&::-webkit-scrollbar-thumb': {
+                            "&::-webkit-scrollbar-thumb": {
                                 backgroundColor: theme.palette.primary.main,
-                                borderRadius: '3px',
+                                borderRadius: "3px",
                             },
                         }}
                     >
-                        {filteredOrganizations.map((org) => (
+
+                        {filteredOrganizations.length === 0 ? (
                             <Box
-                                key={org.organizationId}
                                 sx={{
-                                    mb: 2,
-                                    p: 2,
-                                    border: `1px solid ${org.borderColor}`,
+                                    mb: 1,
+                                    p: 1,
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    width: '100%'
                                 }}
                             >
-                                <Box sx={{ display: 'flex', gap: 4, justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Box sx={{ display: 'flex', gap: 4 }}>
-                                        <Star sx={{ color: theme.palette.text.primary }} />
-                                        <CustomTypography
-                                            text={org.name}
-                                            component="h2"
-                                            variant="h5"
-                                            sx={{
-                                                color: theme.palette.text.primary,
-                                                fontWeight: 'bold',
-                                            }}
-                                        />
-                                    </Box>
-                                    <CustomTypography
-                                        text={org.organizationType || ''}
-                                        component="p"
-                                        variant="h6"
-                                        sx={{ color: theme.palette.text.secondary, display: 'block' }}
-                                    />
-                                </Box>
-                                <Box sx={{ display: 'flex', gap: 4, justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <CustomTypography
-                                        text={org.description}
-                                        component="p"
-                                        variant="h6"
-                                        sx={{ color: theme.palette.text.secondary, mb: 1 }}
-                                    />
-                                    <IconButton
-                                        aria-label="more"
-                                        onClick={(event) => {
-                                            setAnchorEl(event.currentTarget);
-                                            setSelectedOrganization(org);
-                                        }}
-                                    >
-                                        <MoreVert />
-                                    </IconButton>
-                                    <Menu
-                                        anchorEl={anchorEl}
-                                        open={Boolean(anchorEl) && selectedOrganization?.organizationId === org.organizationId}
-                                        onClose={() => setAnchorEl(null)}
-                                    >
-                                        <MenuItem onClick={() => ({})}>Abrir</MenuItem>
-                                        <MenuItem onClick={handleOrganizationAlter}>Alterar</MenuItem>
-                                        <MenuItem onClick={() => { handleEstatisticasClick(org) }}>Estatísticas</MenuItem>
-                                        <MenuItem onClick={() => { toggleConfirm(org) }}>Excluir</MenuItem>
-                                    </Menu>
-                                </Box>
+                                <Typography variant="h6" color={theme.palette.text.primary}>
+                                    {'Nenhuma organização disponível'}
+                                </Typography>
                             </Box>
-                        ))}
+                        ) :
+                            filteredOrganizations.map((org) => (
+                                <Card
+                                    key={org.organizationId}
+                                    variant="outlined"
+                                    sx={{
+                                        mb: 2,
+                                        borderColor: org.favorite ? theme.palette.button.star : theme.palette.text.primary,
+                                        borderWidth: 1,
+                                        borderStyle: "solid",
+                                        borderRadius: 2,
+                                        boxShadow: 2,
+                                    }}
+                                >
+                                    <CardContent>
+                                        <Box
+                                            sx={{
+                                                display: "flex",
+                                                justifyContent: "space-between",
+                                                alignItems: "center",
+                                                mb: 1,
+                                            }}
+                                        >
+                                            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+                                                <IconButton aria-label="star" onClick={() => handleFavoriteOrganizationToggle(org)}>
+                                                    <Star sx={{
+                                                        color: org.favorite ? theme.palette.button.star : theme.palette.text.primary,
+                                                        transition: 'color 0.2s ease-in-out',
+                                                        '&:hover': {
+                                                            transform: 'scale(1.1)'
+                                                        }
+                                                    }} />
+                                                </IconButton>
+                                                <CustomTypography
+                                                    text={org.name}
+                                                    component="h2"
+                                                    variant="h6"
+                                                    sx={{ color: theme.palette.text.primary, fontWeight: "bold" }}
+                                                />
+
+                                                <Typography
+                                                    variant="body1"
+                                                    sx={{
+                                                        fontWeight: "bold",
+                                                        color:
+                                                            org.organizationType?.toString() === "Colaborativo"
+                                                                ? theme.palette.button.star
+                                                                : theme.palette.primary.main,
+                                                        textShadow: "0px 0px 2px rgba(0,0,0,0.3)",
+                                                    }}
+                                                >
+                                                    {org.organizationType || ""}
+                                                </Typography>
+
+                                            </Box>
+
+                                            <IconButton
+                                                aria-label="options"
+                                                onClick={(event) => {
+                                                    setAnchorEl(event.currentTarget);
+                                                    setSelectedOrganization(org);
+                                                }}
+                                            >
+                                                <MoreVert />
+                                            </IconButton>
+                                            <Menu
+                                                anchorEl={anchorEl}
+                                                open={
+                                                    Boolean(anchorEl) &&
+                                                    selectedOrganization?.organizationId === org.organizationId
+                                                }
+                                                onClose={() => setAnchorEl(null)}
+                                            >
+                                                <MenuItem onClick={() => handleOpen(org)}>Abrir</MenuItem>
+                                                <MenuItem onClick={handleOrganizationAlter}>Alterar</MenuItem>
+                                                <MenuItem onClick={handleOrganizationDelete}>Excluir</MenuItem>
+                                            </Menu>
+                                        </Box>
+
+                                        {/* Description */}
+                                        <Typography
+                                            variant="body2"
+                                            sx={{ color: theme.palette.text.secondary, whiteSpace: "pre-line" }}
+                                        >
+                                            {org.description}
+                                        </Typography>
+                                    </CardContent>
+                                </Card>
+                            ))
+                        }
                     </Box>
                 )}
 

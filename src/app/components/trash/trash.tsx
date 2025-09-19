@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import {
     Box, Table, TableBody, TableCell, TableContainer,
@@ -11,11 +11,14 @@ import CustomTextField from '../customTextField';
 import { CachedRounded, Delete } from '@mui/icons-material';
 import CustomButton from '../customButton';
 import { DocumentObj } from '@/app/models/DocumentObj';
-import { formatDate, getDocumentsTrash } from '@/app/services/Documents/DocumentsServices';
+import { getDocumentsTrash } from '@/app/services/Documents/DocumentsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
 import MsgConfirm from '../notification/msgConfirm';
 import { useAuth } from '../useAuth';
+import { formatDate } from '@/app/services/ConstantsTypes';
+import { MessageObj } from '@/app/models/MessageObj';
+import CustomAlert from '../customAlert';
 
 const Trash: React.FC = () => {
     useAuth();
@@ -24,6 +27,18 @@ const Trash: React.FC = () => {
     const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
     const alterConfirm = useMsgConfirmStore((state) => state.alter);
     const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
+    const [message] = useState<MessageObj>(
+        new MessageObj('info', 'Tela da Lixeira', '', 'info')
+    );
+    const [showMessage, setShowMessage] = useState(false);
+
+    useEffect(() => {
+        if (message) {
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 5000);
+        }
+    }, [message]);
+
 
     const documents: DocumentObj[] = getDocumentsTrash();
 
@@ -39,7 +54,8 @@ const Trash: React.FC = () => {
             doc.type.toLowerCase().includes(searchTerm) ||
             formatDate(doc.creationDate).toLowerCase().includes(searchTerm) ||
             formatDate(doc.lastModifiedDate).toLowerCase().includes(searchTerm) ||
-            doc.version.toLowerCase().includes(searchTerm)
+            doc.version.toLowerCase().includes(searchTerm) ||
+            doc.organization.name.toLowerCase().includes(searchTerm)
         );
     }, [documents, filter]);
 
@@ -173,6 +189,27 @@ const Trash: React.FC = () => {
                 <MsgConfirm />
             )
             }
+            {showMessage && message && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        bottom: '0%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 2,
+                        textAlign: 'left',
+                    }}>
+                    <CustomAlert
+                        severity={message.severity}
+                        colorType={message.colorType}
+                        title={message.title}
+                        description={message.description}
+                    />
+                </Box>
+            )}
         </Box>
     );
 };

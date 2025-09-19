@@ -1,0 +1,39 @@
+Termos de Uso
+1. Aceitação dos Termos
+Ao acessar e utilizar a Ferramenta de Gestão de Documentos (“Plataforma”), o usuário concorda integralmente com estes Termos de Uso e com a Política de Privacidade. Caso não concorde, recomenda-se não utilizar a Plataforma.
+
+2. Objetivo da Plataforma
+A Plataforma tem como finalidade disponibilizar um ambiente digital interno para gestão centralizada de documentos, com recursos de:
+Armazenamento e versionamento.
+Colaboração em tempo real.
+Controle de acesso e permissões.
+Busca avançada e categorização automática.
+
+3. Cadastro e Responsabilidade do Usuário
+Para utilizar a Plataforma, o usuário deverá fornecer informações verídicas e atualizadas.
+O usuário é responsável por manter a confidencialidade de suas credenciais de acesso.
+É vedado utilizar a conta de terceiros sem autorização.
+
+4. Uso Permitido
+O usuário compromete-se a utilizar a Plataforma em conformidade com a lei, com as políticas internas da empresa e com estes Termos, sendo expressamente proibido:
+Inserir conteúdos ilícitos, ofensivos ou que violem direitos de terceiros.
+Tentar obter acesso não autorizado a dados, áreas restritas ou sistemas relacionados.
+Utilizar a Plataforma para fins fraudulentos ou que prejudiquem terceiros.
+
+5. Propriedade Intelectual
+O software, sua arquitetura, código, design, logotipos e demais elementos são de propriedade exclusiva dos desenvolvedores ou da empresa responsável.
+O usuário não adquire nenhum direito de propriedade intelectual sobre a Plataforma ou seus componentes, salvo autorização expressa.
+
+6. Disponibilidade e Limitações
+A Plataforma é disponibilizada em servidores internos da empresa e poderá passar por atualizações, manutenções ou interrupções temporárias sem aviso prévio.
+Apesar de adotarem-se medidas para assegurar estabilidade, não há garantia de funcionamento ininterrupto.
+
+7. Exclusão de Responsabilidade
+Os desenvolvedores e a empresa não se responsabilizam por perdas de dados decorrentes de uso inadequado, falhas externas (ex.: rede, energia, ataques cibernéticos internos) ou descumprimento destes Termos.
+O usuário é responsável pelo conteúdo que armazena e pelas permissões que atribui dentro da Plataforma.
+
+8. Alterações dos Termos
+Estes Termos poderão ser alterados a qualquer momento, sendo a versão atualizada disponibilizada internamente na própria Plataforma ou por meios oficiais da empresa.
+
+9. Legislação e Foro
+Este contrato é regido pelas leis brasileiras. Qualquer disputa será resolvida no foro da comarca de Curitiba/Paraná.

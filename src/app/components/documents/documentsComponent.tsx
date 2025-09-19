@@ -16,6 +16,8 @@ import DocumentForm from './documentForm';
 import { useDocumentStore } from '@/app/state/documentState';
 import { DocumentObj } from '@/app/models/DocumentObj';
 import { organizationType } from '@/app/services/ConstantsTypes';
+import { MessageObj } from '@/app/models/MessageObj';
+import CustomAlert from '../customAlert';
 
 const DocumentsComponent: React.FC = () => {
     useAuth();
@@ -28,6 +30,18 @@ const DocumentsComponent: React.FC = () => {
     const documentForm = useDocumentFormStore((state) => state.documentForm);
     const alterDocumentForm = useDocumentFormStore((state) => state.alter);
     const alterDoc = useDocumentStore((state) => state.alter);
+    const [message] = useState<MessageObj>(
+        new MessageObj('info', 'Tela dos Documentos', '', 'info')
+    );
+    const [showMessage, setShowMessage] = useState(false);
+
+    useEffect(() => {
+        if (message) {
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 5000);
+        }
+    }, [message]);
+
 
     const toggleModeViewer = (mode: number) => {
         alterModeViewer(mode)
@@ -55,7 +69,6 @@ const DocumentsComponent: React.FC = () => {
             lastModifiedDate: new Date(),
             version: '',
             creator: '',
-            imagemSrc: '',
             organization: {
                 organizationId: 0,
                 name: '',
@@ -86,7 +99,7 @@ const DocumentsComponent: React.FC = () => {
                     />
                 </Box>
                 <Box
-                    sx={{ width: '75%' }}>
+                    sx={{ width: '65%' }}>
                     <CustomTextField
                         name="filter"
                         label="Informe um detalhe do documento"
@@ -139,7 +152,7 @@ const DocumentsComponent: React.FC = () => {
                 <Box sx={{
                     backgroundColor: theme.palette.background.default,
                     padding: 1,
-                    maxHeight: 'calc(80vh - 150px)',
+                    maxHeight: 'calc(85vh - 150px)',
                     overflowY: 'auto',
                     '&::-webkit-scrollbar': {
                         width: '6px',
@@ -160,7 +173,7 @@ const DocumentsComponent: React.FC = () => {
                 <Box sx={{
                     backgroundColor: theme.palette.background.default,
                     padding: 1,
-                    maxHeight: 'calc(80vh - 150px)',
+                    maxHeight: 'calc(85vh - 150px)',
                     overflowY: 'auto',
                     '&::-webkit-scrollbar': {
                         width: '6px',
@@ -177,6 +190,27 @@ const DocumentsComponent: React.FC = () => {
                 </Box>
             )}
             {documentForm && <DocumentForm />}
+            {showMessage && message && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        bottom: '0%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 2,
+                        textAlign: 'left',
+                    }}>
+                    <CustomAlert
+                        severity={message.severity}
+                        colorType={message.colorType}
+                        title={message.title}
+                        description={message.description}
+                    />
+                </Box>
+            )}
         </Box >
     );
 };

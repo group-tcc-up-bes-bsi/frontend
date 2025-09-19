@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { Box, List, ListItem, ListItemText, Backdrop } from '@mui/material';
+import { Box, List, ListItem, ListItemText, Backdrop, CircularProgress } from '@mui/material';
 import { useNotificationStore } from '@/app/state/notificationState';
 import { Close } from '@mui/icons-material';
 import CheckIcon from '@mui/icons-material/Check';
@@ -10,17 +10,22 @@ import { MessageObj } from '@/app/models/MessageObj';
 import { getInvites } from '@/app/services/Organizations/getInvites';
 import { UserOrganization } from '@/app/models/UserObj';
 import CustomAlert from '../customAlert';
+import CustomTypography from '../customTypography';
+import { updateInvites } from '@/app/services/Organizations/updateInvites';
 
 const Notification: React.FC = () => {
     useAuth();
     const { theme } = useTheme();
     const alterNotification = useNotificationStore((state) => state.alter);
-    const userCurrent = useUserStore((state) => state.userCurrent)
+    const userCurrent = useUserStore((state) => state.userCurrent);
+    const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<MessageObj>(
         new MessageObj('info', 'Tela Principal', '', 'info')
     );
     const [showMessage, setShowMessage] = useState(false);
-    const [/*invites*/, setInvites] = useState<UserOrganization[]>([]);
+    const [invites, setInvites] = useState<UserOrganization[]>([]);
+    const [organizationsInvite, setOrganizationsInvite] = useState<{ organizationId: number; name: string }[]>([]);
+    const [refresh, setRefresh] = useState(0);
 
     useEffect(() => {
         if (message) {
@@ -30,14 +35,58 @@ const Notification: React.FC = () => {
     }, [message]);
 
     useEffect(() => {
-        if (userCurrent != undefined) {
+        if (userCurrent) {
             (async () => {
-                const result = await getInvites(userCurrent, theme);
-                setInvites(result.users)
-                setMessage(result.message);
+                setLoading(true);
+                try {
+                    const result = await getInvites(userCurrent, theme);
+                    setInvites(result.users);
+                    setOrganizationsInvite(result.organizationsInvite);
+                    setMessage(result.message);
+                } finally {
+                    setLoading(false);
+                }
             })();
         }
-    }, [userCurrent, theme]);
+    }, [userCurrent, theme, refresh]);
+
+    const handleAccepted = async (orgId: number) => {
+        if (userCurrent != undefined) {
+            try {
+                const result = await updateInvites(orgId, userCurrent, true);
+                setMessage(result.message);
+
+                setRefresh(prev => prev + 1);
+            } catch (error) {
+                setMessage(new MessageObj(
+                    'error',
+                    'Erro inesperado',
+                    `${error}`,
+                    'error'
+                ));
+
+            }
+        }
+    }
+
+    const handleRecused = async (orgId: number) => {
+        if (userCurrent != undefined) {
+            try {
+                const result = await updateInvites(orgId, userCurrent, false);
+                setMessage(result.message);
+
+                setRefresh(prev => prev + 1);
+            } catch (error) {
+                setMessage(new MessageObj(
+                    'error',
+                    'Erro inesperado',
+                    `${error}`,
+                    'error'
+                ));
+
+            }
+        }
+    }
 
     return (
         <Box className="flex items-center justify-center">
@@ -61,9 +110,21 @@ const Notification: React.FC = () => {
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    p: 1.5
+                    p: 1.5,
                 }}
             >
+                <CustomTypography
+                    text={"Convites"}
+                    component="h2"
+                    variant="h6"
+                    sx={{
+                        color: theme.palette.text.primary,
+                        mb: 1,
+                        fontWeight: 'bold',
+                        width: '100%',
+                        borderBottom: `1px solid ${theme.palette.text.primary}`,
+                    }}
+                />
                 <Box
                     sx={{
                         flex: 1,
@@ -85,49 +146,71 @@ const Notification: React.FC = () => {
                         },
                     }}
                 >
-                    <List dense sx={{ py: 0 }}>
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13].map((item) => (
-                            <ListItem
-                                key={item}
-                                sx={{
-                                    borderBottom: `1px solid ${theme.palette.divider}`,
-                                    py: 1.2,
-                                    px: 1
-                                }}
-                            >
-                                <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
-                                    <ListItemText
-                                        primary={`Convite da organização ${item}`}
-                                        sx={{ flex: 1 }}
-                                    />
-                                    <CheckIcon
+                    {loading ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+                            <CircularProgress color="primary" />
+                        </Box>
+                    ) : <List dense sx={{ py: 0 }}>
+                        {invites.length > 0 ? (
+                            invites.map((invite, index) => {
+                                const org = organizationsInvite.find(
+                                    (o) => o.organizationId === invite.organizationId
+                                );
+
+                                return (
+                                    <ListItem
+                                        key={index}
                                         sx={{
-                                            fontSize: '1.5rem',
-                                            color: theme.palette.text.secondary,
-                                            cursor: 'pointer',
-                                            borderRadius: '50%',
-                                            '&:hover': {
-                                                backgroundColor: theme.palette.success.light,
-                                                color: theme.palette.success.dark,
-                                            }
+                                            borderBottom: `1px solid ${theme.palette.divider}`,
+                                            py: 1.2,
+                                            px: 1,
                                         }}
-                                    />
-                                    <Close
-                                        sx={{
-                                            fontSize: '1.5rem',
-                                            color: theme.palette.text.secondary,
-                                            cursor: 'pointer',
-                                            borderRadius: '50%',
-                                            '&:hover': {
-                                                backgroundColor: theme.palette.error.light,
-                                                color: theme.palette.error.main,
-                                            }
-                                        }}
-                                    />
-                                </Box>
+                                    >
+                                        <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
+                                            <ListItemText
+                                                primary={`Organização: ${org?.name || 'Organização desconhecida'}`}
+                                                sx={{ flex: 1 }}
+                                            />
+                                            <CheckIcon
+                                                onClick={() => org && handleAccepted(org.organizationId)}
+                                                sx={{
+                                                    fontSize: '1.5rem',
+                                                    color: theme.palette.text.secondary,
+                                                    cursor: 'pointer',
+                                                    borderRadius: '50%',
+                                                    '&:hover': {
+                                                        backgroundColor: theme.palette.success.light,
+                                                        color: theme.palette.success.dark,
+                                                    },
+                                                }}
+                                            />
+                                            <Close
+                                                onClick={() => org && handleRecused(org.organizationId)}
+                                                sx={{
+                                                    fontSize: '1.5rem',
+                                                    color: theme.palette.text.secondary,
+                                                    cursor: 'pointer',
+                                                    borderRadius: '50%',
+                                                    '&:hover': {
+                                                        backgroundColor: theme.palette.error.light,
+                                                        color: theme.palette.error.main,
+                                                    },
+                                                }}
+                                            />
+                                        </Box>
+                                    </ListItem>
+                                );
+                            })
+                        ) : (
+                            <ListItem>
+                                <ListItemText
+                                    primary="Nenhum convite encontrado"
+                                    sx={{ textAlign: 'center' }}
+                                />
                             </ListItem>
-                        ))}
+                        )}
                     </List>
+                    }
                 </Box>
             </Box>
             {showMessage && message && (
@@ -143,7 +226,8 @@ const Notification: React.FC = () => {
                         alignItems: 'center',
                         gap: 2,
                         textAlign: 'left',
-                    }}>
+                    }}
+                >
                     <CustomAlert
                         severity={message.severity}
                         colorType={message.colorType}

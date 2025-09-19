@@ -1,0 +1,29 @@
+Política de Privacidade
+1. Coleta de Informações
+A Plataforma poderá coletar as seguintes informações:
+Dados de cadastro: nome, senha.
+Dados de uso: histórico de login, interações e documentos gerenciados.
+
+2. Uso das Informações
+As informações coletadas são utilizadas para:
+Garantir o funcionamento adequado da Plataforma.
+Gerenciar permissões de acesso e autenticação dos usuários.
+Melhorar a experiência e os recursos disponibilizados.
+Garantir segurança e prevenção a usos indevidos.
+
+3. Compartilhamento de Informações
+Os dados tratados pela Plataforma são armazenados exclusivamente no servidor interno da empresa.
+Não há compartilhamento de dados pessoais com terceiros, salvo em situações de obrigação legal ou ordem judicial.
+
+4. Armazenamento e Segurança
+Os dados são armazenados em banco de dados seguro, localizado no servidor interno da empresa.
+Medidas de proteção incluem autenticação via JWT, controle de sessões (ex.: Redis ou equivalente) e criptografia de senhas.
+Apesar das medidas técnicas e administrativas adotadas, nenhum sistema é totalmente imune a falhas ou ataques.
+
+5. Direitos do Usuário
+O usuário poderá, a qualquer momento:
+Acessar suas informações pessoais.
+Corrigir ou atualizar dados de cadastro.
+
+6. Alterações na Política
+Esta Política poderá ser atualizada periodicamente. Alterações relevantes serão comunicadas aos usuários pela própria Plataforma ou por meios internos da empresa.
