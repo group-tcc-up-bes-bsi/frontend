@@ -7,7 +7,7 @@ import CustomTextField from '../customTextField';
 import CustomComboBox from '../customComboBox';
 import CustomButton from '../customButton';
 import CustomTypography from '../customTypography';
-import { getUserTypeLabel, organizationsTypeOptionsNoAll, userType, userTypeOptionsNoOwner } from '../../services/ConstantsTypes';
+import { getUserTypeLabel, organizationsTypeOptionsNoAll, organizationType, userType, userTypeOptionsNoOwner } from '../../services/ConstantsTypes';
 import { getOrganizationUsers } from '@/app/services/Organizations/organizationsServices';
 import { useOrganizationStore } from '@/app/state/organizationState';
 import { getByUserName } from '@/app/services/User/getByUserName';
@@ -437,6 +437,10 @@ const OrganizationForm: React.FC = () => {
                             onChange={(value) => handleChangeOrganizationType(value)}
                             options={organizationsTypeOptionsNoAll}
                             focusedColor="primary"
+                            disabled={
+                                organization?.organizationId !== 0 &&
+                                organization?.organizationType === organizationType.COLLABORATIVE
+                            }
                             hoverColor="info"
                             marginBottom={2}
                         />
@@ -565,7 +569,7 @@ const OrganizationForm: React.FC = () => {
                                                         focusedColor="primary"
                                                         hoverColor="info"
                                                         marginBottom={0}
-                                                        sx={{marginTop: 0}}
+                                                        sx={{ marginTop: 0 }}
                                                     />
                                                 </Box>
                                             )}
