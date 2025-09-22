@@ -1,13 +1,20 @@
 import { MessageObj } from "@/app/models/MessageObj";
 import { getErrorTitle } from "../ErrorTitle";
+import bcrypt from 'bcryptjs';
 
 export async function updatePasswordUser(userId: number, UserName: string, Password: string, AdminPass: string) {
     const url = `${process.env.NEXT_PUBLIC_BACKEND}/users/update-password/`;
+
+    const salt = bcrypt.genSaltSync(10);
+    const hashedPassword = bcrypt.hashSync(Password, salt);
+
     const userData = {
         userName: UserName,
-        password: Password,
+        password: hashedPassword,
         adminPass: AdminPass
     };
+
+    console.log(`usuário atualizado: ${UserName} senha: ${Password}, hash: ${hashedPassword}`)
 
     try {
         const response = await fetch(url, {
