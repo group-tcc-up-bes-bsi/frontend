@@ -1,0 +1,46 @@
+import { DocumentObj } from "@/app/models/DocumentObj";
+import { MessageObj } from "@/app/models/MessageObj";
+import { UserObj } from "@/app/models/UserObj";
+
+export async function updateVersion(
+  userCurrent: UserObj,
+  doc: DocumentObj,
+  Name: string,
+): Promise<MessageObj> {
+  const url = `${process.env.NEXT_PUBLIC_BACKEND}/document-versions/${doc.documentId}`;
+
+  const versionData = {
+    name: Name,
+  }
+
+  try {
+    const response = await fetch(url, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${userCurrent?.jwtToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(versionData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      return new MessageObj("error", "Erro", error.message, "error");
+    }
+
+    return new MessageObj(
+      "success",
+      "Versão Atualizada",
+      "A versão foi atualizada com sucesso",
+      "success"
+    );
+  } catch (error) {
+    console.error(error);
+    return new MessageObj(
+      "error",
+      "Erro de servidor",
+      "Não foi possível enviar a versão",
+      "error"
+    );
+  }
+}

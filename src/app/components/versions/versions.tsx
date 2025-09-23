@@ -28,6 +28,7 @@ import CustomAlert from '../customAlert';
 import { MessageObj } from '@/app/models/MessageObj';
 import { getVersionsByDocument } from '@/app/services/Versions/getVersions';
 import { useDocumentStore } from '@/app/state/documentState';
+import { deleteVersion } from '@/app/services/Versions/deleteVersion';
 
 const Versions: React.FC = () => {
     useAuth();
@@ -90,11 +91,6 @@ const Versions: React.FC = () => {
             setTimeout(() => setShowMessage(false), 5000);
         }
     }, [message]);
-
-    const toggleConfirm = (version: VersionObj) => {
-        alterMsgConfirm(`Excluir a versão ${version.name}?`);
-        alterConfirm(!openConfirm);
-    }
 
     const toggleVersionForm = async (version: VersionObj) => {
         if (userCurrent != undefined) {
@@ -195,6 +191,65 @@ const Versions: React.FC = () => {
         }
     };
 
+    const handleDeleteVersion = async () => {
+        if (selectedVersion && document) {
+            alterVersion(selectedVersion);
+            alterMsgConfirm(`excluir a versão ${selectedVersion.name}?`);
+            alterConfirm(true);
+
+            if (userCurrent != undefined) {
+                try {
+                    const result = await getOrganizationUsers(
+                        document?.organization.organizationId,
+                        userCurrent
+                    );
+                    const users = result.users;
+
+                    for (const user of users) {
+                        if (user.username == userCurrent.username) {
+                            if (user.userType.toString() == 'OWNER') {
+                                useMsgConfirmStore.getState().setOnConfirm(async () => {
+                                    if (userCurrent) {
+                                        const result = await deleteVersion(
+                                            userCurrent,
+                                            selectedVersion.documentVersionId
+                                        );
+                                        setVersions((prev) =>
+                                            prev.filter(
+                                                (version) =>
+                                                    version.documentVersionId !==
+                                                    selectedVersion.documentVersionId
+                                            )
+                                        );
+                                        setMessage(result.message);
+                                    }
+                                });
+                            } else {
+                                setMessage(
+                                    new MessageObj(
+                                        'warning',
+                                        'Não Permitido',
+                                        'Somente o proprietario realizar Exclusão',
+                                        'warning'
+                                    )
+                                );
+                            }
+                        }
+                    }
+                } catch (error) {
+                    setMessage(
+                        new MessageObj(
+                            'error',
+                            'Erro inesperado',
+                            `${error}`,
+                            'error'
+                        )
+                    );
+                }
+            }
+        }
+        setAnchorEl(null);
+    };
 
     return (
         <Box
@@ -306,7 +361,7 @@ const Versions: React.FC = () => {
                                     onClose={() => setAnchorEl(null)}
                                 >
                                     <MenuItem onClick={() => { toggleVersionForm(version) }}>Alterar</MenuItem>
-                                    <MenuItem onClick={() => toggleConfirm(version)}>Excluir</MenuItem>
+                                    <MenuItem onClick={handleDeleteVersion}>Excluir</MenuItem>
                                 </Menu>
                             </Box>
                         </Box>
@@ -328,15 +383,17 @@ const Versions: React.FC = () => {
                 <Box
                     sx={{
                         position: 'absolute',
-                        bottom: '0%',
+                        bottom: '10%',
                         left: '50%',
                         transform: 'translateX(-50%)',
+                        zIndex: 1500,
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
                         gap: 2,
                         textAlign: 'left',
-                    }}>
+                    }}
+                >
                     <CustomAlert
                         severity={message.severity}
                         colorType={message.colorType}

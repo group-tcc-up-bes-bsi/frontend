@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Box, Backdrop } from '@mui/material';
 import CustomTextField from '../customTextField';
 import CustomButton from '../customButton';
@@ -8,16 +8,35 @@ import { useAuth } from '../useAuth';
 import { useVersionFormStore } from '@/app/state/versionFormState';
 import { useVersionStore } from '@/app/state/versionState';
 import PreviewVersion from './previewVersion';
+import { MessageObj } from '@/app/models/MessageObj';
+import CustomAlert from '../customAlert';
+import { useUserStore } from '@/app/state/userState';
+import { useDocumentStore } from '@/app/state/documentState';
+import { createVersion } from '@/app/services/Versions/createVersion';
+import { updateVersion } from '@/app/services/Versions/updateVersion';
 
 const VersionForm: React.FC = () => {
     useAuth();
     const { theme } = useTheme();
+    const userCurrent = useUserStore((state) => state.userCurrent);
     const alterVersionForm = useVersionFormStore((state) => state.alter);
     const version = useVersionStore((state) => state.version);
     const [versionName, setVersionName] = useState(version?.name || '');
     const [file, setFile] = useState<File | null>(null);
     const [previewOpen, setPreviewOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [message, setMessage] = useState<MessageObj>(
+        new MessageObj()
+    );
+    const [showMessage, setShowMessage] = useState(false);
+    const document = useDocumentStore((state) => state.document);
+
+    useEffect(() => {
+        if (message) {
+            setShowMessage(true);
+            setTimeout(() => setShowMessage(false), 5000);
+        }
+    }, [message]);
 
     const handleAttachFile = () => {
         fileInputRef.current?.click();
@@ -30,6 +49,47 @@ const VersionForm: React.FC = () => {
         }
     };
 
+    const handleCreateVersion = async () => {
+        if (!file) {
+            setMessage(new MessageObj("error", "Erro", "Por favor, anexe um arquivo.", "error"));
+            return;
+        }
+        if (versionName.trim() === "") {
+            setMessage(new MessageObj("error", "Erro", "Por favor, insira um nome para a versão.", "error"));
+            return;
+        }
+        try {
+            if (userCurrent && document) {
+                const result = await createVersion(userCurrent, document, versionName, file);
+                setMessage(result);
+                if (result.severity === "success") {
+                    alterVersionForm(false);
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            setMessage(new MessageObj("error", "Erro de servidor", "Não foi possível criar a versão.", "error"));
+        }
+    };
+
+    const handleUpdateVersion = async () => {
+        if (versionName.trim() === "") {
+            setMessage(new MessageObj("error", "Erro", "Por favor, insira um nome para a versão.", "error"));
+            return;
+        }
+        try {
+            if (userCurrent && document) {
+                const result = await updateVersion(userCurrent, document, versionName);
+                setMessage(result);
+                if (result.severity === "success") {
+                    alterVersionForm(false);
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            setMessage(new MessageObj("error", "Erro de servidor", "Não foi possível atualizar a versão.", "error"));
+        }
+    }
 
     return (
         <Box>
@@ -55,7 +115,7 @@ const VersionForm: React.FC = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     backgroundColor: theme.palette.background.default,
-                    width: '800px',
+                    width: '600px',
                     maxWidth: '90%',
                     borderRadius: '4px',
                     boxShadow: 3,
@@ -116,6 +176,7 @@ const VersionForm: React.FC = () => {
                         onClick={() => { handleAttachFile() }}
                         hoverColorType="primary"
                         fullWidth={false}
+                        disabled={version?.documentVersionId ? true : false}
                         paddingY={1}
                         paddingX={3.0}
                         marginBottom={2}
@@ -125,7 +186,7 @@ const VersionForm: React.FC = () => {
                         text={version?.documentVersionId ? "Atualizar" : "Salvar"}
                         type="button"
                         colorType="primary"
-                        onClick={() => { }}
+                        onClick={version?.documentVersionId ? () => { handleUpdateVersion() } : () => { handleCreateVersion() }}
                         hoverColorType="primary"
                         fullWidth={false}
                         paddingY={1}
@@ -138,6 +199,29 @@ const VersionForm: React.FC = () => {
 
             {previewOpen && file && (
                 <PreviewVersion file={file} onClose={() => setPreviewOpen(false)} />
+            )}
+            {showMessage && message && (
+                <Box
+                    sx={{
+                        position: 'absolute',
+                        bottom: '10%',
+                        left: '50%',
+                        transform: 'translateX(-50%)',
+                        zIndex: 1500,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        gap: 2,
+                        textAlign: 'left',
+                    }}
+                >
+                    <CustomAlert
+                        severity={message.severity}
+                        colorType={message.colorType}
+                        title={message.title}
+                        description={message.description}
+                    />
+                </Box>
             )}
         </Box>
     );
