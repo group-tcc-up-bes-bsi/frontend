@@ -19,6 +19,8 @@ import { useTermFormStore } from '@/app/state/termFormState';
 import TermsViewer from './termsViewer';
 import { useAdminPassStore } from '@/app/state/adminPassState';
 import PasswordModal from '../admin/passwordModal';
+import { useOrganizationStore } from '@/app/state/organizationState';
+import { countDocuments, getDocuments } from '@/app/services/Documents/DocumentsServices';
 
 const SettingsComponent: React.FC = () => {
     useAuth();
@@ -34,6 +36,21 @@ const SettingsComponent: React.FC = () => {
     const alterText = useTermFormStore((state) => state.alterText);
     const showAdminRequest = useAdminPassStore((state) => state.showAdminRequest);
     const alterAdminPass = useAdminPassStore((state) => state.alter);
+    const organization = useOrganizationStore((state) => state.organization);
+
+    useEffect(() => {
+        if (userCurrent != undefined) {
+            (async () => {
+                try {
+                    if (!organization?.organizationId) {
+                        const result = await getDocuments(userCurrent, theme);
+                        setCountDocs(countDocuments(result.documents))
+                    }
+                } finally { }
+            })();
+        }
+    }, [userCurrent, theme, openNotification]);
+
 
     useEffect(() => {
         if (!userCurrent) return;
@@ -41,7 +58,6 @@ const SettingsComponent: React.FC = () => {
         (async () => {
             const result = await getOrganizations(userCurrent, theme);
             setCountOrgs(countOrganizations(result.organizations));
-            setCountDocs(8 /*countDocs(docs})*/)
         })();
     }, [userCurrent, theme, openNotification]);
 

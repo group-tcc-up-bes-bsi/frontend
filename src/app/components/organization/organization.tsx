@@ -208,7 +208,7 @@ const Organization: React.FC = () => {
                             marginTop={0.5}
                         />
                     </Box>
-                    <Box sx={{ width: '50%' }}>
+                    <Box sx={{ width: '40%' }}>
                         <CustomTextField
                             name="filter"
                             label="Informe um detalhe da organização"
@@ -219,10 +219,10 @@ const Organization: React.FC = () => {
                             hoverColor="info"
                         />
                     </Box>
-                    <Box sx={{ width: '15%' }}>
+                    <Box sx={{ width: '25%' }}>
                         <CustomComboBox
                             name="organization-type"
-                            label="Tipo"
+                            label="Tipo da organização"
                             value={selectedOrganizationType}
                             onChange={handleChangeOrganizationType}
                             options={organizationsTypeOptions}

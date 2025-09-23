@@ -164,8 +164,10 @@ const OpenOrganization: React.FC = () => {
     };
 
     return (
-        <Box sx={{
-            p: 3, background: theme.palette.background.paper, height: '100%',
+        <Box 
+        paddingX={3}
+        sx={{
+            background: theme.palette.background.paper, height: '100%',
             maxHeight: 'calc(100vh - 50px)',
             overflowY: 'auto',
             '&::-webkit-scrollbar': {
@@ -199,7 +201,7 @@ const OpenOrganization: React.FC = () => {
                     sx={{ width: '55%' }}>
                     <CustomTextField
                         name="filter"
-                        label="Informe um detalhe"
+                        label="Informe um detalhe do documento"
                         type="text"
                         value={filter}
                         onChange={(e) => setFilter(e.target.value)}
@@ -308,7 +310,7 @@ const OpenOrganization: React.FC = () => {
                     <Box sx={{ width: '100%' }}>
                         <CustomComboBox
                             name="user-invite"
-                            label="Tipo"
+                            label="Aceito?"
                             value={selectedUserInvite}
                             onChange={handleChangeUserInvite}
                             options={userInviteAcceptedOptions}

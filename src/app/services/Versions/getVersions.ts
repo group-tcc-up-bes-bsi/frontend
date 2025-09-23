@@ -1,297 +1,91 @@
+import { DocumentObj } from "@/app/models/DocumentObj";
+import { MessageObj } from "@/app/models/MessageObj";
+import { UserObj } from "@/app/models/UserObj";
 import { VersionObj } from "@/app/models/VersionObj";
-import { getDocuments } from "../Documents/DocumentsServices";
+import { getErrorTitle } from "../ErrorTitle";
+import { getOrganizationUsers } from "../Organizations/organizationsServices";
 
-export function getVersions(): VersionObj[] {
-  const documents = getDocuments();
+export async function getVersionsByDocument(
+  userCurrent: UserObj,
+  doc: DocumentObj
+): Promise<{ message: MessageObj; versions: VersionObj[] }> {
+  const url = `${process.env.NEXT_PUBLIC_BACKEND}/document-versions/document/${doc.documentId}`;
 
-  return [
-    {
-      documentVersionId: 1,
-      versionName: "v1.0",
-      versionFilePath: "/files/document_v1.pdf",
-      createdAt: new Date("2023-10-15"),
-      document: documents[0],
-      user: {
-        userId: 2,
-        username: "User B",
-        jwtToken: "mock-token-b",
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userCurrent?.jwtToken}`,
       },
-    },
-    {
-      documentVersionId: 2,
-      versionName: "v1.1",
-      versionFilePath: "/files/document_v1.1.pdf",
-      createdAt: new Date("2023-10-20"),
-      document: documents[0],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 3,
-      versionName: "v2.0",
-      versionFilePath: "/files/spreadsheet_v2.xlsx",
-      createdAt: new Date("2023-11-01"),
-      document: documents[1],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 4,
-      versionName: "v1.0",
-      versionFilePath: "/files/presentation_v1.pptx",
-      createdAt: new Date("2023-09-05"),
-      document: documents[2],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 5,
-      versionName: "v1.0",
-      versionFilePath: "/files/document_v1.pdf",
-      createdAt: new Date("2023-10-15"),
-      document: documents[0],
-      user: {
-        userId: 2,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 6,
-      versionName: "v1.1",
-      versionFilePath: "/files/document_v1.1.pdf",
-      createdAt: new Date("2023-10-20"),
-      document: documents[0],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 7,
-      versionName: "v2.0",
-      versionFilePath: "/files/spreadsheet_v2.xlsx",
-      createdAt: new Date("2023-11-01"),
-      document: documents[1],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 8,
-      versionName: "v1.0",
-      versionFilePath: "/files/presentation_v1.pptx",
-      createdAt: new Date("2023-09-05"),
-      document: documents[2],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 9,
-      versionName: "v1.0",
-      versionFilePath: "/files/document_v1.pdf",
-      createdAt: new Date("2023-10-15"),
-      document: documents[0],
-      user: {
-        userId: 2,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 10,
-      versionName: "v1.1",
-      versionFilePath: "/files/document_v1.1.pdf",
-      createdAt: new Date("2023-10-20"),
-      document: documents[0],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 11,
-      versionName: "v2.0",
-      versionFilePath: "/files/spreadsheet_v2.xlsx",
-      createdAt: new Date("2023-11-01"),
-      document: documents[1],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 12,
-      versionName: "v1.0",
-      versionFilePath: "/files/presentation_v1.pptx",
-      createdAt: new Date("2023-09-05"),
-      document: documents[2],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 13,
-      versionName: "v1.0",
-      versionFilePath: "/files/document_v1.pdf",
-      createdAt: new Date("2023-10-15"),
-      document: documents[0],
-      user: {
-        userId: 2,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 14,
-      versionName: "v1.1",
-      versionFilePath: "/files/document_v1.1.pdf",
-      createdAt: new Date("2023-10-20"),
-      document: documents[0],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 15,
-      versionName: "v2.0",
-      versionFilePath: "/files/spreadsheet_v2.xlsx",
-      createdAt: new Date("2023-11-01"),
-      document: documents[1],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 16,
-      versionName: "v1.0",
-      versionFilePath: "/files/presentation_v1.pptx",
-      createdAt: new Date("2023-09-05"),
-      document: documents[2],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 17,
-      versionName: "v1.0",
-      versionFilePath: "/files/document_v1.pdf",
-      createdAt: new Date("2023-10-15"),
-      document: documents[0],
-      user: {
-        userId: 2,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 18,
-      versionName: "v1.1",
-      versionFilePath: "/files/document_v1.1.pdf",
-      createdAt: new Date("2023-10-20"),
-      document: documents[0],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 19,
-      versionName: "v2.0",
-      versionFilePath: "/files/spreadsheet_v2.xlsx",
-      createdAt: new Date("2023-11-01"),
-      document: documents[1],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 20,
-      versionName: "v1.0",
-      versionFilePath: "/files/presentation_v1.pptx",
-      createdAt: new Date("2023-09-05"),
-      document: documents[2],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 21,
-      versionName: "v1.0",
-      versionFilePath: "/files/document_v1.pdf",
-      createdAt: new Date("2023-10-15"),
-      document: documents[0],
-      user: {
-        userId: 2,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 22,
-      versionName: "v1.1",
-      versionFilePath: "/files/document_v1.1.pdf",
-      createdAt: new Date("2023-10-20"),
-      document: documents[0],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 23,
-      versionName: "v2.0",
-      versionFilePath: "/files/spreadsheet_v2.xlsx",
-      createdAt: new Date("2023-11-01"),
-      document: documents[1],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-    {
-      documentVersionId: 24,
-      versionName: "v1.0",
-      versionFilePath: "/files/presentation_v1.pptx",
-      createdAt: new Date("2023-09-05"),
-      document: documents[2],
-      user: {
-        userId: 1,
-        username: "User B",
-        jwtToken: "mock-token-b",
-      },
-    },
-  ];
+    });
+
+    const responseData = await response.json().catch(() => null);
+    if (
+      !responseData ||
+      !Array.isArray(responseData) ||
+      responseData.length === 0
+    ) {
+      return {
+        message: new MessageObj(
+          "error",
+          getErrorTitle(responseData?.statusCode || 404),
+          "Nenhuma versão encontrada",
+          "error"
+        ),
+        versions: [],
+      };
+    }
+
+    let versions: VersionObj[];
+
+    const orgUsersResponse = await getOrganizationUsers(
+      doc.organization.organizationId,
+      userCurrent
+    );
+
+    const myUser = orgUsersResponse.users.find(
+      (user) => user.username === userCurrent.username
+    );
+    if (myUser?.inviteAccepted !== false) {
+      versions = responseData.map((item) => ({
+        documentVersionId: item.documentVersionId,
+        name: item.name,
+        filePath: item.filePath,
+        createdAt: new Date(item.createdAt),
+        document: doc,
+        user: userCurrent
+      }));
+      return {
+        message: new MessageObj(
+          "success",
+          "Versões carregadas",
+          "Versões carregadas com sucesso",
+          "success"
+        ),
+        versions,
+      };
+    }
+
+    return {
+      message: new MessageObj(
+        "error",
+        "Não encontrado",
+        "Nenhuma documento encontrado",
+        "error"
+      ),
+      versions: [],
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      message: new MessageObj(
+        "error",
+        getErrorTitle(500),
+        "Erro: Servidor inoperante",
+        "error"
+      ),
+      versions: [],
+    };
+  }
 }

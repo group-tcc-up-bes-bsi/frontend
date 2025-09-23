@@ -12,7 +12,10 @@ export async function getDocuments(
   theme: Theme
 ): Promise<{ message: MessageObj; documents: DocumentObj[] }> {
   try {
-    const { message: orgMessage, organizations } = await getMyOrganizations(userCurrent, theme);
+    const { message: orgMessage, organizations } = await getMyOrganizations(
+      userCurrent,
+      theme
+    );
 
     if (!organizations || organizations.length === 0) {
       return {
@@ -117,5 +120,10 @@ export function getDocumentsTrash(): DocumentObj[] {
         icon: undefined,
       },
     },
-  ]
+  ];
+}
+
+export function countDocuments(documents: DocumentObj[]): number {
+  if (!documents || documents.length === 0) return 0;
+  return documents.length;
 }

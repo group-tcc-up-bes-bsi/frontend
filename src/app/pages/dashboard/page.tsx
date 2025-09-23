@@ -111,6 +111,16 @@ const Dashboard = () => {
                 break;
             case 'Settings':
                 setOptionMenu("Configurações");
+                const orgNullSettings: OrganizationObj = {
+                    organizationId: 0,
+                    name: '',
+                    description: '',
+                    favorite: false,
+                    organizationType: undefined,
+                    borderColor: undefined,
+                    icon: undefined
+                };
+                alterOrganization(orgNullSettings);
                 break;
             case 'Open Document':
                 setOptionMenu("Documento: " + document?.name);

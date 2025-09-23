@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import {
     Box,
+    CircularProgress,
     IconButton,
     Menu,
     MenuItem,
@@ -13,7 +14,6 @@ import { VersionObj } from '@/app/models/VersionObj';
 import { useFilterStore } from '@/app/state/filterState';
 import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
 import { formatDate, organizationType } from '@/app/services/ConstantsTypes';
-import { getVersions } from '@/app/services/Versions/getVersions';
 import CustomTypography from '../customTypography';
 import MsgConfirm from '../notification/msgConfirm';
 import { useVersionFormStore } from '@/app/state/versionFormState';
@@ -26,6 +26,8 @@ import { getOrganizationUsers } from '@/app/services/Organizations/organizations
 import { useOrganizationStore } from '@/app/state/organizationState';
 import CustomAlert from '../customAlert';
 import { MessageObj } from '@/app/models/MessageObj';
+import { getVersionsByDocument } from '@/app/services/Versions/getVersions';
+import { useDocumentStore } from '@/app/state/documentState';
 
 const Versions: React.FC = () => {
     useAuth();
@@ -45,8 +47,27 @@ const Versions: React.FC = () => {
         new MessageObj('info', 'Tela das Versões', '', 'info')
     );
     const [showMessage, setShowMessage] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [allVersions, setVersions] = useState<VersionObj[]>([]);
+    const document = useDocumentStore((state) => state.document);
 
-    const allVersions = getVersions();
+    useEffect(() => {
+        if (userCurrent != undefined) {
+            (async () => {
+                setLoading(true);
+                try {
+                    if (document) {
+                        const result = await getVersionsByDocument(userCurrent, document);
+                        setVersions(result.versions);
+                    }
+
+                } finally {
+                    setLoading(false);
+                }
+            })();
+        }
+    }, [userCurrent, theme, versionForm]);
+
     const filteredVersions = useMemo(() => {
         let version = [...allVersions];
 
@@ -54,8 +75,8 @@ const Versions: React.FC = () => {
             const searchTerm = filter.toLowerCase().trim();
 
             version = version.filter((version) =>
-                version.versionName.toLowerCase().includes(searchTerm) ||
-                version.versionFilePath.toLowerCase().includes(searchTerm) ||
+                version.name.toLowerCase().includes(searchTerm) ||
+                version.filePath.toLowerCase().includes(searchTerm) ||
                 formatDate(version.createdAt).toLowerCase().includes(searchTerm) ||
                 version.document.name.toLowerCase().includes(searchTerm)
             );
@@ -71,7 +92,7 @@ const Versions: React.FC = () => {
     }, [message]);
 
     const toggleConfirm = (version: VersionObj) => {
-        alterMsgConfirm(`Excluir a versão ${version.versionName}?`);
+        alterMsgConfirm(`Excluir a versão ${version.name}?`);
         alterConfirm(!openConfirm);
     }
 
@@ -120,8 +141,8 @@ const Versions: React.FC = () => {
                             ) {
                                 const version: VersionObj = {
                                     documentVersionId: 0,
-                                    versionName: "",
-                                    versionFilePath: "",
+                                    name: "",
+                                    filePath: "",
                                     createdAt: new Date(),
                                     document: {
                                         documentId: 0,
@@ -235,7 +256,11 @@ const Versions: React.FC = () => {
                 }}
             >
 
-                {filteredVersions.length === 0 ? (
+                {loading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+                        <CircularProgress color="primary" />
+                    </Box>
+                ) : filteredVersions.length === 0 ? (
                     <CustomTypography
                         text='Nenhuma versão encontrada para o filtro informado'
                         component="h6"
@@ -257,7 +282,7 @@ const Versions: React.FC = () => {
                         }}
                     >
                         <Box fontWeight="bold" fontSize="0.9rem">
-                            Versão: {version.versionName}
+                            Versão: {version.name}
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', }}>

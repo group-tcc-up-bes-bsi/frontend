@@ -14,7 +14,7 @@ const VersionForm: React.FC = () => {
     const { theme } = useTheme();
     const alterVersionForm = useVersionFormStore((state) => state.alter);
     const version = useVersionStore((state) => state.version);
-    const [versionName, setVersionName] = useState(version?.versionName || '');
+    const [versionName, setVersionName] = useState(version?.name || '');
     const [file, setFile] = useState<File | null>(null);
     const [previewOpen, setPreviewOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
