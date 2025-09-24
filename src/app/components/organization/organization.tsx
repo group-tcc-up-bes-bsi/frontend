@@ -43,7 +43,6 @@ const Organization: React.FC = () => {
         new MessageObj('info', 'Tela das Organizações', '', 'info')
     );
     const [showMessage, setShowMessage] = useState(false);
-    const alterOrg = useOrganizationStore((state) => state.alter);
     const alterOption = useOptionsDashboardStore((state) => state.alter);
     const [selectedFavorite, setSelectedFavorite] = useState('');
 
@@ -179,7 +178,7 @@ const Organization: React.FC = () => {
 
     const handleOpen = (organization: OrganizationObj) => {
         alterOption('Open Organization');
-        alterOrg(organization);
+        alterOrganization(organization);
         setAnchorEl(null);
     };
 

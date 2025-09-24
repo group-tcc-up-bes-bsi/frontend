@@ -14,7 +14,7 @@ import { useDocumentFormStore } from '@/app/state/documentFormState';
 import DocumentForm from '../documents/documentForm';
 import { useDocumentStore } from '@/app/state/documentState';
 import { DocumentObj } from '@/app/models/DocumentObj';
-import { getUserTypeLabel, organizationType, userInviteAcceptedOptions } from '@/app/services/ConstantsTypes';
+import { getUserTypeLabel, userInviteAcceptedOptions } from '@/app/services/ConstantsTypes';
 import TableDocuments from '../tableDocuments';
 import { useOrganizationStore } from '@/app/state/organizationState';
 import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
@@ -99,11 +99,11 @@ const OpenOrganization: React.FC = () => {
                                     version: '',
                                     creator: '',
                                     organization: {
-                                        organizationId: 0,
-                                        name: '',
-                                        description: '',
-                                        favorite: false,
-                                        organizationType: organizationType.INDIVIDUAL,
+                                        organizationId: organization.organizationId,
+                                        name: organization.name,
+                                        description: organization.description,
+                                        favorite: organization.favorite,
+                                        organizationType: organization.organizationType,
                                         borderColor: undefined,
                                         icon: undefined,
                                     },
@@ -164,23 +164,23 @@ const OpenOrganization: React.FC = () => {
     };
 
     return (
-        <Box 
-        paddingX={3}
-        sx={{
-            background: theme.palette.background.paper, height: '100%',
-            maxHeight: 'calc(100vh - 50px)',
-            overflowY: 'auto',
-            '&::-webkit-scrollbar': {
-                width: '6px',
-            },
-            '&::-webkit-scrollbar-track': {
-                background: theme.palette.background.default,
-            },
-            '&::-webkit-scrollbar-thumb': {
-                backgroundColor: theme.palette.primary.main,
-                borderRadius: '3px',
-            }
-        }}>
+        <Box
+            paddingX={3}
+            sx={{
+                background: theme.palette.background.paper, height: '100%',
+                maxHeight: 'calc(100vh - 50px)',
+                overflowY: 'auto',
+                '&::-webkit-scrollbar': {
+                    width: '6px',
+                },
+                '&::-webkit-scrollbar-track': {
+                    background: theme.palette.background.default,
+                },
+                '&::-webkit-scrollbar-thumb': {
+                    backgroundColor: theme.palette.primary.main,
+                    borderRadius: '3px',
+                }
+            }}>
             <Box sx={{
                 display: 'flex',
                 gap: 4,
@@ -388,29 +388,44 @@ const OpenOrganization: React.FC = () => {
                     <Typography variant="h6" gutterBottom>
                         Documentos por Tipo
                     </Typography>
-                    <PieChart
-                        sx={{
-                            border: '1px dashed',
-                            borderColor: theme.palette.text.primary,
-                            paddingX: 40,
-                        }}
-                        series={[
-                            {
+                    {pieDataDoc.length > 0 ? (
+                        <PieChart
+                            sx={{
+                                border: '1px dashed',
+                                borderColor: theme.palette.text.primary,
+                                paddingX: 40,
+                            }}
+                            series={[{
                                 data: pieDataDoc,
                                 highlightScope: { fade: "global", highlight: "item" },
                                 innerRadius: 0,
                                 outerRadius: 200,
                                 paddingAngle: 0,
-                            },
-                        ]}
-                        height={500}
-                        margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
-                        colors={[
-                            "#8e24aa", "#039be5", "#fbc02d", "#fb8c00", "#d84315", "#6d4c41", "#757575",
-                            "#c62828", "#ad1457", "#4527a0", "#283593", "#0277bd", "#00838f", "#2e7d32",
-                            "#f9a825", "#ff7043", "#5d4037", "#616161", "#b71c1c", "#880e4f", "#1a237e",
-                        ]}
-                    />
+                            }]}
+                            height={500}
+                            margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
+                            colors={[
+                                "#8e24aa", "#039be5", "#fbc02d", "#fb8c00", "#d84315", "#6d4c41", "#757575",
+                                "#c62828", "#ad1457", "#4527a0", "#283593", "#0277bd", "#00838f", "#2e7d32",
+                                "#f9a825", "#ff7043", "#5d4037", "#616161", "#b71c1c", "#880e4f", "#1a237e",
+                            ]}
+                        />
+                    ) : (
+                        <Box
+                            sx={{
+                                height: 500,
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                border: '1px dashed',
+                                borderColor: theme.palette.text.primary,
+                            }}
+                        >
+                            <Typography variant="body1" sx={{ color: theme.palette.text.primary }}>
+                                Sem documentos para a organização selecionada
+                            </Typography>
+                        </Box>
+                    )}
                 </Box>
 
                 <Box sx={{ flex: 1 }}>

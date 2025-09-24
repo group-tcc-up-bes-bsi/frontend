@@ -78,11 +78,11 @@ const Versions: React.FC = () => {
             version = version.filter((version) =>
                 version.name.toLowerCase().includes(searchTerm) ||
                 version.filePath.toLowerCase().includes(searchTerm) ||
-                formatDate(version.createdAt).toLowerCase().includes(searchTerm) ||
+                formatDate(version.creationDate).toLowerCase().includes(searchTerm) ||
                 version.document.name.toLowerCase().includes(searchTerm)
             );
         }
-        return version.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        return version.sort((a, b) => b.creationDate.getTime() - a.creationDate.getTime());
     }, [allVersions, filter]);
 
     useEffect(() => {
@@ -139,7 +139,7 @@ const Versions: React.FC = () => {
                                     documentVersionId: 0,
                                     name: "",
                                     filePath: "",
-                                    createdAt: new Date(),
+                                    creationDate: new Date(),
                                     document: {
                                         documentId: 0,
                                         name: "",
@@ -367,7 +367,7 @@ const Versions: React.FC = () => {
                         </Box>
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                             <Box fontSize="0.75rem" mt={1} sx={{ color: theme.palette.text.primary }}>
-                                Criado em {formatDate(version.createdAt)}
+                                Criado em {formatDate(version.creationDate)}
                             </Box>
                         </Box>
                     </Box>

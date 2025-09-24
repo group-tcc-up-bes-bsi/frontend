@@ -52,7 +52,7 @@ export async function getVersionsByDocument(
         documentVersionId: item.documentVersionId,
         name: item.name,
         filePath: item.filePath,
-        createdAt: new Date(item.createdAt),
+        creationDate: new Date(item.creationDate),
         document: doc,
         user: userCurrent
       }));

@@ -5,7 +5,7 @@ export interface VersionObj {
   documentVersionId: number;
   name: string;
   filePath: string;
-  createdAt: Date;
+  creationDate: Date;
   document: DocumentObj;
   user: UserObj;
 }
