@@ -1,13 +1,13 @@
-import { DocumentObj } from "@/app/models/DocumentObj";
 import { MessageObj } from "@/app/models/MessageObj";
 import { UserObj } from "@/app/models/UserObj";
+import { VersionObj } from "@/app/models/VersionObj";
 
 export async function updateVersion(
   userCurrent: UserObj,
-  doc: DocumentObj,
+  version: VersionObj,
   Name: string,
 ): Promise<MessageObj> {
-  const url = `${process.env.NEXT_PUBLIC_BACKEND}/document-versions/${doc.documentId}`;
+  const url = `${process.env.NEXT_PUBLIC_BACKEND}/document-versions/${version.documentVersionId}`;
 
   const versionData = {
     name: Name,

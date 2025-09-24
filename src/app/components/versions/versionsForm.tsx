@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Backdrop } from '@mui/material';
+import { Box, Backdrop, IconButton } from '@mui/material';
 import CustomTextField from '../customTextField';
 import CustomButton from '../customButton';
 import CustomTypography from '../customTypography';
@@ -14,6 +14,8 @@ import { useUserStore } from '@/app/state/userState';
 import { useDocumentStore } from '@/app/state/documentState';
 import { createVersion } from '@/app/services/Versions/createVersion';
 import { updateVersion } from '@/app/services/Versions/updateVersion';
+import { downloadVersion } from '@/app/services/Versions/downloadVersion';
+import { Download } from '@mui/icons-material';
 
 const VersionForm: React.FC = () => {
     useAuth();
@@ -29,7 +31,7 @@ const VersionForm: React.FC = () => {
         new MessageObj()
     );
     const [showMessage, setShowMessage] = useState(false);
-    const document = useDocumentStore((state) => state.document);
+    const doc = useDocumentStore((state) => state.document);
 
     useEffect(() => {
         if (message) {
@@ -45,6 +47,9 @@ const VersionForm: React.FC = () => {
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
             const selectedFile = event.target.files[0];
+            if(versionName.trim() === ""){
+                setVersionName(selectedFile.name);
+            }
             setFile(selectedFile);
         }
     };
@@ -59,8 +64,8 @@ const VersionForm: React.FC = () => {
             return;
         }
         try {
-            if (userCurrent && document) {
-                const result = await createVersion(userCurrent, document, versionName, file);
+            if (userCurrent && doc) {
+                const result = await createVersion(userCurrent, doc, versionName, file);
                 setMessage(result);
                 if (result.severity === "success") {
                     alterVersionForm(false);
@@ -78,8 +83,8 @@ const VersionForm: React.FC = () => {
             return;
         }
         try {
-            if (userCurrent && document) {
-                const result = await updateVersion(userCurrent, document, versionName);
+            if (userCurrent && version) {
+                const result = await updateVersion(userCurrent, version, versionName);
                 setMessage(result);
                 if (result.severity === "success") {
                     alterVersionForm(false);
@@ -91,6 +96,35 @@ const VersionForm: React.FC = () => {
         }
     }
 
+    useEffect(() => {
+        const download = async () => {
+            if (userCurrent && version?.documentVersionId) {
+                const result = await downloadVersion(userCurrent, version.documentVersionId);
+                setMessage(result.message);
+                if (result.file) {
+                    setFile(result.file);
+                }
+            }
+        };
+        download();
+    }, [alterVersionForm]);
+
+    const handleDownloadVersion = () => {
+        if (!file) return;
+        if (!version) return;
+        const url = URL.createObjectURL(file);
+
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = file.name;
+        document.body.appendChild(link);
+        link.click();
+
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+    };
+
+
     return (
         <Box>
             <input
@@ -99,6 +133,7 @@ const VersionForm: React.FC = () => {
                 style={{ display: 'none' }}
                 onChange={handleFileChange}
             />
+
             <Backdrop
                 open={true}
                 onClick={() => alterVersionForm(false)}
@@ -108,98 +143,104 @@ const VersionForm: React.FC = () => {
                     backgroundColor: 'rgba(0, 0, 0, 0.5)',
                 }}
             />
+
             <Box
                 sx={{
                     zIndex: 200,
                     position: 'absolute',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    backgroundColor: theme.palette.background.default,
-                    width: '600px',
-                    maxWidth: '90%',
-                    borderRadius: '4px',
-                    boxShadow: 3,
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    p: 3
+                    width: '600px',
+                    maxWidth: '90%',
+                    borderRadius: 2,
+                    boxShadow: 3,
+                    backgroundColor: theme.palette.background.default,
+                    p: 3,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
                 }}
             >
-                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
-                    <CustomTypography
-                        text={version?.documentVersionId ? 'Editar Versão' : 'Criar Versão'}
-                        component="h2"
-                        variant="h6"
+                <CustomTypography
+                    text={version?.documentVersionId ? 'Editar Versão' : 'Criar Versão'}
+                    component="h2"
+                    variant="h6"
+                    sx={{
+                        color: theme.palette.text.primary,
+                        fontWeight: 'bold',
+                        borderBottom: `1px solid ${theme.palette.text.primary}`,
+                        pb: 1,
+                    }}
+                />
+
+                <CustomTextField
+                    name="VersionName"
+                    label="Nome da Versão"
+                    type="text"
+                    value={versionName}
+                    onChange={(e) => setVersionName(e.target.value)}
+                    focusedColor="primary"
+                    hoverColor="info"
+                    marginBottom={2}
+                />
+
+                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 2 }}>
+                    <CustomButton
+                        text="Pré-visualizar"
+                        type="button"
+                        colorType="secondary"
+                        onClick={() => setPreviewOpen(true)}
+                        hoverColorType="secondary"
+                        fullWidth={true}
+                        paddingY={1}
+                        disabled={!file}
+                    />
+
+                    <IconButton
+                        color="primary"
+                        onClick={handleDownloadVersion}
+                        disabled={!file}
                         sx={{
-                            color: theme.palette.text.primary,
-                            mb: 1,
-                            padding: 1,
-                            fontWeight: 'bold',
-                            width: '100%',
-                            borderBottom: `1px solid ${theme.palette.text.primary}`,
+                            width: 48,
+                            height: 48,
+                            borderRadius: '50%',
+                            p: 0,
                         }}
-                    />
+                    >
+                        <Download sx={{ fontSize: 38 }} />
+                    </IconButton>
                 </Box>
 
-                <Box sx={{ width: '100%', display: 'flex', gap: 4, marginTop: 2 }}>
-                    <CustomTextField
-                        name="VersionName"
-                        label="Nome da Versão"
-                        type="text"
-                        value={versionName}
-                        onChange={(e) => setVersionName(e.target.value)}
-                        focusedColor="primary"
-                        hoverColor="info"
-                        marginBottom={2}
-                    />
-                </Box>
-
-                <Box sx={{ display: 'flex', justifyContent: 'end', gap: 4, marginTop: 2 }}>
-                    {file && (
-                        <CustomButton
-                            text={"Pré-visualizar"}
-                            type="button"
-                            colorType="secondary"
-                            onClick={() => setPreviewOpen(true)}
-                            hoverColorType="secondary"
-                            fullWidth={false}
-                            paddingY={1}
-                            paddingX={3.0}
-                            marginBottom={2}
-                            marginTop={2}
-                        />
-                    )}
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
                     <CustomButton
-                        text={"Anexar Documento"}
+                        text="Anexar Documento"
                         type="button"
                         colorType="primary"
-                        onClick={() => { handleAttachFile() }}
+                        onClick={handleAttachFile}
                         hoverColorType="primary"
-                        fullWidth={false}
-                        disabled={version?.documentVersionId ? true : false}
+                        fullWidth={true}
+                        disabled={!!version?.documentVersionId}
                         paddingY={1}
-                        paddingX={3.0}
-                        marginBottom={2}
-                        marginTop={2}
+                        paddingX={3}
                     />
+
                     <CustomButton
-                        text={version?.documentVersionId ? "Atualizar" : "Salvar"}
+                        text={version?.documentVersionId ? 'Atualizar' : 'Salvar'}
                         type="button"
                         colorType="primary"
-                        onClick={version?.documentVersionId ? () => { handleUpdateVersion() } : () => { handleCreateVersion() }}
+                        onClick={
+                            version?.documentVersionId ? handleUpdateVersion : handleCreateVersion
+                        }
                         hoverColorType="primary"
                         fullWidth={false}
                         paddingY={1}
-                        paddingX={3.0}
-                        marginBottom={2}
-                        marginTop={2}
+                        paddingX={3}
                     />
                 </Box>
             </Box>
 
-            {previewOpen && file && (
-                <PreviewVersion file={file} onClose={() => setPreviewOpen(false)} />
-            )}
+            {previewOpen && file && <PreviewVersion file={file} onClose={() => setPreviewOpen(false)} />}
             {showMessage && message && (
                 <Box
                     sx={{
@@ -211,8 +252,6 @@ const VersionForm: React.FC = () => {
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        gap: 2,
-                        textAlign: 'left',
                     }}
                 >
                     <CustomAlert
