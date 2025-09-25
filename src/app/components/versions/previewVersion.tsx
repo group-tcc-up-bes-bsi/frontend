@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Box, Modal, Typography, useTheme } from "@mui/material";
 import { Close } from "@mui/icons-material";
+import { useAuth } from "../useAuth";
 
 interface PreviewDocumentProps {
   file: File;
@@ -10,6 +11,7 @@ interface PreviewDocumentProps {
 const PreviewVersion: React.FC<PreviewDocumentProps> = ({ file, onClose }) => {
   const [url, setUrl] = useState("");
   const theme = useTheme();
+  useAuth();
 
   useEffect(() => {
     const objectUrl = URL.createObjectURL(file);

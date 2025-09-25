@@ -47,7 +47,7 @@ const VersionForm: React.FC = () => {
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files.length > 0) {
             const selectedFile = event.target.files[0];
-            if(versionName.trim() === ""){
+            if (versionName.trim() === "") {
                 setVersionName(selectedFile.name);
             }
             setFile(selectedFile);
@@ -61,6 +61,10 @@ const VersionForm: React.FC = () => {
         }
         if (versionName.trim() === "") {
             setMessage(new MessageObj("error", "Erro", "Por favor, insira um nome para a versão.", "error"));
+            return;
+        }
+        if (versionName.includes(" ")) {
+            setMessage(new MessageObj("error", "Erro", "O nome da versão não pode conter espaços.", "error"));
             return;
         }
         try {
@@ -80,6 +84,10 @@ const VersionForm: React.FC = () => {
     const handleUpdateVersion = async () => {
         if (versionName.trim() === "") {
             setMessage(new MessageObj("error", "Erro", "Por favor, insira um nome para a versão.", "error"));
+            return;
+        }
+        if (versionName.trim().length !== versionName.length) {
+            setMessage(new MessageObj("error", "Erro", "O nome da versão não pode conter espaços.", "error"));
             return;
         }
         try {

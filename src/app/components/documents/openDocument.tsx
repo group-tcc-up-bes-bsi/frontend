@@ -97,7 +97,7 @@ const OpenDocument: React.FC = () => {
         padding: 5 }}>
         <Box sx={{ flex: 1 }}>
           <Typography variant="h6" gutterBottom sx={{ mb: 7 }}>
-            Alterações por usuário
+            Versões por usuário
           </Typography>
           <PieChart
             sx={{
@@ -126,7 +126,7 @@ const OpenDocument: React.FC = () => {
 
         <Box sx={{ flex: 1 }}>
           <Typography variant="h6" gutterBottom>
-            Alterações por mês
+            Versões por mês
           </Typography>
           <MonthsSelector
             monthsCount={monthsCount}
