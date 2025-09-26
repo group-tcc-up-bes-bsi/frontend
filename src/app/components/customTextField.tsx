@@ -116,7 +116,21 @@ const CustomTextField = ({
             backgroundColor: theme.palette.primary.main,
             borderRadius: '3px',
           },
+
+          '& input': {
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'clip',
+            display: 'inline-block',
+            animation: value.length > 20 ? 'marquee 8s linear infinite' : 'none',
+          },
         },
+
+        '@keyframes marquee': {
+          '0%': { transform: 'translateX(0%)' },
+          '100%': { transform: 'translateX(-100%)' },
+        },
+
         mb: marginBottom,
         mt: marginTop,
         ...props.sx

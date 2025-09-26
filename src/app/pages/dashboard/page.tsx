@@ -172,13 +172,31 @@ const Dashboard = () => {
                         <Menu />
                     </IconButton>
 
-                    <CustomTypography
-                        text="DD"
-                        component="h5"
-                        variant='h5'
-                        className="font-bold"
-                        sx={{ color: theme.palette.text.primary }}
-                    />
+                    <Box
+                        sx={{
+                            maxWidth: "200px",
+                            overflow: "hidden",
+                            whiteSpace: "nowrap",
+                            position: "relative",
+                        }}
+                    >
+                        <CustomTypography
+                            text={optionMenu}
+                            component="h5"
+                            variant="h5"
+                            className="font-bold"
+                            sx={{
+                                color: theme.palette.text.primary,
+                                display: "inline-block",
+                                whiteSpace: "nowrap",
+                                animation: optionMenu.length > 20 ? "marquee 8s linear infinite" : "none",
+                                "@keyframes marquee": {
+                                    "0%": { transform: "translateX(100%)" },
+                                    "100%": { transform: "translateX(-100%)" },
+                                },
+                            }}
+                        />
+                    </Box>
                 </Box>
 
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
