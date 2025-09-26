@@ -149,7 +149,6 @@ const Dashboard = () => {
         }}>
             <CssBaseline />
 
-            {/* Header - Mobile */}
             <Box
                 className="flex items-center justify-between w-full"
                 sx={{
@@ -165,19 +164,16 @@ const Dashboard = () => {
                     display: { xs: 'flex', md: 'none' }
                 }}
             >
-                {/* Logo e Título para Mobile */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                    <Box
-                        component="img"
-                        src="/logo.png"
-                        alt="logo marca"
-                        sx={{
-                            height: 40,
-                            width: 40,
-                        }}
-                    />
+                    <IconButton
+                        onClick={toggleDrawer}
+                        sx={{ color: theme.palette.text.primary }}
+                    >
+                        <Menu />
+                    </IconButton>
+
                     <CustomTypography
-                        text="DocDash"
+                        text="DD"
                         component="h5"
                         variant='h5'
                         className="font-bold"
@@ -185,7 +181,6 @@ const Dashboard = () => {
                     />
                 </Box>
 
-                {/* Ícones do Header para Mobile */}
                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                     <Box className="relative flex flex-col items-center">
                         <Badge
@@ -208,17 +203,9 @@ const Dashboard = () => {
 
                     <LogoutIcon onClick={logoutUser} sx={{ color: theme.palette.text.primary }} />
 
-                    {/* Botão do Menu Hamburger para Mobile */}
-                    <IconButton
-                        onClick={toggleDrawer}
-                        sx={{ color: theme.palette.text.primary }}
-                    >
-                        <Menu />
-                    </IconButton>
                 </Box>
             </Box>
 
-            {/* Header - Desktop (mantém o original) */}
             <Box
                 className="fixed top-0 left-0 right-0 z-10 h-16 flex items-center"
                 sx={{
@@ -261,7 +248,6 @@ const Dashboard = () => {
                 </Box>
             </Box>
 
-            {/* Drawer para Desktop */}
             <Drawer
                 variant={isMobile ? "temporary" : "permanent"}
                 open={isMobile ? open : true}
@@ -384,7 +370,6 @@ const Dashboard = () => {
                 </List>
             </Drawer>
 
-            {/* Drawer Mobile */}
             <Drawer
                 variant="temporary"
                 open={isMobile && open}
@@ -398,7 +383,7 @@ const Dashboard = () => {
                     },
                 }}
             >
-                <Box sx={{ height: '64px' }} /> {/* Espaço para o header fixo */}
+                <Box sx={{ height: '64px' }} />
                 <List>
                     {[
                         { optionText: 'Home', text: 'Inicio', icon: <Home sx={{ color: theme.palette.text.primary }} /> },
@@ -436,7 +421,6 @@ const Dashboard = () => {
                 </List>
             </Drawer>
 
-            {/* Conteúdo Principal */}
             <Box
                 component="main"
                 sx={{
@@ -459,7 +443,6 @@ const Dashboard = () => {
                 {option === "Open Document" && <OpenDocument />}
             </Box>
 
-            {/* Backdrop para Mobile */}
             <Backdrop
                 sx={{
                     color: "#fff",

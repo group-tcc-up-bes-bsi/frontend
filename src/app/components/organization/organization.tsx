@@ -374,7 +374,6 @@ const Organization: React.FC = () => {
                                             </Menu>
                                         </Box>
 
-                                        {/* Description */}
                                         <Typography
                                             variant="body2"
                                             sx={{ color: theme.palette.text.secondary, whiteSpace: "pre-line" }}
