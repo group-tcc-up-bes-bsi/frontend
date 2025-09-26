@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useState } from 'react';
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box, Backdrop, Badge } from '@mui/material';
-import { Settings, Star, Folder, Groups, Home, Delete } from '@mui/icons-material';
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Divider, Box, Backdrop, Badge, useMediaQuery, IconButton, CssBaseline } from '@mui/material';
+import { Settings, Star, Folder, Groups, Home, Delete, Menu } from '@mui/icons-material';
 import { useTheme } from '@/app/theme/ThemeContext';
 import CustomTypography from '@/app/components/customTypography';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -43,6 +43,7 @@ const Dashboard = () => {
     const userCurrent = useUserStore((state) => state.userCurrent);
     const [invites, setInvites] = useState(0);
     const alterOrganization = useOrganizationStore((state) => state.alter);
+    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
     const loadInvitesCount = async () => {
         if (!userCurrent) return;
@@ -61,12 +62,6 @@ const Dashboard = () => {
 
     const toggleDrawer = () => {
         setOpen(!open);
-    };
-
-    const toggleDrawerMain = () => {
-        if (open) {
-            setOpen(!open);
-        }
     };
 
     const optionMenuChoice = () => {
@@ -145,13 +140,91 @@ const Dashboard = () => {
     }
 
     return (
-        <Box className="flex h-screen"
-            sx={{ backgroundColor: theme.palette.background.paper }}>
+        <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100vh',
+            width: '100%',
+            backgroundColor: theme.palette.background.paper
+        }}>
+            <CssBaseline />
+
+            {/* Header - Mobile */}
+            <Box
+                className="flex items-center justify-between w-full"
+                sx={{
+                    height: '64px',
+                    backgroundColor: theme.palette.background.default,
+                    transition: 'all 0.3s ease',
+                    padding: 2,
+                    position: 'fixed',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    zIndex: 1300,
+                    display: { xs: 'flex', md: 'none' }
+                }}
+            >
+                {/* Logo e Título para Mobile */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <Box
+                        component="img"
+                        src="/logo.png"
+                        alt="logo marca"
+                        sx={{
+                            height: 40,
+                            width: 40,
+                        }}
+                    />
+                    <CustomTypography
+                        text="DocDash"
+                        component="h5"
+                        variant='h5'
+                        className="font-bold"
+                        sx={{ color: theme.palette.text.primary }}
+                    />
+                </Box>
+
+                {/* Ícones do Header para Mobile */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                    <Box className="relative flex flex-col items-center">
+                        <Badge
+                            badgeContent={invites > 0 ? invites : null}
+                            color="info"
+                            overlap="circular"
+                        >
+                            <NotificationsIcon
+                                onClick={toggleNotification}
+                                sx={{ color: theme.palette.text.primary, cursor: 'pointer' }}
+                            />
+                        </Badge>
+                    </Box>
+
+                    {isDarkMode ? (
+                        <LightModeIcon onClick={toggleTheme} sx={{ color: theme.palette.text.primary }} />
+                    ) : (
+                        <DarkModeIcon onClick={toggleTheme} sx={{ color: theme.palette.text.primary }} />
+                    )}
+
+                    <LogoutIcon onClick={logoutUser} sx={{ color: theme.palette.text.primary }} />
+
+                    {/* Botão do Menu Hamburger para Mobile */}
+                    <IconButton
+                        onClick={toggleDrawer}
+                        sx={{ color: theme.palette.text.primary }}
+                    >
+                        <Menu />
+                    </IconButton>
+                </Box>
+            </Box>
+
+            {/* Header - Desktop (mantém o original) */}
             <Box
                 className="fixed top-0 left-0 right-0 z-10 h-16 flex items-center"
                 sx={{
                     backgroundColor: theme.palette.background.default,
                     transition: 'all 0.3s ease',
+                    display: { xs: 'none', md: 'flex' }
                 }}
             >
                 <Box className="flex items-center justify-between w-full px-4">
@@ -187,11 +260,16 @@ const Dashboard = () => {
                     <LogoutIcon onClick={logoutUser} sx={{ color: theme.palette.text.primary }} />
                 </Box>
             </Box>
+
+            {/* Drawer para Desktop */}
             <Drawer
-                variant="permanent"
+                variant={isMobile ? "temporary" : "permanent"}
+                open={isMobile ? open : true}
+                onClose={isMobile ? toggleDrawer : undefined}
                 sx={{
                     width: open ? 240 : 56,
                     flexShrink: 0,
+                    display: { xs: 'none', md: 'block' },
                     '& .MuiDrawer-paper': {
                         width: open ? 240 : 56,
                         boxSizing: 'border-box',
@@ -245,11 +323,9 @@ const Dashboard = () => {
                         <ListItem key={item.text} disablePadding>
                             <ListItemButton
                                 onClick={() => {
-                                    toggleDrawer();
+                                    if (isMobile) toggleDrawer();
                                     toggleOption(item.optionText);
-                                }
-                                }
-
+                                }}
                                 sx={{
                                     '&:hover': {
                                         backgroundColor: theme.palette.primary.main,
@@ -279,7 +355,7 @@ const Dashboard = () => {
                 <List>
                     <ListItem disablePadding>
                         <ListItemButton onClick={() => {
-                            toggleDrawer();
+                            if (isMobile) toggleDrawer();
                             toggleOption('Settings');
                         }}
                             sx={{
@@ -308,11 +384,68 @@ const Dashboard = () => {
                 </List>
             </Drawer>
 
-            <main
-                className="flex-1 p-4 overflow-hidden"
-                style={{
-                    marginTop: "70px",
-                    transition: "margin-left 0.3s ease",
+            {/* Drawer Mobile */}
+            <Drawer
+                variant="temporary"
+                open={isMobile && open}
+                onClose={toggleDrawer}
+                sx={{
+                    display: { xs: 'block', md: 'none' },
+                    '& .MuiDrawer-paper': {
+                        width: 240,
+                        boxSizing: 'border-box',
+                        backgroundColor: theme.palette.background.default,
+                    },
+                }}
+            >
+                <Box sx={{ height: '64px' }} /> {/* Espaço para o header fixo */}
+                <List>
+                    {[
+                        { optionText: 'Home', text: 'Inicio', icon: <Home sx={{ color: theme.palette.text.primary }} /> },
+                        { optionText: 'Documents', text: 'Meus Documentos', icon: <Folder sx={{ color: theme.palette.text.primary }} /> },
+                        { optionText: 'Organizations', text: 'Organizações', icon: <Groups sx={{ color: theme.palette.text.primary }} /> },
+                        { optionText: 'Favorites', text: 'Favoritos', icon: <Star sx={{ color: theme.palette.text.primary }} /> },
+                        { optionText: 'Recycle Bin', text: 'Lixeira', icon: <Delete sx={{ color: theme.palette.text.primary }} /> },
+                        { optionText: 'Settings', text: 'Configurações', icon: <Settings sx={{ color: theme.palette.text.primary }} /> },
+                    ].map((item) => (
+                        <ListItem key={item.text} disablePadding>
+                            <ListItemButton
+                                onClick={() => {
+                                    toggleDrawer();
+                                    toggleOption(item.optionText);
+                                }}
+                                sx={{
+                                    '&:hover': {
+                                        backgroundColor: theme.palette.primary.main,
+                                        '& .MuiListItemIcon-root, & .MuiListItemText-root': {
+                                            color: theme.palette.text.primary,
+                                        }
+                                    }
+                                }}
+                            >
+                                <ListItemIcon sx={{ color: theme.palette.text.primary }}>
+                                    {item.icon}
+                                </ListItemIcon>
+                                <ListItemText
+                                    primary={item.text}
+                                    sx={{ color: theme.palette.text.primary }}
+                                />
+                            </ListItemButton>
+                        </ListItem>
+                    ))}
+                </List>
+            </Drawer>
+
+            {/* Conteúdo Principal */}
+            <Box
+                component="main"
+                sx={{
+                    flex: 1,
+                    p: 2,
+                    overflow: 'auto',
+                    marginTop: { xs: '64px', md: '70px' },
+                    marginLeft: { xs: 0, md: open ? '240px' : '56px' },
+                    transition: "all 0.3s ease",
                     backgroundColor: theme.palette.background.paper,
                 }}
             >
@@ -324,20 +457,22 @@ const Dashboard = () => {
                 {option === "Recycle Bin" && <Trash />}
                 {option === "Settings" && <SettingsComponent />}
                 {option === "Open Document" && <OpenDocument />}
-            </main>
+            </Box>
 
+            {/* Backdrop para Mobile */}
             <Backdrop
                 sx={{
                     color: "#fff",
                     zIndex: theme.zIndex.drawer - 1,
+                    display: { xs: 'block', md: 'none' }
                 }}
-                open={open}
-                onClick={toggleDrawerMain}
+                open={open && isMobile}
+                onClick={toggleDrawer}
             />
+
             {openNotification && (
                 <Notification />
-            )
-            }
+            )}
         </Box>
     );
 };
