@@ -79,7 +79,7 @@ const CustomTextField = ({
                 edge="end"
                 sx={{ color: theme.palette.text.primary }}
               >
-                {showPassword ? <VisibilityOff /> : <Visibility />}
+                {showPassword ? <Visibility /> : <VisibilityOff />}
               </IconButton>
             </InputAdornment>
           ) : undefined,
