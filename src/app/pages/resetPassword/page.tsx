@@ -101,7 +101,6 @@ const ResetPassword: React.FC = () => {
                             opacity: isDarkMode ? 0.8 : 1
                         }}
                     />
-                    {/* Title Overlay */}
                     <Box
                         sx={{
                             position: 'absolute',

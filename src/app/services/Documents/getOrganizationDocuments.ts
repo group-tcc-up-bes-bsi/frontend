@@ -30,7 +30,7 @@ export async function getOrganizationDocuments(
         message: new MessageObj(
           "error",
           getErrorTitle(responseData?.statusCode || 404),
-          "Nenhuma documento encontrado",
+          "Nenhum documento encontrado",
           "error"
         ),
         documents: [],
@@ -77,7 +77,7 @@ export async function getOrganizationDocuments(
       message: new MessageObj(
         "error",
         "Não encontrado",
-        "Nenhuma documento encontrado",
+        "Nenhum documento encontrado",
         "error"
       ),
       documents: [],

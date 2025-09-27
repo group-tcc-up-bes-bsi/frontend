@@ -103,8 +103,18 @@ const Notification: React.FC = () => {
                 className="fixed z-[1330] flex flex-col"
                 sx={{
                     backgroundColor: theme.palette.background.paper,
-                    width: '400px',
-                    height: '450px',
+                    width: {
+                        xs: '95vw',   
+                        sm: '380px',
+                        md: '400px'   
+                    },
+                    height: {
+                        xs: '75vh',   
+                        sm: '420px', 
+                        md: '450px'   
+                    },
+                    maxWidth: '400px', 
+                    maxHeight: '90vh',
                     borderRadius: '4px',
                     boxShadow: theme.shadows[3],
                     top: '50%',
@@ -123,6 +133,7 @@ const Notification: React.FC = () => {
                         fontWeight: 'bold',
                         width: '100%',
                         borderBottom: `1px solid ${theme.palette.text.primary}`,
+                        fontSize: { xs: '1.1rem', md: '1.25rem' } 
                     }}
                 />
                 <Box
@@ -166,37 +177,57 @@ const Notification: React.FC = () => {
                                             px: 1,
                                         }}
                                     >
-                                        <Box sx={{ display: 'flex', gap: 1, width: '100%' }}>
+                                        <Box sx={{
+                                            display: 'flex',
+                                            gap: 1,
+                                            width: '100%',
+                                            alignItems: 'center',
+                                        }}>
                                             <ListItemText
-                                                primary={`Organização: ${org?.name || 'Organização desconhecida'}`}
-                                                sx={{ flex: 1 }}
-                                            />
-                                            <CheckIcon
-                                                onClick={() => org && handleAccepted(org.organizationId)}
+                                                primary={`Org: ${org?.name || 'Organização desconhecida'}`}
                                                 sx={{
-                                                    fontSize: '1.5rem',
-                                                    color: theme.palette.text.secondary,
-                                                    cursor: 'pointer',
-                                                    borderRadius: '50%',
-                                                    '&:hover': {
-                                                        backgroundColor: theme.palette.success.light,
-                                                        color: theme.palette.success.dark,
-                                                    },
+                                                    flex: 1,
+                                                    '& .MuiTypography-root': {
+                                                        fontSize: { xs: '0.9rem', sm: '1rem' } 
+                                                    }
+                                                }}
+                                                primaryTypographyProps={{
+                                                    noWrap: true,
+                                                    title: org?.name 
                                                 }}
                                             />
-                                            <Close
-                                                onClick={() => org && handleRecused(org.organizationId)}
-                                                sx={{
-                                                    fontSize: '1.5rem',
-                                                    color: theme.palette.text.secondary,
-                                                    cursor: 'pointer',
-                                                    borderRadius: '50%',
-                                                    '&:hover': {
-                                                        backgroundColor: theme.palette.error.light,
-                                                        color: theme.palette.error.main,
-                                                    },
-                                                }}
-                                            />
+                                            <Box sx={{
+                                                display: 'flex',
+                                                gap: 1,
+                                                alignSelf: { xs: 'flex-end', sm: 'center' } 
+                                            }}>
+                                                <CheckIcon
+                                                    onClick={() => org && handleAccepted(org.organizationId)}
+                                                    sx={{
+                                                        fontSize: { xs: '1.3rem', sm: '1.5rem' },
+                                                        color: theme.palette.text.secondary,
+                                                        cursor: 'pointer',
+                                                        borderRadius: '50%',
+                                                        '&:hover': {
+                                                            backgroundColor: theme.palette.success.light,
+                                                            color: theme.palette.success.dark,
+                                                        },
+                                                    }}
+                                                />
+                                                <Close
+                                                    onClick={() => org && handleRecused(org.organizationId)}
+                                                    sx={{
+                                                        fontSize: { xs: '1.3rem', sm: '1.5rem' }, 
+                                                        color: theme.palette.text.secondary,
+                                                        cursor: 'pointer',
+                                                        borderRadius: '50%',
+                                                        '&:hover': {
+                                                            backgroundColor: theme.palette.error.light,
+                                                            color: theme.palette.error.main,
+                                                        },
+                                                    }}
+                                                />
+                                            </Box>
                                         </Box>
                                     </ListItem>
                                 );
@@ -206,6 +237,9 @@ const Notification: React.FC = () => {
                                 <ListItemText
                                     primary="Nenhum convite encontrado"
                                     sx={{ textAlign: 'center' }}
+                                    primaryTypographyProps={{
+                                        fontSize: { xs: '0.9rem', sm: '1rem' }
+                                    }}
                                 />
                             </ListItem>
                         )}
@@ -217,7 +251,7 @@ const Notification: React.FC = () => {
                 <Box
                     sx={{
                         position: 'absolute',
-                        bottom: '10%',
+                        bottom: { xs: '5%', md: '10%' },
                         left: '50%',
                         transform: 'translateX(-50%)',
                         zIndex: 1500,
@@ -226,6 +260,7 @@ const Notification: React.FC = () => {
                         alignItems: 'center',
                         gap: 2,
                         textAlign: 'left',
+                        width: { xs: '90vw', sm: 'auto' },
                     }}
                 >
                     <CustomAlert

@@ -55,7 +55,7 @@ const HomeComponent: React.FC = () => {
 
     useEffect(() => {
         toggleModeViewer(modeViewer)
-    }, [modeViewer]);
+    }, [modeViewer, theme]);
 
     useEffect(() => {
         if (userCurrent != undefined) {

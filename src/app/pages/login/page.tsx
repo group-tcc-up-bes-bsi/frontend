@@ -175,7 +175,14 @@ const Login: React.FC = () => {
             marginBottom={4}
           />
 
-          <Box component="form" sx={{ mt: 2 }}>
+            <Box
+            component="form"
+            sx={{ mt: 2 }}
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleSubmit();
+            }}
+            >
             <CustomTextField
               name="user"
               label="Usuário"
@@ -206,10 +213,9 @@ const Login: React.FC = () => {
 
             <CustomButton
               text="Entrar"
-              type="button"
+              type="submit"
               colorType="primary"
               hoverColorType="primary"
-              onClick={handleSubmit}
             />
 
             <CustomLink
@@ -221,26 +227,26 @@ const Login: React.FC = () => {
             />
             {showMessage && message && (
               <Box
-                sx={{
-                  position: 'absolute',
-                  bottom: '10%',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  display: 'flex',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  gap: 2,
-                  textAlign: 'left',
-                }}>
-                <CustomAlert
-                  severity={message.severity}
-                  colorType={message.colorType}
-                  title={message.title}
-                  description={message.description}
-                />
+              sx={{
+                position: 'absolute',
+                bottom: '10%',
+                left: '50%',
+                transform: 'translateX(-50%)',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: 2,
+                textAlign: 'left',
+              }}>
+              <CustomAlert
+                severity={message.severity}
+                colorType={message.colorType}
+                title={message.title}
+                description={message.description}
+              />
               </Box>
             )}
-          </Box>
+            </Box>
         </Container>
       </Box>
     </Box>

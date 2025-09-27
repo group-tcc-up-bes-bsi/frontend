@@ -50,7 +50,6 @@ const DocumentForm: React.FC = () => {
             })();
         }
     }, [userCurrent, theme]);
-
     const isValidOrganization = organization &&
         organizations.some(org => org.organizationId === organization.organizationId);
 
@@ -246,7 +245,7 @@ const DocumentForm: React.FC = () => {
                             setOrganization(org || null);
                         }}
                         options={organizationsOptions}
-                        disabled={document?.documentId == 0 ? false : true}
+                        disabled={document?.organization.organizationId == 0 ? false : true}
                         focusedColor="primary"
                         hoverColor="info"
                         marginBottom={2}

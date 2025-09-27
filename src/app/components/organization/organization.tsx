@@ -43,7 +43,6 @@ const Organization: React.FC = () => {
         new MessageObj('info', 'Tela das Organizações', '', 'info')
     );
     const [showMessage, setShowMessage] = useState(false);
-    const alterOrg = useOrganizationStore((state) => state.alter);
     const alterOption = useOptionsDashboardStore((state) => state.alter);
     const [selectedFavorite, setSelectedFavorite] = useState('');
 
@@ -179,7 +178,7 @@ const Organization: React.FC = () => {
 
     const handleOpen = (organization: OrganizationObj) => {
         alterOption('Open Organization');
-        alterOrg(organization);
+        alterOrganization(organization);
         setAnchorEl(null);
     };
 
@@ -208,7 +207,7 @@ const Organization: React.FC = () => {
                             marginTop={0.5}
                         />
                     </Box>
-                    <Box sx={{ width: '50%' }}>
+                    <Box sx={{ width: '40%' }}>
                         <CustomTextField
                             name="filter"
                             label="Informe um detalhe da organização"
@@ -219,10 +218,10 @@ const Organization: React.FC = () => {
                             hoverColor="info"
                         />
                     </Box>
-                    <Box sx={{ width: '15%' }}>
+                    <Box sx={{ width: '25%' }}>
                         <CustomComboBox
                             name="organization-type"
-                            label="Tipo"
+                            label="Tipo da organização"
                             value={selectedOrganizationType}
                             onChange={handleChangeOrganizationType}
                             options={organizationsTypeOptions}
@@ -375,7 +374,6 @@ const Organization: React.FC = () => {
                                             </Menu>
                                         </Box>
 
-                                        {/* Description */}
                                         <Typography
                                             variant="body2"
                                             sx={{ color: theme.palette.text.secondary, whiteSpace: "pre-line" }}
