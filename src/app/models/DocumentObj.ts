@@ -8,8 +8,6 @@ export interface DocumentObj {
   creationDate: Date;
   lastModifiedDate: Date;
   organization: OrganizationObj;
-  
   version: string;
-  creator: string;
   favorite: boolean;
 }

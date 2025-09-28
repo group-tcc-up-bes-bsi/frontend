@@ -97,7 +97,6 @@ const OpenOrganization: React.FC = () => {
                                     creationDate: new Date(),
                                     lastModifiedDate: new Date(),
                                     version: '',
-                                    creator: '',
                                     organization: {
                                         organizationId: organization.organizationId,
                                         name: organization.name,
@@ -208,6 +207,7 @@ const OpenOrganization: React.FC = () => {
                         focusedColor="primary"
                         hoverColor="info"
                         marginBottom={2}
+                        sx={{wordWrap: 'break-word'}}
                     />
                 </Box>
                 <Box sx={{

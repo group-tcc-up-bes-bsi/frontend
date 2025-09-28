@@ -4,6 +4,8 @@ import { UserObj } from "@/app/models/UserObj";
 import { getErrorTitle } from "../ErrorTitle";
 import { OrganizationObj } from "@/app/models/OrganizationObj";
 import { getOrganizationUsers } from "../Organizations/organizationsServices";
+import { VersionObj } from "@/app/models/VersionObj";
+import { getVersionsByDocument } from "../Versions/getVersions";
 
 export async function getOrganizationDocuments(
   userCurrent: UserObj,
@@ -37,8 +39,6 @@ export async function getOrganizationDocuments(
       };
     }
 
-    let documents: DocumentObj[];
-
     const orgUsersResponse = await getOrganizationUsers(
       organization.organizationId,
       userCurrent
@@ -47,21 +47,43 @@ export async function getOrganizationDocuments(
     const myUser = orgUsersResponse.users.find(
       (user) => user.username === userCurrent.username
     );
-    if (myUser?.inviteAccepted !== false) {
-      documents = responseData.map((item) => ({
-        documentId: item.documentId,
-        name: item.name,
-        type: item.type,
-        description: item.description,
-        creationDate: new Date(item.creationDate),
-        lastModifiedDate: new Date(item.lastModifiedDate),
-        organization: organization,
 
-        version: item.version || "1.0",
-        creator: item.creator || "Desconhecido",
-        imagemSrc: item.imagemSrc || "",
-        favorite: item.favorite ?? false,
-      }));
+    if (myUser?.inviteAccepted !== false) {
+      const documents: DocumentObj[] = [];
+
+      for (const item of responseData) {
+        const document: DocumentObj = {
+          documentId: item.documentId,
+          name: item.name,
+          type: item.type,
+          description: item.description,
+          creationDate: new Date(item.creationDate),
+          lastModifiedDate: new Date(item.lastModifiedDate),
+          organization: organization,
+          version: 'Sem Versão',
+          favorite: item.favorite ?? false,
+        };
+
+        if (item.activeVersionId) {
+          const versionsResponse = await getVersionsByDocument(userCurrent, document);
+
+          if (versionsResponse.versions.length > 0) {
+            const activeVersion: VersionObj | undefined =
+              versionsResponse.versions.find(
+                (v) => v.documentVersionId === item.activeVersionId
+              );
+
+            if (activeVersion) {
+              document.version = activeVersion.name;
+            } else {
+              document.version = versionsResponse.versions[0].name;
+            }
+          }
+        }
+
+        documents.push(document);
+      }
+
       return {
         message: new MessageObj(
           "success",

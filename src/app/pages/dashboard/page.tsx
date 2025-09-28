@@ -189,6 +189,7 @@ const Dashboard = () => {
                                 color: theme.palette.text.primary,
                                 display: "inline-block",
                                 whiteSpace: "nowrap",
+                                wordWrap: "normal",
                                 animation: optionMenu.length > 20 ? "marquee 8s linear infinite" : "none",
                                 "@keyframes marquee": {
                                     "0%": { transform: "translateX(100%)" },

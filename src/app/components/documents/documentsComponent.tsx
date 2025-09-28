@@ -68,7 +68,6 @@ const DocumentsComponent: React.FC = () => {
             creationDate: new Date(),
             lastModifiedDate: new Date(),
             version: '',
-            creator: '',
             organization: {
                 organizationId: 0,
                 name: '',
@@ -108,6 +107,7 @@ const DocumentsComponent: React.FC = () => {
                         onChange={(e) => setFilter(e.target.value)}
                         focusedColor="primary"
                         hoverColor="info"
+                        sx={{wordWrap: 'break-word'}}
                     />
                 </Box>
                 <Box sx={{

@@ -216,6 +216,7 @@ const Organization: React.FC = () => {
                             onChange={(e) => setFilter(e.target.value)}
                             focusedColor="primary"
                             hoverColor="info"
+                            sx={{wordWrap: 'break-word'}}
                         />
                     </Box>
                     <Box sx={{ width: '25%' }}>

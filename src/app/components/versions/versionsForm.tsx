@@ -191,6 +191,7 @@ const VersionForm: React.FC = () => {
                     focusedColor="primary"
                     hoverColor="info"
                     marginBottom={2}
+                    sx={{wordWrap: 'break-word'}}
                 />
 
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 2 }}>

@@ -94,6 +94,7 @@ const AdminPasswordModal: React.FC = () => {
                     onChange={(e) => setAdminPass(e.target.value)}
                     focusedColor="primary"
                     hoverColor="info"
+                    sx={{wordWrap: 'break-word'}}
                 />
 
                 <Button

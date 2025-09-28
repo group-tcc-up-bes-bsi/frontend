@@ -101,6 +101,7 @@ const PasswordModal: React.FC = () => {
                     onChange={(e) => setPassword(e.target.value)}
                     focusedColor="primary"
                     hoverColor="info"
+                    sx={{wordWrap: 'break-word'}}
                 />
 
                 <Button

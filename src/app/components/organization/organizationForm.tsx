@@ -406,6 +406,7 @@ const OrganizationForm: React.FC = () => {
                             focusedColor="primary"
                             hoverColor="info"
                             marginBottom={2}
+                            sx={{wordWrap: 'break-word'}}
                         />
                         <CustomTextField
                             name="username"
@@ -416,6 +417,7 @@ const OrganizationForm: React.FC = () => {
                             focusedColor="primary"
                             hoverColor="info"
                             marginBottom={2}
+                            sx={{wordWrap: 'break-word'}}
                         />
                         <Box sx={{ display: 'flex', justifyContent: 'end' }}>
                             <CustomButton

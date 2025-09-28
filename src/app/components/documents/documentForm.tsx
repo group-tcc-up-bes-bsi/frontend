@@ -223,6 +223,7 @@ const DocumentForm: React.FC = () => {
                         focusedColor="primary"
                         hoverColor="info"
                         marginBottom={2}
+                        sx={{wordWrap: 'break-word'}}
                     />
 
                     <CustomTextField
@@ -234,6 +235,7 @@ const DocumentForm: React.FC = () => {
                         focusedColor="primary"
                         hoverColor="info"
                         marginBottom={2}
+                        sx={{wordWrap: 'break-word'}}
                     />
 
                     <CustomComboBox
