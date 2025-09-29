@@ -144,7 +144,6 @@ const Favorites: React.FC = () => {
                             onChange={(e) => setFilter(e.target.value)}
                             focusedColor="primary"
                             hoverColor="info"
-                            sx={{ wordWrap: 'break-word' }}
                         />
                     </Box>
                     <Box sx={{ width: isMobile ? '100%' : '40%' }}>
