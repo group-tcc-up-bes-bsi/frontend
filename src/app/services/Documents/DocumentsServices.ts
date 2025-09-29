@@ -69,7 +69,6 @@ export function getDocumentsTrash(): DocumentObj[] {
       description: "Pdf",
       favorite: true,
       version: "Test",
-      creator: "User A",
       organization: {
         organizationId: 1,
         name: "Projeto Inovação",
@@ -89,7 +88,6 @@ export function getDocumentsTrash(): DocumentObj[] {
       description: "Planilha Excel",
       favorite: false,
       version: "2.0",
-      creator: "User B",
       organization: {
         organizationId: 1,
         name: "TCC",
@@ -109,7 +107,6 @@ export function getDocumentsTrash(): DocumentObj[] {
       description: "Apresentação do projeto",
       favorite: false,
       version: "1.5",
-      creator: "User C",
       organization: {
         organizationId: 1,
         name: "TCC",
