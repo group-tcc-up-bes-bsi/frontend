@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { Box, CircularProgress, Divider, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, } from '@mui/material';
+import { Box, CircularProgress, Divider, IconButton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useMediaQuery, } from '@mui/material';
 import CustomTypography from '../customTypography';
 import Menu from '@mui/icons-material/Menu';
 import SpaceDashboard from '@mui/icons-material/SpaceDashboard';
@@ -17,12 +17,10 @@ import { DocumentObj } from '@/app/models/DocumentObj';
 import { getUserTypeLabel, userInviteAcceptedOptions } from '@/app/services/ConstantsTypes';
 import TableDocuments from '../tableDocuments';
 import { useOrganizationStore } from '@/app/state/organizationState';
-import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
 import { getOrganizationUsers } from '@/app/services/Organizations/organizationsServices';
 import { useUserStore } from '@/app/state/userState';
 import { UserOrganization } from '@/app/models/UserObj';
 import CustomComboBox from '../customComboBox';
-import { Close } from '@mui/icons-material';
 import { PieChart } from '@mui/x-charts';
 import { buildPieDataDocumentsType, buildPieDataUser } from '@/app/services/Organizations/buildPieOrganization';
 import { countOrganizationDocuments, getOrganizationDocuments } from '@/app/services/Documents/getOrganizationDocuments';
@@ -42,8 +40,6 @@ const OpenOrganization: React.FC = () => {
     const alterDocumentForm = useDocumentFormStore((state) => state.alter);
     const alterDoc = useDocumentStore((state) => state.alter);
     const organization = useOrganizationStore((state) => state.organization);
-    const alterOption = useOptionsDashboardStore((state) => state.alter);
-    const lastOption = useOptionsDashboardStore((state) => state.lastOption);
     const [selectedUserInvite, setSelectedUserInvite] = useState('');
     const [usersInvite, setUsersInvite] = useState<UserOrganization[]>([]);
     const [documents, setDocuments] = useState<DocumentObj[]>([]);
@@ -56,6 +52,8 @@ const OpenOrganization: React.FC = () => {
     );
     const [showMessage, setShowMessage] = useState(false);
     const pieDataUser = useMemo(() => buildPieDataUser(usersInvite), [usersInvite]);
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
 
     useEffect(() => {
         if (message) {
@@ -162,13 +160,15 @@ const OpenOrganization: React.FC = () => {
         setSelectedUserInvite(value);
     };
 
+
     return (
         <Box
-            paddingX={3}
             sx={{
-                background: theme.palette.background.paper, height: '100%',
+                background: theme.palette.background.paper,
+                height: '100%',
                 maxHeight: 'calc(100vh - 50px)',
                 overflowY: 'auto',
+                p: isMobile ? 1 : 3,
                 '&::-webkit-scrollbar': {
                     width: '6px',
                 },
@@ -180,77 +180,104 @@ const OpenOrganization: React.FC = () => {
                     borderRadius: '3px',
                 }
             }}>
+
             <Box sx={{
                 display: 'flex',
-                gap: 4,
+                gap: isMobile ? 2 : 4,
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                flexDirection: isMobile ? 'column' : 'row'
             }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: isMobile ? '100%' : 'auto'
+                }}>
                     <CustomButton
                         text="Adicionar Documento"
                         type="button"
                         colorType="primary"
                         hoverColorType="primary"
                         onClick={toggleDocumentForm}
-                        paddingY={2}
-                    />
-                </Box>
-                <Box
-                    sx={{ width: '55%' }}>
-                    <CustomTextField
-                        name="filter"
-                        label="Informe um detalhe do documento"
-                        type="text"
-                        value={filter}
-                        onChange={(e) => setFilter(e.target.value)}
-                        focusedColor="primary"
-                        hoverColor="info"
-                        marginBottom={2} 
+                        paddingY={isMobile ? 1 : 2.2}
+                        marginBottom={0}
+                        marginTop={0}
                     />
                 </Box>
                 <Box sx={{
-                    backgroundColor: theme.palette.background.default,
-                    padding: 1,
                     display: 'flex',
+                    gap: isMobile ? 2 : 4,
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexDirection: 'row',
+                    width: isMobile ? '100%' : '75%'
                 }}>
-                    <Menu onClick={() => { toggleModeViewer(1) }} sx={{ color: colorMode1, fontSize: 32 }} />
-                    <Divider
-                        orientation="vertical"
-                        sx={{
-                            backgroundColor: theme.palette.text.primary,
-                            height: 30,
-                            margin: '0 10px',
-                            padding: 0.2,
-                            borderRadius: '20%'
-                        }} />
-                    <SpaceDashboard onClick={() => { toggleModeViewer(2) }} sx={{ color: colorMode2, fontSize: 32 }} />
-                </Box>
-                <Box sx={{ display: "flex", flexDirection: "row", gap: 4, alignItems: 'center' }}>
-                    <Close
-                        onClick={() => { alterOption(lastOption); }}
-                        sx={{
-                            fontSize: 30,
-                            color: theme.palette.text.primary,
-                            cursor: 'pointer',
-                            '&:hover': {
-                                color: theme.palette.error.main,
-                            }
-                        }}
-                    />
+                    <Box sx={{
+                        width: isMobile ? '100%' : isTablet ? '75%' : '75%'
+                    }}>
+                        <CustomTextField
+                            name="filter"
+                            label="Detalhe do documento"
+                            type="text"
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value)}
+                            focusedColor="primary"
+                            hoverColor="info"
+                            marginBottom={0}
+                            marginTop={0}
+                        />
+                    </Box>
+
+                    <Box sx={{
+                        backgroundColor: theme.palette.background.default,
+                        padding: isMobile ? 1.4 : 0.5,
+                        display: 'flex',
+                        borderRadius: 1,
+                        alignItems: 'center',
+                    }}>
+                        <IconButton
+                            onClick={() => { toggleModeViewer(1) }}
+                            size={isMobile ? "small" : "medium"}
+                        >
+                            <Menu sx={{
+                                color: colorMode1,
+                                fontSize: isMobile ? 24 : 32
+                            }} />
+                        </IconButton>
+                        <Divider
+                            orientation="vertical"
+                            sx={{
+                                backgroundColor: theme.palette.text.primary,
+                                height: isMobile ? 30 : 40,
+                                margin: isMobile ? '0 5px' : '0 10px',
+                                padding: isMobile ? 0.1 : 0.2,
+                                borderRadius: '20%'
+                            }} />
+                        <IconButton
+                            onClick={() => { toggleModeViewer(2) }}
+                            size={isMobile ? "small" : "medium"}
+                        >
+                            <SpaceDashboard sx={{
+                                color: colorMode2,
+                                fontSize: isMobile ? 24 : 32
+                            }} />
+                        </IconButton>
+                    </Box>
                 </Box>
             </Box>
+
             <Box sx={{
                 display: 'flex',
                 width: '100%',
                 background: theme.palette.background.default,
-                marginTop: 2,
-                paddingLeft: 2
+                marginTop: isMobile ? 1 : 2,
+                paddingLeft: isMobile ? 1 : 2
             }}>
                 <CustomTypography
-                    text={"Documentos da Organização: " + documentsCount}
+                    text={"Documentos: " + documentsCount}
                     component="h2"
-                    variant="h5"
+                    variant={isMobile ? "h6" : "h5"}
                     sx={{
                         color: theme.palette.text.primary,
                         mt: 1,
@@ -258,11 +285,12 @@ const OpenOrganization: React.FC = () => {
                     }}
                 />
             </Box>
+
             {modeViewer == 1 && (
                 <Box sx={{
                     backgroundColor: theme.palette.background.default,
-                    padding: 1,
-                    maxHeight: 'calc(85vh - 150px)',
+                    padding: isMobile ? 0.5 : 1,
+                    maxHeight: isMobile ? '400px' : 'calc(85vh - 150px)',
                     overflowY: 'auto',
                     '&::-webkit-scrollbar': {
                         width: '6px',
@@ -277,13 +305,13 @@ const OpenOrganization: React.FC = () => {
                 }}>
                     <TableDocuments />
                 </Box>
-            )
-            }
+            )}
+
             {modeViewer == 2 && (
                 <Box sx={{
                     backgroundColor: theme.palette.background.default,
-                    padding: 1,
-                    maxHeight: 'calc(85vh - 150px)',
+                    padding: isMobile ? 0.5 : 1,
+                    maxHeight: isMobile ? '400px' : 'calc(85vh - 150px)',
                     overflowY: 'auto',
                     '&::-webkit-scrollbar': {
                         width: '6px',
@@ -299,11 +327,28 @@ const OpenOrganization: React.FC = () => {
                     <Documents />
                 </Box>
             )}
+
             {documentForm && <DocumentForm />}
 
-            <Box sx={{ padding: 2, display: "flex", flexDirection: "row", justifyContent: 'space-around', alignItems: 'center', marginTop: '2rem', background: theme.palette.background.default }}>
-                <Box sx={{ width: '40%' }}>
-                    <Typography variant="h6" gutterBottom sx={{ mb: 1 }}>
+            <Box sx={{
+                padding: isMobile ? 1 : 2,
+                display: "flex",
+                flexDirection: isMobile ? "column" : "row",
+                justifyContent: 'space-around',
+                alignItems: isMobile ? 'flex-start' : 'center',
+                marginTop: isMobile ? '1rem' : '2rem',
+                background: theme.palette.background.default,
+                gap: isMobile ? 2 : 0
+            }}>
+                <Box sx={{
+                    width: isMobile ? '100%' : '40%',
+                    mb: isMobile ? 2 : 0
+                }}>
+                    <Typography
+                        variant={isMobile ? "body1" : "h6"}
+                        gutterBottom
+                        sx={{ mb: 1, fontWeight: 'bold' }}
+                    >
                         Filtro de Convite
                     </Typography>
                     <Box sx={{ width: '100%' }}>
@@ -315,19 +360,29 @@ const OpenOrganization: React.FC = () => {
                             options={userInviteAcceptedOptions}
                             focusedColor="primary"
                             hoverColor="info"
+                            marginBottom={0}
+                            sx={{ marginTop: 0 }}
                         />
                     </Box>
                 </Box>
+
                 {loading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+                    <Box sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        minHeight: '200px',
+                        width: isMobile ? '100%' : '60%'
+                    }}>
                         <CircularProgress color="primary" />
                     </Box>
                 ) : (
                     <Box sx={{
                         backgroundColor: theme.palette.background.default,
                         padding: 1,
-                        maxHeight: 'calc(85vh - 150px)',
-                        pr: 2,
+                        maxHeight: isMobile ? '300px' : 'calc(85vh - 150px)',
+                        pr: isMobile ? 0 : 2,
+                        overflowX: 'auto',
                         '&::-webkit-scrollbar': {
                             width: '2px',
                             height: '6px',
@@ -341,24 +396,49 @@ const OpenOrganization: React.FC = () => {
                         },
                     }}>
                         <TableContainer>
-                            <Table sx={{ minWidth: 650 }} aria-label="tabela de Documentos">
+                            <Table
+                                sx={{ minWidth: isMobile ? 250 : 500 }}
+                                aria-label="tabela de Documentos"
+                                size={isMobile ? "small" : "medium"}
+                            >
                                 <TableHead>
                                     <TableRow sx={{ backgroundColor: theme.palette.background.default }}>
-                                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Usuário</TableCell>
-                                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Tipo</TableCell>
-                                        <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Convite</TableCell>
+                                        <TableCell sx={{
+                                            textTransform: 'uppercase',
+                                            fontWeight: 'bold',
+                                            fontSize: isMobile ? '0.75rem' : '1rem'
+                                        }}>Usuário</TableCell>
+                                        <TableCell sx={{
+                                            textTransform: 'uppercase',
+                                            fontWeight: 'bold',
+                                            fontSize: isMobile ? '0.75rem' : '1rem'
+                                        }}>Tipo</TableCell>
+                                        <TableCell sx={{
+                                            textTransform: 'uppercase',
+                                            fontWeight: 'bold',
+                                            fontSize: isMobile ? '0.75rem' : '1rem'
+                                        }}>Convite</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {filteredUsersInvite.map((user) => (
                                         <TableRow key={user.username}>
-                                            <TableCell sx={{ background: theme.palette.background.default }}>
+                                            <TableCell sx={{
+                                                background: theme.palette.background.default,
+                                                fontSize: isMobile ? '0.8rem' : '1rem'
+                                            }}>
                                                 {user.username}
                                             </TableCell>
-                                            <TableCell sx={{ background: theme.palette.background.default }}>
+                                            <TableCell sx={{
+                                                background: theme.palette.background.default,
+                                                fontSize: isMobile ? '0.8rem' : '1rem'
+                                            }}>
                                                 {getUserTypeLabel(user.userType)}
                                             </TableCell>
-                                            <TableCell sx={{ background: theme.palette.background.default }}>
+                                            <TableCell sx={{
+                                                background: theme.palette.background.default,
+                                                fontSize: isMobile ? '0.8rem' : '1rem'
+                                            }}>
                                                 {
                                                     userInviteAcceptedOptions.find(
                                                         (opt) => opt.value === String(user.inviteAccepted)
@@ -366,8 +446,7 @@ const OpenOrganization: React.FC = () => {
                                                 }
                                             </TableCell>
                                         </TableRow>
-                                    ))
-                                    }
+                                    ))}
                                 </TableBody>
                             </Table>
                         </TableContainer>
@@ -377,42 +456,92 @@ const OpenOrganization: React.FC = () => {
 
             <Box sx={{
                 display: "flex",
-                flexDirection: 'column',
+                flexDirection: isMobile ? 'column' : 'row',
                 gap: 3,
-                mt: 5,
+                mt: isMobile ? 3 : 5,
                 background: theme.palette.background.default,
-                padding: 5
+                padding: isMobile ? 2 : 5
             }}>
-                <Box sx={{ flex: 1 }}>
-                    <Typography variant="h6" gutterBottom>
+                <Box sx={{
+                    flex: 1,
+                    width: isMobile ? '100%' : '50%'
+                }}>
+                    <Typography
+                        variant={isMobile ? "body1" : "h6"}
+                        gutterBottom
+                        sx={{ fontWeight: 'bold' }}
+                    >
                         Documentos por Tipo
                     </Typography>
                     {pieDataDoc.length > 0 ? (
-                        <PieChart
-                            sx={{
+                        <Box>
+                            <Box sx={{
                                 border: '1px dashed',
                                 borderColor: theme.palette.text.primary,
-                                paddingX: 40,
-                            }}
-                            series={[{
-                                data: pieDataDoc,
-                                highlightScope: { fade: "global", highlight: "item" },
-                                innerRadius: 0,
-                                outerRadius: 200,
-                                paddingAngle: 0,
-                            }]}
-                            height={500}
-                            margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
-                            colors={[
-                                "#8e24aa", "#039be5", "#fbc02d", "#fb8c00", "#d84315", "#6d4c41", "#757575",
-                                "#c62828", "#ad1457", "#4527a0", "#283593", "#0277bd", "#00838f", "#2e7d32",
-                                "#f9a825", "#ff7043", "#5d4037", "#616161", "#b71c1c", "#880e4f", "#1a237e",
-                            ]}
-                        />
+                                padding: isMobile ? 1 : 2,
+                            }}>
+                                <PieChart
+                                    series={[{
+                                        data: pieDataDoc,
+                                        highlightScope: { fade: "global", highlight: "item" },
+                                        outerRadius: isMobile ? 100 : 200,
+                                    }]}
+                                    height={isMobile ? 300 : 500}
+                                    margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
+                                    colors={[
+                                        "#8e24aa", "#039be5", "#fbc02d", "#fb8c00", "#d84315", "#6d4c41", "#757575",
+                                        "#c62828", "#ad1457", "#4527a0", "#283593", "#0277bd", "#00838f", "#2e7d32",
+                                    ]}
+                                    sx={{
+                                        width: '100%',
+                                        '& .MuiChartsLegend-root': {
+                                            display: 'none !important',
+                                        }
+                                    }}
+                                />
+                                <Box sx={{
+                                    mt: 2,
+                                    display: 'grid',
+                                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                                    gap: 1,
+                                    maxHeight: isMobile ? '150px' : '200px',
+                                    overflowY: 'auto',
+                                    p: 1
+                                }}>
+                                    {pieDataDoc.map((item, index) => (
+                                        <Box key={item.id} sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 1,
+                                            fontSize: isMobile ? '0.75rem' : '0.875rem'
+                                        }}>
+                                            <Box sx={{
+                                                width: 12,
+                                                height: 12,
+                                                backgroundColor: [
+                                                    "#8e24aa", "#039be5", "#fbc02d", "#fb8c00", "#d84315", "#6d4c41", "#757575",
+                                                    "#c62828", "#ad1457", "#4527a0", "#283593", "#0277bd", "#00838f", "#2e7d32",
+                                                ][index % 14],
+                                                borderRadius: '2px'
+                                            }} />
+                                            <Typography
+                                                variant="body2"
+                                                sx={{
+                                                    color: theme.palette.text.primary,
+                                                    fontSize: 'inherit'
+                                                }}
+                                            >
+                                                {item.label}: {item.value}
+                                            </Typography>
+                                        </Box>
+                                    ))}
+                                </Box>
+                            </Box>
+                        </Box>
                     ) : (
                         <Box
                             sx={{
-                                height: 500,
+                                height: isMobile ? 200 : 500,
                                 display: 'flex',
                                 justifyContent: 'center',
                                 alignItems: 'center',
@@ -420,47 +549,127 @@ const OpenOrganization: React.FC = () => {
                                 borderColor: theme.palette.text.primary,
                             }}
                         >
-                            <Typography variant="body1" sx={{ color: theme.palette.text.primary }}>
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    color: theme.palette.text.primary,
+                                    textAlign: 'center',
+                                    p: 2
+                                }}
+                            >
                                 Sem documentos para a organização selecionada
                             </Typography>
                         </Box>
                     )}
                 </Box>
 
-                <Box sx={{ flex: 1 }}>
-                    <Typography variant="h6" gutterBottom>
+                <Box sx={{
+                    flex: 1,
+                    width: isMobile ? '100%' : '50%'
+                }}>
+                    <Typography
+                        variant={isMobile ? "body1" : "h6"}
+                        gutterBottom
+                        sx={{ fontWeight: 'bold' }}
+                    >
                         Usuários por Tipo
                     </Typography>
-                    <PieChart
-                        sx={{
-                            border: '1px dashed',
-                            borderColor: theme.palette.text.primary,
-                            paddingX: 40,
-                        }}
-                        series={[
-                            {
-                                data: pieDataUser,
-                                highlightScope: { fade: "global", highlight: "item" },
-                                innerRadius: 0,
-                                outerRadius: 200,
-                                paddingAngle: 0,
-                            },
-                        ]}
-                        height={500}
-                        margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
-                        colors={[
-                            "#8e24aa", "#039be5", "#fbc02d", "#fb8c00", "#d84315", "#6d4c41", "#757575",
-                            "#c62828", "#ad1457", "#4527a0", "#283593", "#0277bd", "#00838f", "#2e7d32",
-                            "#f9a825", "#ff7043", "#5d4037", "#616161", "#b71c1c", "#880e4f", "#1a237e",
-                        ]}
-                    />
+                    {pieDataUser.length > 0 ? (
+                        <Box>
+                            <Box sx={{
+                                border: '1px dashed',
+                                borderColor: theme.palette.text.primary,
+                                padding: isMobile ? 1 : 2,
+                            }}>
+                                <PieChart
+                                    series={[{
+                                        data: pieDataUser,
+                                        highlightScope: { fade: "global", highlight: "item" },
+                                        outerRadius: isMobile ? 100 : 200,
+                                    }]}
+                                    height={isMobile ? 300 : 500}
+                                    margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
+                                    colors={[
+                                        "#8e24aa", "#039be5", "#fbc02d", "#fb8c00", "#d84315", "#6d4c41", "#757575",
+                                        "#c62828", "#ad1457", "#4527a0", "#283593", "#0277bd", "#00838f", "#2e7d32",
+                                    ]}
+                                    sx={{
+                                        width: '100%',
+                                        '& .MuiChartsLegend-root': {
+                                            display: 'none !important',
+                                        }
+                                    }}
+                                />
+                                <Box sx={{
+                                    mt: 2,
+                                    display: 'grid',
+                                    gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                                    gap: 1,
+                                    maxHeight: isMobile ? '150px' : '200px',
+                                    overflowY: 'auto',
+                                    p: 1
+                                }}>
+                                    {pieDataUser.map((item, index) => (
+                                        <Box key={item.id} sx={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 1,
+                                            fontSize: isMobile ? '0.75rem' : '0.875rem'
+                                        }}>
+                                            <Box sx={{
+                                                width: 12,
+                                                height: 12,
+                                                backgroundColor: [
+                                                    "#8e24aa", "#039be5", "#fbc02d", "#fb8c00", "#d84315", "#6d4c41", "#757575",
+                                                    "#c62828", "#ad1457", "#4527a0", "#283593", "#0277bd", "#00838f", "#2e7d32",
+                                                ][index % 14],
+                                                borderRadius: '2px'
+                                            }} />
+                                            <Typography
+                                                variant="body2"
+                                                sx={{
+                                                    color: theme.palette.text.primary,
+                                                    fontSize: 'inherit'
+                                                }}
+                                            >
+                                                {item.label}: {item.value}
+                                            </Typography>
+                                        </Box>
+                                    ))}
+                                </Box>
+                            </Box>
+                        </Box>
+                    ) : (
+                        <Box
+                            sx={{
+                                height: isMobile ? 200 : 500,
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                border: '1px dashed',
+                                borderColor: theme.palette.text.primary,
+                            }}
+                        >
+                            <Typography
+                                variant="body1"
+                                sx={{
+                                    color: theme.palette.text.primary,
+                                    textAlign: 'center',
+                                    p: 2
+                                }}
+                            >
+                                Sem usuários para a organização selecionada
+                            </Typography>
+                        </Box>
+                    )}
                 </Box>
             </Box>
+
             {showMessage && message && (
                 <Box
                     sx={{
-                        position: 'absolute',
-                        bottom: '0%',
+                        position: 'fixed',
+                        bottom: isMobile ? '5%' : '2%',
                         left: '50%',
                         transform: 'translateX(-50%)',
                         display: 'flex',
@@ -468,6 +677,8 @@ const OpenOrganization: React.FC = () => {
                         alignItems: 'center',
                         gap: 2,
                         textAlign: 'left',
+                        width: isMobile ? '90%' : 'auto',
+                        zIndex: 9999
                     }}>
                     <CustomAlert
                         severity={message.severity}
@@ -477,7 +688,7 @@ const OpenOrganization: React.FC = () => {
                     />
                 </Box>
             )}
-        </Box >
+        </Box>
     );
 };
 
