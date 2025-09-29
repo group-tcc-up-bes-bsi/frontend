@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Backdrop, IconButton } from '@mui/material';
+import { Box, Backdrop, IconButton, useMediaQuery } from '@mui/material';
 import CustomTextField from '../customTextField';
 import CustomButton from '../customButton';
 import CustomTypography from '../customTypography';
@@ -32,6 +32,7 @@ const VersionForm: React.FC = () => {
     );
     const [showMessage, setShowMessage] = useState(false);
     const doc = useDocumentStore((state) => state.document);
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     useEffect(() => {
         if (message) {
@@ -192,18 +193,18 @@ const VersionForm: React.FC = () => {
                     hoverColor="info"
                     marginBottom={2}
                 />
-
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 2 }}>
-                    <CustomButton
-                        text="Pré-visualizar"
-                        type="button"
-                        colorType="secondary"
-                        onClick={() => setPreviewOpen(true)}
-                        hoverColorType="secondary"
-                        fullWidth={true}
-                        paddingY={1}
-                        disabled={!file}
-                    />
+                    {!isMobile &&
+                        <CustomButton
+                            text="Pré-visualizar"
+                            type="button"
+                            colorType="secondary"
+                            onClick={() => setPreviewOpen(true)}
+                            hoverColorType="secondary"
+                            fullWidth={true}
+                            paddingY={1}
+                            disabled={!file}
+                        />}
 
                     <IconButton
                         color="primary"
