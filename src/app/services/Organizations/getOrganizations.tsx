@@ -13,6 +13,20 @@ export async function getOrganizations(
 ): Promise<{ message: MessageObj; organizations: OrganizationObj[] }> {
     try {
         const myOrgsResponse = await getMyOrganizations(userCurrent, theme);
+        const favoritesUrl = `${process.env.NEXT_PUBLIC_BACKEND}/users/favorites/organizations`;
+        const favoritesResponse = await fetch(favoritesUrl, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${userCurrent?.jwtToken}`,
+            },
+        });
+        const favoritesData = await favoritesResponse.json().catch(() => []);
+        const favoriteOrgIds = new Set<number>(
+            Array.isArray(favoritesData)
+                ? favoritesData.map((fav: OrganizationObj) => fav.organizationId)
+                : []
+        );
 
         if (myOrgsResponse.organizations.length === 0) {
             return {
@@ -43,7 +57,7 @@ export async function getOrganizations(
                     organizationType: org.organizationType === 'Colaborativo' ?
                         organizationType.COLLABORATIVE
                         : organizationType.INDIVIDUAL,
-                    favorite: false,
+                    favorite: favoriteOrgIds.has(org.organizationId),
                     borderColor: theme.palette.text.primary,
                     icon: org.organizationType === 'Colaborativo'
                         ? <Folder sx={{ color: theme.palette.button.star }} />

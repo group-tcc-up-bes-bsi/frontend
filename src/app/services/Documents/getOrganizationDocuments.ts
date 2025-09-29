@@ -12,6 +12,7 @@ export async function getOrganizationDocuments(
   organization: OrganizationObj
 ): Promise<{ message: MessageObj; documents: DocumentObj[] }> {
   const url = `${process.env.NEXT_PUBLIC_BACKEND}/documents/organization/${organization.organizationId}`;
+  const favoritesUrl = `${process.env.NEXT_PUBLIC_BACKEND}/users/favorites/documents`;
 
   try {
     const response = await fetch(url, {
@@ -23,6 +24,22 @@ export async function getOrganizationDocuments(
     });
 
     const responseData = await response.json().catch(() => null);
+
+    const favoritesResponse = await fetch(favoritesUrl, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userCurrent?.jwtToken}`,
+      },
+    });
+    const favoritesData = await favoritesResponse.json().catch(() => []);
+
+    const favoriteIds = new Set<number>(
+      Array.isArray(favoritesData)
+        ? favoritesData.map((fav: DocumentObj) => fav.documentId)
+        : []
+    );
+
     if (
       !responseData ||
       !Array.isArray(responseData) ||
@@ -60,12 +77,15 @@ export async function getOrganizationDocuments(
           creationDate: new Date(item.creationDate),
           lastModifiedDate: new Date(item.lastModifiedDate),
           organization: organization,
-          version: 'Sem Versão',
-          favorite: item.favorite ?? false,
+          version: "Sem Versão",
+          favorite:  favoriteIds.has(item.documentId),
         };
 
         if (item.activeVersionId) {
-          const versionsResponse = await getVersionsByDocument(userCurrent, document);
+          const versionsResponse = await getVersionsByDocument(
+            userCurrent,
+            document
+          );
 
           if (versionsResponse.versions.length > 0) {
             const activeVersion: VersionObj | undefined =
