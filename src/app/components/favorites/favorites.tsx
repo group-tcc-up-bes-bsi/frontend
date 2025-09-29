@@ -144,6 +144,8 @@ const Favorites: React.FC = () => {
                             onChange={(e) => setFilter(e.target.value)}
                             focusedColor="primary"
                             hoverColor="info"
+                            marginBottom={0}
+                            marginTop={0}
                         />
                     </Box>
                     <Box sx={{ width: isMobile ? '100%' : '40%' }}>
@@ -156,6 +158,10 @@ const Favorites: React.FC = () => {
                                 options={favoriteTypeOptions}
                                 focusedColor="primary"
                                 hoverColor="info"
+                                marginBottom={2}
+                                sx={{
+                                    marginTop: 0
+                                }}
                             />
                         </Box>
                     </Box>
