@@ -211,7 +211,6 @@ const ResetPassword: React.FC = () => {
                             onChange={(e) => setUser(e.target.value)}
                             focusedColor="primary"
                             hoverColor="info"
-                            sx={{wordWrap: 'break-word'}}
                         />
 
                         <CustomTextField
@@ -222,7 +221,6 @@ const ResetPassword: React.FC = () => {
                             onChange={(e) => setPassword(e.target.value)}
                             focusedColor="primary"
                             hoverColor="info"
-                            sx={{wordWrap: 'break-word'}}
                         />
 
                         {showAdminRequest && (

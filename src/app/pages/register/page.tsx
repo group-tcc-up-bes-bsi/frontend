@@ -209,7 +209,6 @@ const Register: React.FC = () => {
                             onChange={(e) => setUser(e.target.value)}
                             focusedColor="primary"
                             hoverColor="info"
-                            sx={{wordWrap: 'break-word'}}
                         />
 
                         <CustomTextField
@@ -219,7 +218,6 @@ const Register: React.FC = () => {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             showPasswordToggle
-                            sx={{wordWrap: 'break-word'}}
                         />
 
                         <CustomTextField
@@ -229,7 +227,7 @@ const Register: React.FC = () => {
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             showPasswordToggle
-                            sx={{wordWrap: 'break-word'}}
+                            
                         />
 
                         <CustomButton

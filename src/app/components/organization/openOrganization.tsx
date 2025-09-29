@@ -206,8 +206,7 @@ const OpenOrganization: React.FC = () => {
                         onChange={(e) => setFilter(e.target.value)}
                         focusedColor="primary"
                         hoverColor="info"
-                        marginBottom={2}
-                        sx={{wordWrap: 'break-word'}}
+                        marginBottom={2} 
                     />
                 </Box>
                 <Box sx={{

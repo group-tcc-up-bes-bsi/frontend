@@ -191,7 +191,6 @@ const Login: React.FC = () => {
               onChange={(e) => setUser(e.target.value)}
               focusedColor="primary"
               hoverColor="info"
-              sx={{wordWrap: 'break-word'}}
             />
 
             <CustomTextField
@@ -202,7 +201,6 @@ const Login: React.FC = () => {
               onChange={(e) => setPassword(e.target.value)}
               focusedColor="primary"
               hoverColor="info"
-              sx={{wordWrap: 'break-word'}}
             />
 
             <CustomLink
