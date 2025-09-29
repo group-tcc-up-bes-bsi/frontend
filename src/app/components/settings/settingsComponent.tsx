@@ -7,6 +7,9 @@ import {
     RadioGroup,
     FormControlLabel,
     Radio,
+    useMediaQuery,
+    Theme,
+    CssBaseline,
 } from '@mui/material';
 import CustomTypography from '../customTypography';
 import CustomButton from '../customButton';
@@ -19,6 +22,8 @@ import { useTermFormStore } from '@/app/state/termFormState';
 import TermsViewer from './termsViewer';
 import { useAdminPassStore } from '@/app/state/adminPassState';
 import PasswordModal from '../admin/passwordModal';
+import { useOrganizationStore } from '@/app/state/organizationState';
+import { countDocuments, getDocuments } from '@/app/services/Documents/DocumentsServices';
 
 const SettingsComponent: React.FC = () => {
     useAuth();
@@ -34,6 +39,22 @@ const SettingsComponent: React.FC = () => {
     const alterText = useTermFormStore((state) => state.alterText);
     const showAdminRequest = useAdminPassStore((state) => state.showAdminRequest);
     const alterAdminPass = useAdminPassStore((state) => state.alter);
+    const organization = useOrganizationStore((state) => state.organization);
+    const isMobile = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'));
+
+    useEffect(() => {
+        if (userCurrent != undefined) {
+            (async () => {
+                try {
+                    if (!organization?.organizationId) {
+                        const result = await getDocuments(userCurrent, theme);
+                        setCountDocs(countDocuments(result.documents))
+                    }
+                } finally { }
+            })();
+        }
+    }, [userCurrent, theme, openNotification]);
+
 
     useEffect(() => {
         if (!userCurrent) return;
@@ -41,7 +62,6 @@ const SettingsComponent: React.FC = () => {
         (async () => {
             const result = await getOrganizations(userCurrent, theme);
             setCountOrgs(countOrganizations(result.organizations));
-            setCountDocs(8 /*countDocs(docs})*/)
         })();
     }, [userCurrent, theme, openNotification]);
 
@@ -67,191 +87,262 @@ const SettingsComponent: React.FC = () => {
 
     return (
         <Box sx={{
-            maxWidth: '100%',
-            justifyContent: 'center',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            padding: 3
+            width: '100%',
+            padding: { xs: 1, md: 3 }
         }}>
+            <CssBaseline />
+
             <Box sx={{
                 backgroundColor: theme.palette.background.default,
-                padding: 2,
-                width: '70%'
+                padding: { xs: 2, md: 3 },
+                width: { xs: '100%', md: '90%', lg: '70%' },
+                maxWidth: '1200px',
+                margin: '0 auto',
+                borderRadius: { xs: 1, md: 2 },
+                boxShadow: { xs: 1, md: 3 }
             }}>
-                <Box sx={{ display: 'flex' }}>
+                <CustomTypography
+                    text='Configurações da Conta'
+                    component="h1"
+                    variant={isMobile ? 'h5' : 'h4'}
+                    align="center"
+                    className="font-bold"
+                    sx={{
+                        color: theme.palette.text.primary,
+                        mb: 1,
+                        fontSize: { xs: '1.5rem', md: '2rem' }
+                    }}
+                />
+                <Divider sx={{
+                    backgroundColor: theme.palette.text.primary,
+                    marginY: 1
+                }} />
+
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: { xs: 'column', md: 'row' },
+                    gap: { xs: 3, md: 4 }
+                }}>
                     <Box sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        alignItems: 'start',
-                        ml: 10,
-                        mr: 10,
-                        paddingY: 5
+                        alignItems: { xs: 'center', md: 'start' },
+                        width: { xs: '100%', md: '50%' },
+                        padding: { xs: 1, md: 3 }
                     }}>
-
                         <CustomTypography
                             text='Informações da conta'
-                            component="h5"
-                            variant='h5'
-                            align="center"
+                            component="h2"
+                            variant={isMobile ? 'h6' : 'h5'}
+                            align={isMobile ? 'center' : 'left'}
                             className="font-bold"
-                            sx={{ color: theme.palette.text.primary, mb: 2 }} />
-                        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'space-between', alignItems: 'center' }}>
+                            sx={{
+                                color: theme.palette.text.primary,
+                                mb: 2,
+                                width: '100%'
+                            }}
+                        />
+
+                        <Box sx={{
+                            width: '100%',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: { xs: 'start', md: 'start' },
+                            gap: 1.3,
+                            marginLeft: 2
+                        }}>
+                            <Box sx={{
+                                display: 'flex',
+                                flexDirection: { xs: 'column', md: 'row' },
+                                alignItems: { xs: 'center', md: 'start' },
+                                gap: 1,
+                                textAlign: { xs: 'center', md: 'left' }
+                            }}>
+                                <CustomTypography
+                                    text={'Nome: ' + (userCurrent?.username || 'N/A')}
+                                    component="p"
+                                    variant={isMobile ? 'body1' : 'h6'}
+                                    sx={{ color: theme.palette.text.primary }}
+                                />
+                            </Box>
+
                             <CustomTypography
-                                text={'Nome: ' + userCurrent?.username}
-                                component="h5"
-                                variant='h6'
-                                align="center"
-                                className="font-bold"
-                                sx={{ color: theme.palette.text.primary, ml: 2 }}
+                                text={'Documentos: ' + countDocs}
+                                component="p"
+                                variant={isMobile ? 'body1' : 'h6'}
+                                sx={{ color: theme.palette.text.primary }}
+                            />
+
+                            <CustomTypography
+                                text={'Organizações: ' + countOrgs}
+                                component="p"
+                                variant={isMobile ? 'body1' : 'h6'}
+                                sx={{ color: theme.palette.text.primary }}
                             />
                         </Box>
-                        <CustomTypography
-                            text={'Documentos: ' + countDocs}
-                            component="h5"
-                            variant='h6'
-                            align="center"
-                            className="font-bold"
-                            sx={{ color: theme.palette.text.primary, ml: 2 }}
-                        />
-                        <CustomTypography
-                            text={'Organizações: ' + countOrgs}
-                            component="h5"
-                            variant='h6'
-                            align="center"
-                            className="font-bold"
-                            sx={{ color: theme.palette.text.primary, ml: 2 }}
-                        />
                     </Box>
+
+
                     <Box sx={{
-                        width: '50%',
+                        width: { xs: '100%', md: '50%' },
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
-                        flexDirection: 'column'
+                        flexDirection: 'column',
+                        padding: { xs: 1, md: 3 }
                     }}>
                         <CustomTypography
                             text='Tema'
-                            component="h5"
-                            variant='h5'
+                            component="h2"
+                            variant={isMobile ? 'h6' : 'h5'}
                             align="center"
                             className="font-bold"
-                            sx={{ color: theme.palette.text.primary, mb: 2 }}
+                            sx={{
+                                color: theme.palette.text.primary,
+                                mb: 2,
+                                width: '100%'
+                            }}
                         />
-                        <FormControl sx={{ marginLeft: 10 }}>
+
+                        <FormControl sx={{
+                            width: '100%',
+                            marginLeft: { xs: 0, md: 10 }
+                        }}>
                             <RadioGroup
                                 aria-labelledby="tema-radio-label"
                                 value={isDarkMode ? 'Escuro' : 'Claro'}
                                 name="tema-radio-group"
+                                sx={{
+                                    flexDirection: { xs: 'row', md: 'column' },
+                                    justifyContent: { xs: 'space-around', md: 'flex-start' },
+                                    gap: { xs: 1, md: 2 }
+                                }}
                             >
                                 <FormControlLabel
                                     value="Claro"
-                                    control={<Radio sx={{ color: theme.palette.text.primary, '&.Mui-checked': { color: theme.palette.primary.main } }} />}
+                                    control={<Radio sx={{
+                                        color: theme.palette.text.primary,
+                                        '&.Mui-checked': { color: theme.palette.primary.main }
+                                    }} />}
                                     label="Claro"
                                     onChange={() => setIsDarkMode(false)}
                                     sx={{ color: theme.palette.text.primary }}
                                 />
                                 <FormControlLabel
                                     value="Escuro"
-                                    control={<Radio sx={{ color: theme.palette.text.primary, '&.Mui-checked': { color: theme.palette.primary.main } }} />}
+                                    control={<Radio sx={{
+                                        color: theme.palette.text.primary,
+                                        '&.Mui-checked': { color: theme.palette.primary.main }
+                                    }} />}
                                     label="Escuro"
                                     onChange={() => setIsDarkMode(true)}
                                     sx={{ color: theme.palette.text.primary }}
                                 />
                             </RadioGroup>
                         </FormControl>
-                    </Box >
+                    </Box>
                 </Box>
+
                 <Divider sx={{
                     backgroundColor: theme.palette.text.primary,
-                    marginBottom: 3,
-                    mt: 3
+                    marginY: 3
                 }} />
+
                 <Box sx={{
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'start',
-                    ml: 10,
-                    mr: 10
+                    gap: 2,
+                    paddingX: { xs: 1, md: 10 }
                 }}>
                     <Box sx={{
                         width: '100%',
                         display: 'flex',
+                        flexDirection: { xs: 'column', md: 'row' },
                         justifyContent: 'space-between',
-                        alignItems: 'center'
+                        alignItems: { xs: 'center', md: 'center' },
+                        gap: { xs: 2, md: 0 }
                     }}>
                         <CustomTypography
                             text='Termos de Uso'
-                            component="h5"
-                            variant='h6'
-                            align="center"
-                            className="font-bold"
-                            sx={{ color: theme.palette.text.primary, ml: 2 }}
+                            component="h3"
+                            variant={isMobile ? 'body1' : 'h6'}
+                            sx={{ color: theme.palette.text.primary }}
                         />
                         <CustomButton
                             text="Visualizar"
-                            fullWidth={false}
+                            fullWidth={isMobile}
                             type="button"
                             onClick={handleViewTerms}
                             colorType="primary"
                             hoverColorType="primary"
-                            paddingY={2}
-                            paddingX={4}
+                            paddingY={isMobile ? 1.5 : 2}
+                            paddingX={isMobile ? 2 : 4}
+                            sx={{ minWidth: { xs: '100%', md: 'auto' } }}
                         />
                     </Box>
+
                     <Box sx={{
                         width: '100%',
                         display: 'flex',
+                        flexDirection: { xs: 'column', md: 'row' },
                         justifyContent: 'space-between',
-                        alignItems: 'center'
+                        alignItems: { xs: 'center', md: 'center' },
+                        gap: { xs: 2, md: 0 }
                     }}>
                         <CustomTypography
                             text='Política de Privacidade'
-                            component="h5"
-                            variant='h6'
-                            align="center"
-                            className="font-bold"
-                            sx={{ color: theme.palette.text.primary, ml: 2 }}
+                            component="h3"
+                            variant={isMobile ? 'body1' : 'h6'}
+                            sx={{ color: theme.palette.text.primary }}
                         />
                         <CustomButton
                             text="Visualizar"
-                            fullWidth={false}
+                            fullWidth={isMobile}
                             type="button"
                             onClick={handleViewPrivacyPolicy}
                             colorType="primary"
                             hoverColorType="primary"
-                            paddingY={2}
-                            paddingX={4}
+                            paddingY={isMobile ? 1.5 : 2}
+                            paddingX={isMobile ? 2 : 4}
+                            sx={{ minWidth: { xs: '100%', md: 'auto' } }}
                         />
                     </Box>
                 </Box>
+
                 <Divider sx={{
                     backgroundColor: theme.palette.text.primary,
-                    marginBottom: 3,
-                    mt: 3
+                    marginY: 3
                 }} />
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4, width: '100%' }}>
+
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    width: '100%',
+                    paddingX: { xs: 1, md: 10 }
+
+                }}>
                     <CustomButton
                         text="Alterar senha"
-                        fullWidth={false}
+                        fullWidth={isMobile}
                         type="button"
                         onClick={handleSubmitUserName}
                         colorType="primary"
                         hoverColorType="primary"
-                        paddingY={2}
-                        paddingX={4}
+                        paddingY={isMobile ? 1.5 : 2}
+                        paddingX={isMobile ? 3 : 4}
                         marginTop={0.5}
+                        sx={{
+                            maxWidth: { xs: '100%', md: 'auto' },
+                            minWidth: { xs: '100%', md: '200px' }
+                        }}
                     />
                 </Box>
             </Box>
-            {termForm && (
-                <TermsViewer />
-            )
-            }
-            {showAdminRequest && (
-                <PasswordModal />
-            )}
-        </Box >
+
+            {termForm && <TermsViewer />}
+            {showAdminRequest && <PasswordModal />}
+        </Box>
     );
 };
 

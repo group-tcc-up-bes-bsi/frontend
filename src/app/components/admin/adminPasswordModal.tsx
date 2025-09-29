@@ -28,11 +28,10 @@ const AdminPasswordModal: React.FC = () => {
                 await new Promise(resolve => setTimeout(resolve, 1000));
                 if (result.message.severity === 'success') {
                     handleClose();
+                    window.location.href = "/";
                 }
             }
-        } catch (error) {
-            console.error('Erro ao atualizar usuário:', error);
-        }
+        } finally { }
     };
 
     useEffect(() => {

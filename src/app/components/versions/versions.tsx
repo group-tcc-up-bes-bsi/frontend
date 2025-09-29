@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
 import {
     Box,
+    CircularProgress,
     IconButton,
     Menu,
     MenuItem,
@@ -13,7 +14,6 @@ import { VersionObj } from '@/app/models/VersionObj';
 import { useFilterStore } from '@/app/state/filterState';
 import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
 import { formatDate, organizationType } from '@/app/services/ConstantsTypes';
-import { getVersions } from '@/app/services/Versions/getVersions';
 import CustomTypography from '../customTypography';
 import MsgConfirm from '../notification/msgConfirm';
 import { useVersionFormStore } from '@/app/state/versionFormState';
@@ -26,6 +26,9 @@ import { getOrganizationUsers } from '@/app/services/Organizations/organizations
 import { useOrganizationStore } from '@/app/state/organizationState';
 import CustomAlert from '../customAlert';
 import { MessageObj } from '@/app/models/MessageObj';
+import { getVersionsByDocument } from '@/app/services/Versions/getVersions';
+import { useDocumentStore } from '@/app/state/documentState';
+import { deleteVersion } from '@/app/services/Versions/deleteVersion';
 
 const Versions: React.FC = () => {
     useAuth();
@@ -45,8 +48,27 @@ const Versions: React.FC = () => {
         new MessageObj('info', 'Tela das Versões', '', 'info')
     );
     const [showMessage, setShowMessage] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [allVersions, setVersions] = useState<VersionObj[]>([]);
+    const document = useDocumentStore((state) => state.document);
 
-    const allVersions = getVersions();
+    useEffect(() => {
+        if (userCurrent != undefined) {
+            (async () => {
+                setLoading(true);
+                try {
+                    if (document) {
+                        const result = await getVersionsByDocument(userCurrent, document);
+                        setVersions(result.versions);
+                    }
+
+                } finally {
+                    setLoading(false);
+                }
+            })();
+        }
+    }, [userCurrent, theme, versionForm]);
+
     const filteredVersions = useMemo(() => {
         let version = [...allVersions];
 
@@ -54,13 +76,13 @@ const Versions: React.FC = () => {
             const searchTerm = filter.toLowerCase().trim();
 
             version = version.filter((version) =>
-                version.versionName.toLowerCase().includes(searchTerm) ||
-                version.versionFilePath.toLowerCase().includes(searchTerm) ||
-                formatDate(version.createdAt).toLowerCase().includes(searchTerm) ||
+                version.name.toLowerCase().includes(searchTerm) ||
+                version.filePath.toLowerCase().includes(searchTerm) ||
+                formatDate(version.creationDate).toLowerCase().includes(searchTerm) ||
                 version.document.name.toLowerCase().includes(searchTerm)
             );
         }
-        return version.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+        return version.sort((a, b) => b.creationDate.getTime() - a.creationDate.getTime());
     }, [allVersions, filter]);
 
     useEffect(() => {
@@ -69,11 +91,6 @@ const Versions: React.FC = () => {
             setTimeout(() => setShowMessage(false), 5000);
         }
     }, [message]);
-
-    const toggleConfirm = (version: VersionObj) => {
-        alterMsgConfirm(`Excluir a versão ${version.versionName}?`);
-        alterConfirm(!openConfirm);
-    }
 
     const toggleVersionForm = async (version: VersionObj) => {
         if (userCurrent != undefined) {
@@ -120,9 +137,9 @@ const Versions: React.FC = () => {
                             ) {
                                 const version: VersionObj = {
                                     documentVersionId: 0,
-                                    versionName: "",
-                                    versionFilePath: "",
-                                    createdAt: new Date(),
+                                    name: "",
+                                    filePath: "",
+                                    creationDate: new Date(),
                                     document: {
                                         documentId: 0,
                                         name: "",
@@ -140,7 +157,6 @@ const Versions: React.FC = () => {
                                             icon: null,
                                         },
                                         version: "",
-                                        creator: "",
                                         favorite: false,
                                     },
                                     user: {
@@ -174,6 +190,65 @@ const Versions: React.FC = () => {
         }
     };
 
+    const handleDeleteVersion = async () => {
+        if (selectedVersion && document) {
+            alterVersion(selectedVersion);
+            alterMsgConfirm(`excluir a versão ${selectedVersion.name}?`);
+            alterConfirm(true);
+
+            if (userCurrent != undefined) {
+                try {
+                    const result = await getOrganizationUsers(
+                        document?.organization.organizationId,
+                        userCurrent
+                    );
+                    const users = result.users;
+
+                    for (const user of users) {
+                        if (user.username == userCurrent.username) {
+                            if (user.userType.toString() == 'OWNER') {
+                                useMsgConfirmStore.getState().setOnConfirm(async () => {
+                                    if (userCurrent) {
+                                        const result = await deleteVersion(
+                                            userCurrent,
+                                            selectedVersion.documentVersionId
+                                        );
+                                        setVersions((prev) =>
+                                            prev.filter(
+                                                (version) =>
+                                                    version.documentVersionId !==
+                                                    selectedVersion.documentVersionId
+                                            )
+                                        );
+                                        setMessage(result.message);
+                                    }
+                                });
+                            } else {
+                                setMessage(
+                                    new MessageObj(
+                                        'warning',
+                                        'Não Permitido',
+                                        'Somente o proprietario realizar Exclusão',
+                                        'warning'
+                                    )
+                                );
+                            }
+                        }
+                    }
+                } catch (error) {
+                    setMessage(
+                        new MessageObj(
+                            'error',
+                            'Erro inesperado',
+                            `${error}`,
+                            'error'
+                        )
+                    );
+                }
+            }
+        }
+        setAnchorEl(null);
+    };
 
     return (
         <Box
@@ -235,7 +310,11 @@ const Versions: React.FC = () => {
                 }}
             >
 
-                {filteredVersions.length === 0 ? (
+                {loading ? (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+                        <CircularProgress color="primary" />
+                    </Box>
+                ) : filteredVersions.length === 0 ? (
                     <CustomTypography
                         text='Nenhuma versão encontrada para o filtro informado'
                         component="h6"
@@ -257,7 +336,7 @@ const Versions: React.FC = () => {
                         }}
                     >
                         <Box fontWeight="bold" fontSize="0.9rem">
-                            Versão: {version.versionName}
+                            Versão: {version.name}
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                             <Box sx={{ display: 'flex', flexDirection: 'column', }}>
@@ -281,13 +360,13 @@ const Versions: React.FC = () => {
                                     onClose={() => setAnchorEl(null)}
                                 >
                                     <MenuItem onClick={() => { toggleVersionForm(version) }}>Alterar</MenuItem>
-                                    <MenuItem onClick={() => toggleConfirm(version)}>Excluir</MenuItem>
+                                    <MenuItem onClick={handleDeleteVersion}>Excluir</MenuItem>
                                 </Menu>
                             </Box>
                         </Box>
                         <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                             <Box fontSize="0.75rem" mt={1} sx={{ color: theme.palette.text.primary }}>
-                                Criado em {formatDate(version.createdAt)}
+                                Criado em {formatDate(version.creationDate)}
                             </Box>
                         </Box>
                     </Box>
@@ -303,15 +382,17 @@ const Versions: React.FC = () => {
                 <Box
                     sx={{
                         position: 'absolute',
-                        bottom: '0%',
+                        bottom: '10%',
                         left: '50%',
                         transform: 'translateX(-50%)',
+                        zIndex: 1500,
                         display: 'flex',
                         justifyContent: 'center',
                         alignItems: 'center',
                         gap: 2,
                         textAlign: 'left',
-                    }}>
+                    }}
+                >
                     <CustomAlert
                         severity={message.severity}
                         colorType={message.colorType}

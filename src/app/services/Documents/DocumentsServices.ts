@@ -12,7 +12,10 @@ export async function getDocuments(
   theme: Theme
 ): Promise<{ message: MessageObj; documents: DocumentObj[] }> {
   try {
-    const { message: orgMessage, organizations } = await getMyOrganizations(userCurrent, theme);
+    const { message: orgMessage, organizations } = await getMyOrganizations(
+      userCurrent,
+      theme
+    );
 
     if (!organizations || organizations.length === 0) {
       return {
@@ -66,7 +69,6 @@ export function getDocumentsTrash(): DocumentObj[] {
       description: "Pdf",
       favorite: true,
       version: "Test",
-      creator: "User A",
       organization: {
         organizationId: 1,
         name: "Projeto Inovação",
@@ -86,7 +88,6 @@ export function getDocumentsTrash(): DocumentObj[] {
       description: "Planilha Excel",
       favorite: false,
       version: "2.0",
-      creator: "User B",
       organization: {
         organizationId: 1,
         name: "TCC",
@@ -106,7 +107,6 @@ export function getDocumentsTrash(): DocumentObj[] {
       description: "Apresentação do projeto",
       favorite: false,
       version: "1.5",
-      creator: "User C",
       organization: {
         organizationId: 1,
         name: "TCC",
@@ -117,5 +117,10 @@ export function getDocumentsTrash(): DocumentObj[] {
         icon: undefined,
       },
     },
-  ]
+  ];
+}
+
+export function countDocuments(documents: DocumentObj[]): number {
+  if (!documents || documents.length === 0) return 0;
+  return documents.length;
 }

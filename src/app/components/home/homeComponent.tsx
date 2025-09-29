@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { Box, Divider, Typography, } from '@mui/material';
+import { Box, Divider, IconButton, Typography, useMediaQuery, } from '@mui/material';
 import CustomTypography from '../customTypography';
 import Menu from '@mui/icons-material/Menu';
 import SpaceDashboard from '@mui/icons-material/SpaceDashboard';
@@ -33,6 +33,7 @@ const HomeComponent: React.FC = () => {
     const openNotification = useNotificationStore((state) => state.openNotification);
     const alterOrg = useOrganizationStore((state) => state.alter);
     const alterOption = useOptionsDashboardStore((state) => state.alter);
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const toggleModeViewer = (mode: number) => {
         alterModeViewer(mode)
@@ -55,7 +56,7 @@ const HomeComponent: React.FC = () => {
 
     useEffect(() => {
         toggleModeViewer(modeViewer)
-    }, [modeViewer]);
+    }, [modeViewer, theme]);
 
     useEffect(() => {
         if (userCurrent != undefined) {
@@ -72,63 +73,98 @@ const HomeComponent: React.FC = () => {
     };
 
     return (
-        <Box sx={{ maxWidth: '100%' }}>
-            <Box sx={{ display: 'flex', gap: 4, alignItems: 'center', justifyContent: 'space-between' }}>
-                <Box>
+        <Box sx={{ maxWidth: '100%', p: isMobile ? 1 : 0 }}>
+            <Box sx={{
+                display: 'flex',
+                gap: isMobile ? 2 : 4,
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexDirection: 'row',
+                mb: isMobile ? 2 : 0
+            }}>
+                <Box sx={{ width: isMobile ? '100%' : 'auto' }}>
                     <CustomTypography
                         text={"Usuário: " + userCurrent?.username}
                         component="h2"
-                        variant="h6"
+                        variant={isMobile ? "body1" : "h6"}
                         sx={{
                             color: theme.palette.text.primary,
                             fontWeight: 'bold',
-                            padding: 1,
-                            marginBottom: 1,
-                            background: theme.palette.background.default
+                            padding: 1.5,
+                            marginBottom: isMobile ? 0 : 1,
+                            background: theme.palette.background.default,
+                            textAlign: isMobile ? 'center' : 'left',
+                            fontSize: isMobile ? '1.1rem' : '1.3rem'
                         }}
                     />
                 </Box>
                 <Box sx={{
                     backgroundColor: theme.palette.background.default,
-                    padding: 1,
+                    padding: isMobile ? 1 : 0.5,
                     display: 'flex',
-                    marginBottom: 1,
+                    marginBottom: isMobile ? 0 : 1,
                     alignItems: 'center',
+                    borderRadius: 1
                 }}>
-                    <Menu onClick={() => { toggleModeViewer(1) }} sx={{ color: colorMode1, fontSize: 32 }} />
+                    <IconButton
+                        onClick={() => { toggleModeViewer(1) }}
+                        size={isMobile ? "small" : "medium"}
+                    >
+                        <Menu sx={{
+                            color: colorMode1,
+                            fontSize: isMobile ? 24 : 32
+                        }} />
+                    </IconButton>
                     <Divider
                         orientation="vertical"
                         sx={{
                             backgroundColor: theme.palette.text.primary,
-                            height: 30,
-                            margin: '0 10px',
+                            height: isMobile ? 20 : 30,
+                            margin: isMobile ? '0 5px' : '0 10px',
                             padding: 0.2,
                             borderRadius: '20%'
                         }} />
-                    <SpaceDashboard onClick={() => { toggleModeViewer(2) }} sx={{ color: colorMode2, fontSize: 32 }} />
+                    <IconButton
+                        onClick={() => { toggleModeViewer(2) }}
+                        size={isMobile ? "small" : "medium"}
+                    >
+                        <SpaceDashboard sx={{
+                            color: colorMode2,
+                            fontSize: isMobile ? 24 : 32
+                        }} />
+                    </IconButton>
                 </Box>
             </Box>
-            <Box sx={{ backgroundColor: theme.palette.background.default, padding: 1 }}>
-                <Box
-                    sx={{ width: '100%', display: 'flex', marginLeft: '1rem' }}
-                >
+
+            <Box sx={{
+                backgroundColor: theme.palette.background.default,
+                padding: isMobile ? 0.5 : 1,
+                mb: isMobile ? 2 : 0
+            }}>
+                <Box sx={{
+                    width: '100%',
+                    display: 'flex',
+                    marginLeft: isMobile ? '0.5rem' : '1rem',
+                    mb: 1
+                }}>
                     <CustomTypography
-                        text="Organização Recentes"
+                        text="Organizações Recentes"
                         component="h2"
-                        variant="h6"
+                        variant={isMobile ? "body1" : "h6"}
                         sx={{
                             color: theme.palette.text.primary,
-                            fontWeight: 'bold'
+                            fontWeight: 'bold',
+                            fontSize: isMobile ? '1rem' : '1.25rem'
                         }}
                     />
                 </Box>
                 <Box
                     sx={{
                         display: 'flex',
-                        gap: 3,
-                        maxHeight: 'calc(80vh - 150px)',
+                        gap: isMobile ? 1 : 3,
+                        maxHeight: isMobile ? '200px' : 'calc(80vh - 150px)',
                         overflowX: 'auto',
-                        pr: 2,
+                        pr: isMobile ? 1 : 2,
                         '&::-webkit-scrollbar': {
                             width: '2px',
                             height: '6px',
@@ -152,7 +188,10 @@ const HomeComponent: React.FC = () => {
                                 width: '100%'
                             }}
                         >
-                            <Typography variant="h6" color={theme.palette.text.primary}>
+                            <Typography
+                                variant={isMobile ? "body2" : "h6"}
+                                color={theme.palette.text.primary}
+                            >
                                 {'Nenhuma organização disponível'}
                             </Typography>
                         </Box>
@@ -162,7 +201,7 @@ const HomeComponent: React.FC = () => {
                                 key={org.organizationId}
                                 sx={{
                                     mb: 1,
-                                    p: 1,
+                                    p: isMobile ? 0.5 : 1,
                                     display: 'flex',
                                     cursor: 'pointer',
                                     '&:hover': {
@@ -175,14 +214,14 @@ const HomeComponent: React.FC = () => {
                             >
                                 <Box sx={{
                                     display: 'flex',
-                                    gap: 4,
+                                    gap: isMobile ? 2 : 4,
                                     justifyContent: 'space-between',
                                     alignItems: 'center',
                                     width: '100%'
                                 }}>
                                     <Box sx={{
                                         display: 'flex',
-                                        gap: 1,
+                                        gap: isMobile ? 0.5 : 1,
                                         alignItems: 'center',
                                         justifyContent: 'center'
                                     }}>
@@ -190,12 +229,13 @@ const HomeComponent: React.FC = () => {
                                         <CustomTypography
                                             text={org.name}
                                             component="h2"
-                                            variant="h6"
+                                            variant={isMobile ? "body2" : "h6"}
                                             sx={{
                                                 color: theme.palette.text.primary,
                                                 fontWeight: 'bold',
                                                 mb: 0,
                                                 whiteSpace: 'nowrap',
+                                                fontSize: isMobile ? '0.9rem' : '1rem'
                                             }}
                                         />
                                     </Box>
@@ -204,29 +244,32 @@ const HomeComponent: React.FC = () => {
                         )))}
                 </Box>
             </Box>
+
             <Box sx={{
                 display: 'flex',
                 width: '100%',
                 background: theme.palette.background.default,
-                marginTop: 2,
-                paddingLeft: 2
+                marginTop: isMobile ? 1 : 2,
+                paddingLeft: isMobile ? 1 : 2
             }}>
                 <CustomTypography
                     text="Documentos Recentes"
                     component="h2"
-                    variant="h5"
+                    variant={isMobile ? "h6" : "h5"}
                     sx={{
                         color: theme.palette.text.primary,
                         mt: 1,
                         fontWeight: 'bold',
+                        fontSize: isMobile ? '1.1rem' : '1.5rem'
                     }}
                 />
             </Box>
+
             {modeViewer == 1 && (
                 <Box sx={{
                     backgroundColor: theme.palette.background.default,
-                    padding: 1,
-                    maxHeight: 'calc(80vh - 150px)',
+                    padding: isMobile ? 0.5 : 1,
+                    maxHeight: isMobile ? '400px' : 'calc(80vh - 150px)',
                     overflowY: 'auto',
                     '&::-webkit-scrollbar': {
                         width: '6px',
@@ -241,13 +284,13 @@ const HomeComponent: React.FC = () => {
                 }}>
                     <TableDocuments />
                 </Box>
-            )
-            }
+            )}
+
             {modeViewer == 2 && (
                 <Box sx={{
                     backgroundColor: theme.palette.background.default,
-                    padding: 1,
-                    maxHeight: 'calc(80vh - 150px)',
+                    padding: isMobile ? 0.5 : 1,
+                    maxHeight: isMobile ? '400px' : 'calc(80vh - 150px)',
                     overflowY: 'auto',
                     '&::-webkit-scrollbar': {
                         width: '6px',
@@ -263,11 +306,12 @@ const HomeComponent: React.FC = () => {
                     <Documents />
                 </Box>
             )}
+
             {showMessage && message && (
                 <Box
                     sx={{
-                        position: 'absolute',
-                        bottom: '0%',
+                        position: 'fixed',
+                        bottom: isMobile ? '10%' : '0%',
                         left: '50%',
                         transform: 'translateX(-50%)',
                         display: 'flex',
@@ -275,6 +319,8 @@ const HomeComponent: React.FC = () => {
                         alignItems: 'center',
                         gap: 2,
                         textAlign: 'left',
+                        width: isMobile ? '95%' : 'auto',
+                        zIndex: 9999
                     }}>
                     <CustomAlert
                         severity={message.severity}
@@ -284,7 +330,7 @@ const HomeComponent: React.FC = () => {
                     />
                 </Box>
             )}
-        </Box >
+        </Box>
     );
 };
 

@@ -156,7 +156,7 @@ const TableDocuments = () => {
                             }
                         }
                     }
-                }else{
+                } else {
                     const result = await getOrganizationUsers(document.organization.organizationId, userCurrent)
                     const users = result.users;
                     for (const user of users) {
@@ -178,7 +178,20 @@ const TableDocuments = () => {
     }
 
     return (
-        <TableContainer>
+        <TableContainer
+            sx={{
+                '&::-webkit-scrollbar': {
+                    width: '2px',
+                    height: '6px',
+                },
+                '&::-webkit-scrollbar-track': {
+                    background: theme.palette.background.default,
+                },
+                '&::-webkit-scrollbar-thumb': {
+                    backgroundColor: theme.palette.primary.main,
+                    borderRadius: '6px',
+                },
+            }}>
             <Table sx={{ minWidth: 650 }} aria-label="tabela de Documentos">
                 <TableHead>
                     <TableRow sx={{ backgroundColor: theme.palette.background.default }}>

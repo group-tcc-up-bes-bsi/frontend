@@ -68,7 +68,6 @@ const DocumentsComponent: React.FC = () => {
             creationDate: new Date(),
             lastModifiedDate: new Date(),
             version: '',
-            creator: '',
             organization: {
                 organizationId: 0,
                 name: '',

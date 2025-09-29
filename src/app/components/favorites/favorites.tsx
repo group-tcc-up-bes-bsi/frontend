@@ -5,6 +5,7 @@ import {
     TableHead, TableRow, Paper,
     IconButton,
     Typography,
+    useMediaQuery,
 } from '@mui/material';
 import CustomTypography from '../customTypography';
 import CustomTextField from '../customTextField';
@@ -20,6 +21,11 @@ import CustomAlert from '../customAlert';
 import CustomComboBox from '../customComboBox';
 import { favoriteTypeOptions } from '@/app/services/ConstantsTypes';
 import { DocumentObj } from '@/app/models/DocumentObj';
+import { createFavoriteDocument } from '@/app/services/Documents/createFavoriteDocument';
+import { deleteFavoriteDocument } from '@/app/services/Documents/deleteFavoriteDocument';
+import { createFavoriteOrganization } from '@/app/services/Organizations/createFavoriteDocument';
+import { deleteFavoriteOrganization } from '@/app/services/Organizations/deleteFavoriteDocument';
+import { countOrganizationDocuments } from '@/app/services/Documents/getOrganizationDocuments';
 
 const Favorites: React.FC = () => {
     useAuth();
@@ -33,6 +39,7 @@ const Favorites: React.FC = () => {
     );
     const [showMessage, setShowMessage] = useState(false);
     const [selectedFavorite, setSelectedFavorite] = useState('');
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     useEffect(() => {
         if (message) {
@@ -93,13 +100,25 @@ const Favorites: React.FC = () => {
     }, [organizations, filter, selectedFavorite]);
 
 
-    const handleFavoriteToggle = (doc: typeof documents[number]) => {
-        doc.favorite = !doc.favorite;
+    const handleFavoriteToggle = async (doc: typeof documents[number]) => {
+        if (doc.favorite === false) {
+            doc.favorite = true;
+            await createFavoriteDocument(doc.documentId, userCurrent!);
+        } else {
+            doc.favorite = false;
+            await deleteFavoriteDocument(doc.documentId, userCurrent!);
+        }
         setDocuments([...documents]);
     };
 
-    const handleFavoriteOrganizationToggle = (org: typeof organizations[number]) => {
-        org.favorite = !org.favorite;
+    const handleFavoriteOrganizationToggle = async (org: typeof organizations[number]) => {
+        if (org.favorite === false) {
+            org.favorite = true;
+            await createFavoriteOrganization(org.organizationId, userCurrent!);
+        } else {
+            org.favorite = false;
+            await deleteFavoriteOrganization(org.organizationId, userCurrent!);
+        }
         setOrganizations([...organizations]);
     };
 
@@ -108,10 +127,15 @@ const Favorites: React.FC = () => {
     };
 
     return (
-        <Box sx={{ maxWidth: '100%' }}>
+        <Box sx={{ maxWidth: '100%', p: isMobile ? 1 : 0 }}>
             <Box>
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 4 }}>
-                    <Box sx={{ width: '100%' }}>
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                    gap: isMobile ? 2 : 4,
+                    flexDirection: isMobile ? 'column' : 'row'
+                }}>
+                    <Box sx={{ width: isMobile ? '100%' : '100%' }}>
                         <CustomTextField
                             name="filter"
                             label="Informe algo"
@@ -122,7 +146,7 @@ const Favorites: React.FC = () => {
                             hoverColor="info"
                         />
                     </Box>
-                    <Box sx={{ width: '40%' }}>
+                    <Box sx={{ width: isMobile ? '100%' : '40%' }}>
                         <Box sx={{ width: '100%' }}>
                             <CustomComboBox
                                 name="user-invite"
@@ -137,25 +161,40 @@ const Favorites: React.FC = () => {
                     </Box>
                 </Box>
             </Box>
-            <Box sx={{ backgroundColor: theme.palette.background.default, padding: 3 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'start', width: '50%' }}>
+            <Box sx={{
+                backgroundColor: theme.palette.background.default,
+                padding: isMobile ? 1 : 3
+            }}>
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    gap: isMobile ? 3 : 0
+                }}>
+                    <Box sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'start',
+                        width: isMobile ? '100%' : '50%'
+                    }}>
                         <CustomTypography
                             text="Documentos"
                             component="h2"
-                            variant="h5"
+                            variant={isMobile ? "h6" : "h5"}
                             sx={{
                                 color: theme.palette.text.primary,
-                                mb: 1,
-                                mt: 1,
                                 fontWeight: 'bold'
                             }}
                         />
+                        <Divider sx={{
+                            backgroundColor: theme.palette.text.primary,
+                            marginY: 1
+                        }} />
                         <Box
                             sx={{
                                 backgroundColor: theme.palette.background.default,
                                 padding: 1,
-                                maxHeight: 'calc(80vh - 150px)',
+                                maxHeight: isMobile ? '400px' : 'calc(80vh - 150px)',
                                 overflowY: 'auto',
                                 '&::-webkit-scrollbar': {
                                     width: '6px',
@@ -168,20 +207,38 @@ const Favorites: React.FC = () => {
                                     borderRadius: '3px',
                                 },
                             }}>
-                            <TableContainer component={Paper} sx={{ background: 'transparent', boxShadow: 'none' }}>
-                                <Table size="small">
+                            <TableContainer component={Paper} sx={{
+                                background: 'transparent',
+                                boxShadow: 'none',
+                                maxWidth: '100%',
+                                overflowX: 'auto'
+                            }}>
+                                <Table size={isMobile ? "small" : "small"}>
                                     <TableHead>
-                                        <TableRow>
-                                            <TableCell />
-                                            <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Documento</TableCell>
-                                            <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Organização</TableCell>
+                                        <TableRow sx={{ display: isMobile ? 'none' : 'table-cell' }}>
+                                            <TableCell sx={{ width: isMobile ? '40px' : 'auto' }} />
+                                            <TableCell sx={{
+                                                textTransform: 'uppercase',
+                                                fontWeight: 'bold',
+                                                fontSize: isMobile ? '0.75rem' : '1rem'
+                                            }}>Documento</TableCell>
+                                            {!isMobile && (
+                                                <TableCell sx={{
+                                                    textTransform: 'uppercase',
+                                                    fontWeight: 'bold',
+                                                    fontSize: isMobile ? '0.75rem' : '1rem',
+                                                }}>Organização</TableCell>
+                                            )}
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         {filteredDocuments.length === 0 ? (
                                             <TableRow>
-                                                <TableCell colSpan={7} align="center">
-                                                    <Typography variant="h6" color={theme.palette.text.primary}>
+                                                <TableCell colSpan={isMobile ? 2 : 3} align="center">
+                                                    <Typography
+                                                        variant={isMobile ? "body2" : "h6"}
+                                                        color={theme.palette.text.primary}
+                                                    >
                                                         {filter ? 'Nenhum documento encontrado para o filtro informado' : 'Nenhum documento disponível'}
                                                     </Typography>
                                                 </TableCell>
@@ -190,18 +247,43 @@ const Favorites: React.FC = () => {
                                             filteredDocuments.map((doc) => (
                                                 <TableRow key={doc.documentId}>
                                                     <TableCell>
-                                                        <IconButton aria-label="star" onClick={() => handleFavoriteToggle(doc)}>
+                                                        <IconButton
+                                                            aria-label="star"
+                                                            onClick={() => handleFavoriteToggle(doc)}
+                                                            size={isMobile ? "small" : "medium"}
+                                                        >
                                                             <Star sx={{
                                                                 color: doc.favorite ? theme.palette.button.star : theme.palette.text.primary,
                                                                 transition: 'color 0.2s ease-in-out',
                                                                 '&:hover': {
                                                                     transform: 'scale(1.1)'
-                                                                }
+                                                                },
+                                                                fontSize: isMobile ? '1.2rem' : '1.5rem'
                                                             }} />
                                                         </IconButton>
                                                     </TableCell>
-                                                    <TableCell sx={{ color: theme.palette.text.primary }}>{doc.name}</TableCell>
-                                                    <TableCell sx={{ color: theme.palette.text.primary }}>{doc.organization.name}</TableCell>
+                                                    <TableCell sx={{
+                                                        color: theme.palette.text.primary,
+                                                        fontSize: isMobile ? '0.8rem' : '1rem'
+                                                    }}>
+                                                        {doc.name}
+                                                        {isMobile && (
+                                                            <Typography
+                                                                variant="body2"
+                                                                sx={{
+                                                                    color: theme.palette.text.secondary,
+                                                                    fontSize: '0.7rem'
+                                                                }}
+                                                            >
+                                                                {doc.organization.name}
+                                                            </Typography>
+                                                        )}
+                                                    </TableCell>
+                                                    {!isMobile && (
+                                                        <TableCell sx={{ color: theme.palette.text.primary }}>
+                                                            {doc.organization.name}
+                                                        </TableCell>
+                                                    )}
                                                 </TableRow>
                                             ))}
                                     </TableBody>
@@ -209,35 +291,48 @@ const Favorites: React.FC = () => {
                             </TableContainer>
                         </Box>
                     </Box>
-                    <Divider
-                        orientation="vertical"
-                        sx={{
-                            backgroundColor: theme.palette.text.primary,
-                            height: '70vh',
-                            margin: '0 10px',
-                            marginLeft: 2,
-                            marginRight: 2,
-                            padding: 0.05,
-                            borderRadius: '20%'
-                        }} />
-                    <Box sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'start', width: '50%' }}>
+
+                    {!isMobile && (
+                        <Divider
+                            orientation="vertical"
+                            sx={{
+                                backgroundColor: theme.palette.text.primary,
+                                height: '70vh',
+                                margin: '0 10px',
+                                marginLeft: 2,
+                                marginRight: 2,
+                                padding: 0.05,
+                                borderRadius: '20%'
+                            }}
+                        />
+                    )}
+
+                    <Box sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'start',
+                        width: isMobile ? '100%' : '50%'
+                    }}>
                         <CustomTypography
                             text="Organizações"
                             component="h2"
-                            variant="h5"
+                            variant={isMobile ? "h6" : "h5"}
                             sx={{
                                 color: theme.palette.text.primary,
-                                mb: 2,
-                                mt: 1,
                                 fontWeight: 'bold'
                             }}
                         />
+
+                        <Divider sx={{
+                            backgroundColor: theme.palette.text.primary,
+                            marginY: 1
+                        }} />
 
                         <Box
                             sx={{
                                 backgroundColor: theme.palette.background.default,
                                 padding: 1,
-                                maxHeight: 'calc(80vh - 150px)',
+                                maxHeight: isMobile ? '400px' : 'calc(80vh - 150px)',
                                 overflowY: 'auto',
                                 '&::-webkit-scrollbar': {
                                     width: '6px',
@@ -251,42 +346,90 @@ const Favorites: React.FC = () => {
                                 },
                             }}
                         >
-                            <TableContainer component={Paper} sx={{ background: 'transparent', boxShadow: 'none' }}>
-                                <Table size="small">
+                            <TableContainer component={Paper} sx={{
+                                background: 'transparent',
+                                boxShadow: 'none',
+                                maxWidth: '100%',
+                                overflowX: 'auto'
+                            }}>
+                                <Table size={isMobile ? "small" : "small"}>
                                     <TableHead>
-                                        <TableRow>
-                                            <TableCell />
-                                            <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Organização</TableCell>
-                                            <TableCell sx={{ textTransform: 'uppercase', fontWeight: 'bold', fontSize: '1rem' }}>Total de Arquivos</TableCell>
+                                        <TableRow sx={{ display: isMobile ? 'none' : 'table-cell' }}>
+                                            <TableCell sx={{ width: isMobile ? '40px' : 'auto' }} />
+                                            <TableCell sx={{
+                                                textTransform: 'uppercase',
+                                                fontWeight: 'bold',
+                                                fontSize: isMobile ? '0.75rem' : '1rem'
+                                            }}>Organização</TableCell>
+                                            {!isMobile && (
+                                                <TableCell sx={{
+                                                    textTransform: 'uppercase',
+                                                    fontWeight: 'bold',
+                                                    fontSize: isMobile ? '0.75rem' : '1rem'
+                                                }}>Total de Documentos</TableCell>
+                                            )}
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
                                         {filteredOrganizations.length === 0 ? (
                                             <TableRow>
-                                                <TableCell colSpan={7} align="center">
-                                                    <Typography variant="h6" color={theme.palette.text.primary}>
+                                                <TableCell colSpan={isMobile ? 2 : 3} align="center">
+                                                    <Typography
+                                                        variant={isMobile ? "body2" : "h6"}
+                                                        color={theme.palette.text.primary}
+                                                    >
                                                         {filter ? 'Nenhuma organização encontrada para o filtro informado' : 'Nenhuma organização disponível'}
                                                     </Typography>
                                                 </TableCell>
                                             </TableRow>
                                         ) :
-                                            filteredOrganizations.map((org) => (
-                                                <TableRow key={org.organizationId}>
-                                                    <TableCell>
-                                                        <IconButton aria-label="star" onClick={() => handleFavoriteOrganizationToggle(org)}>
-                                                            <Star sx={{
-                                                                color: org.favorite ? theme.palette.button.star : theme.palette.text.primary,
-                                                                transition: 'color 0.2s ease-in-out',
-                                                                '&:hover': {
-                                                                    transform: 'scale(1.1)'
-                                                                }
-                                                            }} />
-                                                        </IconButton>
-                                                    </TableCell>
-                                                    <TableCell sx={{ color: theme.palette.text.primary }}>{org.name}</TableCell>
-                                                    <TableCell sx={{ color: theme.palette.text.primary }}>10</TableCell>
-                                                </TableRow>
-                                            ))}
+                                            filteredOrganizations.map((org) => {
+                                                const orgDocuments = filteredDocuments.filter(
+                                                    (doc) => doc.organization.organizationId === org.organizationId
+                                                );
+                                                return (
+                                                    <TableRow key={org.organizationId}>
+                                                        <TableCell>
+                                                            <IconButton
+                                                                aria-label="star"
+                                                                onClick={() => handleFavoriteOrganizationToggle(org)}
+                                                                size={isMobile ? "small" : "medium"}
+                                                            >
+                                                                <Star sx={{
+                                                                    color: org.favorite ? theme.palette.button.star : theme.palette.text.primary,
+                                                                    transition: 'color 0.2s ease-in-out',
+                                                                    '&:hover': {
+                                                                        transform: 'scale(1.1)'
+                                                                    },
+                                                                    fontSize: isMobile ? '1.2rem' : '1.5rem'
+                                                                }} />
+                                                            </IconButton>
+                                                        </TableCell>
+                                                        <TableCell sx={{
+                                                            color: theme.palette.text.primary,
+                                                            fontSize: isMobile ? '0.8rem' : '1rem'
+                                                        }}>
+                                                            {org.name}
+                                                            {isMobile && (
+                                                                <Typography
+                                                                    variant="body2"
+                                                                    sx={{
+                                                                        color: theme.palette.text.secondary,
+                                                                        fontSize: '0.7rem'
+                                                                    }}
+                                                                >
+                                                                    Documentos: {countOrganizationDocuments(orgDocuments)}
+                                                                </Typography>
+                                                            )}
+                                                        </TableCell>
+                                                        {!isMobile && (
+                                                            <TableCell sx={{ color: theme.palette.text.primary }}>
+                                                                {countOrganizationDocuments(orgDocuments)}
+                                                            </TableCell>
+                                                        )}
+                                                    </TableRow>
+                                                )
+                                            })}
                                     </TableBody>
                                 </Table>
                             </TableContainer>
@@ -297,8 +440,8 @@ const Favorites: React.FC = () => {
             {showMessage && message && (
                 <Box
                     sx={{
-                        position: 'absolute',
-                        bottom: '0%',
+                        position: 'fixed',
+                        bottom: isMobile ? '10%' : '0%',
                         left: '50%',
                         transform: 'translateX(-50%)',
                         display: 'flex',
@@ -306,6 +449,8 @@ const Favorites: React.FC = () => {
                         alignItems: 'center',
                         gap: 2,
                         textAlign: 'left',
+                        width: isMobile ? '95%' : 'auto',
+                        zIndex: 9999
                     }}>
                     <CustomAlert
                         severity={message.severity}

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { Box, Divider, IconButton, Menu, MenuItem, CircularProgress, Typography, CardContent, Card } from '@mui/material';
+import { Box, IconButton, Menu, MenuItem, CircularProgress, Typography, CardContent, Card, useMediaQuery, Chip } from '@mui/material';
 import CustomTypography from '../customTypography';
 import CustomComboBox from '../customComboBox';
 import CustomTextField from '../customTextField';
@@ -22,6 +22,8 @@ import { MessageObj } from '@/app/models/MessageObj';
 import CustomAlert from '../customAlert';
 import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
 import { getOrganizations } from '@/app/services/Organizations/getOrganizations';
+import { createFavoriteOrganization } from '@/app/services/Organizations/createFavoriteDocument';
+import { deleteFavoriteOrganization } from '@/app/services/Organizations/deleteFavoriteDocument';
 
 const Organization: React.FC = () => {
     useAuth();
@@ -43,9 +45,11 @@ const Organization: React.FC = () => {
         new MessageObj('info', 'Tela das Organizações', '', 'info')
     );
     const [showMessage, setShowMessage] = useState(false);
-    const alterOrg = useOrganizationStore((state) => state.alter);
     const alterOption = useOptionsDashboardStore((state) => state.alter);
     const [selectedFavorite, setSelectedFavorite] = useState('');
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
+
 
     useEffect(() => {
         if (message) {
@@ -179,58 +183,81 @@ const Organization: React.FC = () => {
 
     const handleOpen = (organization: OrganizationObj) => {
         alterOption('Open Organization');
-        alterOrg(organization);
+        alterOrganization(organization);
         setAnchorEl(null);
     };
 
-    const handleFavoriteOrganizationToggle = (org: typeof organizations[number]) => {
-        org.favorite = !org.favorite;
+    const handleFavoriteOrganizationToggle = async (org: typeof organizations[number]) => {
+        if (org.favorite === false) {
+            org.favorite = true;
+            await createFavoriteOrganization(org.organizationId, userCurrent!);
+        } else {
+            org.favorite = false;
+            await deleteFavoriteOrganization(org.organizationId, userCurrent!);
+        }
         setOrganizations([...organizations]);
     };
+
 
     const handleChangeFavorite = (value: string) => {
         setSelectedFavorite(value);
     };
 
-
     return (
-        <Box sx={{ maxWidth: '100%' }}>
+        <Box sx={{ maxWidth: '100%', p: isMobile ? 1 : 0 }}>
             <Box>
-                <Box sx={{ display: 'flex', gap: 4, alignItems: 'center', justifyContent: 'space-between' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Box sx={{
+                    display: 'flex',
+                    gap: isMobile ? 0 : 4,
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexDirection: isMobile ? 'column' : 'row'
+                }}>
+                    <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: isMobile ? 'center' : 'center',
+                        width: isMobile ? '100%' : 'auto'
+                    }}>
                         <CustomButton
                             text="+ Nova Organização"
                             type="button"
                             colorType="primary"
                             hoverColorType="primary"
                             onClick={handleOrganizationCreate}
-                            paddingY={2}
+                            paddingY={isMobile ? 1 : 2}
                             marginTop={0.5}
                         />
                     </Box>
-                    <Box sx={{ width: '50%' }}>
+
+                    <Box sx={{ width: isMobile ? '100%' : isTablet ? '50%' : '40%' }}>
                         <CustomTextField
                             name="filter"
                             label="Informe um detalhe da organização"
                             type="text"
                             value={filter}
+                            marginTop={isMobile ? 0.5 : 0}
+                            marginBottom={isMobile ? 0 : 1}
                             onChange={(e) => setFilter(e.target.value)}
                             focusedColor="primary"
                             hoverColor="info"
                         />
                     </Box>
-                    <Box sx={{ width: '15%' }}>
+
+                    <Box sx={{ width: isMobile ? '100%' : isTablet ? '35%' : '25%' }}>
                         <CustomComboBox
                             name="organization-type"
-                            label="Tipo"
+                            label="Tipo da organização"
                             value={selectedOrganizationType}
+                            marginBottom={isMobile ? 0 : 3}
                             onChange={handleChangeOrganizationType}
                             options={organizationsTypeOptions}
                             focusedColor="primary"
                             hoverColor="info"
                         />
                     </Box>
-                    <Box sx={{ width: '15%' }}>
+
+                    <Box sx={{ width: isMobile ? '100%' : isTablet ? '25%' : '15%' }}>
                         <Box sx={{ width: '100%' }}>
                             <CustomComboBox
                                 name="user-invite"
@@ -238,6 +265,7 @@ const Organization: React.FC = () => {
                                 value={selectedFavorite}
                                 onChange={handleChangeFavorite}
                                 options={favoriteTypeOptions}
+                                marginBottom={isMobile ? 2 : 3}
                                 focusedColor="primary"
                                 hoverColor="info"
                             />
@@ -245,32 +273,41 @@ const Organization: React.FC = () => {
                     </Box>
                 </Box>
             </Box>
-            <Divider sx={{ backgroundColor: theme.palette.text.primary, marginBottom: 3 }} />
-            <Box sx={{ backgroundColor: theme.palette.background.default, padding: 1 }}>
-                <Box sx={{ width: '100%', display: 'flex', marginLeft: '3rem' }}>
+
+            <Box sx={{ backgroundColor: theme.palette.background.default, padding: isMobile ? 0.5 : 1 }}>
+                <Box sx={{
+                    width: '100%',
+                    display: 'flex',
+                    mb: isMobile ? 1 : 2
+                }}>
                     <CustomTypography
                         text="Organizações"
                         component="h2"
-                        variant="h5"
+                        variant={isMobile ? "h6" : "h5"}
                         sx={{
                             color: theme.palette.text.primary,
-                            mb: 2,
-                            mt: 1,
+                            mb: isMobile ? 1 : 2,
+                            mt: isMobile ? 0 : 1,
                             fontWeight: 'bold'
                         }}
                     />
                 </Box>
 
                 {loading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+                    <Box sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        minHeight: '200px'
+                    }}>
                         <CircularProgress color="primary" />
                     </Box>
                 ) : (
                     <Box
                         sx={{
-                            maxHeight: "calc(85vh - 150px)",
+                            maxHeight: isMobile ? "calc(85vh - 200px)" : "calc(85vh - 150px)",
                             overflowY: "auto",
-                            p: 2,
+                            p: isMobile ? 1 : 2,
                             "&::-webkit-scrollbar": { width: "6px" },
                             "&::-webkit-scrollbar-track": {
                                 background: theme.palette.background.default,
@@ -281,7 +318,6 @@ const Organization: React.FC = () => {
                             },
                         }}
                     >
-
                         {filteredOrganizations.length === 0 ? (
                             <Box
                                 sx={{
@@ -292,7 +328,11 @@ const Organization: React.FC = () => {
                                     width: '100%'
                                 }}
                             >
-                                <Typography variant="h6" color={theme.palette.text.primary}>
+                                <Typography
+                                    variant={isMobile ? "body1" : "h6"}
+                                    color={theme.palette.text.primary}
+                                    textAlign="center"
+                                >
                                     {'Nenhuma organização disponível'}
                                 </Typography>
                             </Box>
@@ -310,78 +350,173 @@ const Organization: React.FC = () => {
                                         boxShadow: 2,
                                     }}
                                 >
-                                    <CardContent>
+                                    <CardContent sx={{ p: isMobile ? 1 : 1.5 }}>
                                         <Box
                                             sx={{
                                                 display: "flex",
                                                 justifyContent: "space-between",
-                                                alignItems: "center",
-                                                mb: 1,
+                                                alignItems: "flex-start",
+                                                mb: isMobile ? 0.5 : 1,
+                                                flexDirection: isMobile ? "column" : "row",
+                                                gap: isMobile ? 1 : 0
                                             }}
                                         >
-                                            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-                                                <IconButton aria-label="star" onClick={() => handleFavoriteOrganizationToggle(org)}>
-                                                    <Star sx={{
-                                                        color: org.favorite ? theme.palette.button.star : theme.palette.text.primary,
-                                                        transition: 'color 0.2s ease-in-out',
-                                                        '&:hover': {
-                                                            transform: 'scale(1.1)'
-                                                        }
-                                                    }} />
-                                                </IconButton>
-                                                <CustomTypography
-                                                    text={org.name}
-                                                    component="h2"
-                                                    variant="h6"
-                                                    sx={{ color: theme.palette.text.primary, fontWeight: "bold" }}
-                                                />
+                                            <Box sx={{
+                                                display: "flex",
+                                                alignItems: isMobile ? "flex-start" : "center",
+                                                gap: 1,
+                                                flex: 1,
+                                                flexWrap: 'wrap',
+                                                width: isMobile ? '100%' : 'auto',
+                                                flexDirection: isMobile ? 'column' : 'row'
+                                            }}>
+                                                <Box sx={{
+                                                    display: "flex",
+                                                    alignItems: "center",
+                                                    gap: 1,
+                                                    width: isMobile ? '100%' : 'auto',
+                                                    mb: isMobile ? 0.5 : 0
+                                                }}>
+                                                    <IconButton
+                                                        aria-label="star"
+                                                        onClick={() => handleFavoriteOrganizationToggle(org)}
+                                                        size={isMobile ? "small" : "medium"}
+                                                        sx={{
+                                                            padding: isMobile ? '4px' : '8px',
+                                                            '&:hover': {
+                                                                backgroundColor: theme.palette.action.hover,
+                                                            }
+                                                        }}
+                                                    >
+                                                        <Star sx={{
+                                                            color: org.favorite ? theme.palette.button.star : theme.palette.text.primary,
+                                                            transition: 'all 0.2s ease-in-out',
+                                                            fontSize: isMobile ? '1.1rem' : '1.5rem'
+                                                        }} />
+                                                    </IconButton>
 
-                                                <Typography
-                                                    variant="body1"
-                                                    sx={{
-                                                        fontWeight: "bold",
-                                                        color:
-                                                            org.organizationType?.toString() === "Colaborativo"
+                                                    <CustomTypography
+                                                        text={org.name}
+                                                        component="h2"
+                                                        variant={isMobile ? "body1" : "h6"}
+                                                        sx={{
+                                                            color: theme.palette.text.primary,
+                                                            fontWeight: "bold",
+                                                            fontSize: isMobile ? '0.85rem' : '1rem',
+                                                            lineHeight: 1.2,
+                                                            flex: 1,
+                                                            wordBreak: 'break-word'
+                                                        }}
+                                                    />
+                                                </Box>
+
+                                                <Box sx={{
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    width: isMobile ? '100%' : 'auto',
+                                                    ml: isMobile ? 4 : 1
+                                                }}>
+                                                    <Chip
+                                                        label={org.organizationType || ""}
+                                                        size={isMobile ? "small" : "medium"}
+                                                        sx={{
+                                                            fontWeight: "bold",
+                                                            backgroundColor: org.organizationType?.toString() === "Colaborativo"
                                                                 ? theme.palette.button.star
                                                                 : theme.palette.primary.main,
-                                                        textShadow: "0px 0px 2px rgba(0,0,0,0.3)",
-                                                    }}
-                                                >
-                                                    {org.organizationType || ""}
-                                                </Typography>
-
+                                                            color: org.organizationType?.toString() === "Colaborativo"
+                                                                ? 'white'
+                                                                : 'white',
+                                                            fontSize: isMobile ? '0.7rem' : '0.8rem',
+                                                            height: isMobile ? 24 : 32,
+                                                            '& .MuiChip-label': {
+                                                                px: isMobile ? 1 : 1.5
+                                                            }
+                                                        }}
+                                                    />
+                                                </Box>
                                             </Box>
 
-                                            <IconButton
-                                                aria-label="options"
-                                                onClick={(event) => {
-                                                    setAnchorEl(event.currentTarget);
-                                                    setSelectedOrganization(org);
-                                                }}
-                                            >
-                                                <MoreVert />
-                                            </IconButton>
-                                            <Menu
-                                                anchorEl={anchorEl}
-                                                open={
-                                                    Boolean(anchorEl) &&
-                                                    selectedOrganization?.organizationId === org.organizationId
-                                                }
-                                                onClose={() => setAnchorEl(null)}
-                                            >
-                                                <MenuItem onClick={() => handleOpen(org)}>Abrir</MenuItem>
-                                                <MenuItem onClick={handleOrganizationAlter}>Alterar</MenuItem>
-                                                <MenuItem onClick={handleOrganizationDelete}>Excluir</MenuItem>
-                                            </Menu>
+                                            <Box sx={{
+                                                alignSelf: isMobile ? 'flex-end' : 'center',
+                                                mt: isMobile ? -4 : 0
+                                            }}>
+                                                <IconButton
+                                                    aria-label="options"
+                                                    onClick={(event) => {
+                                                        setAnchorEl(event.currentTarget);
+                                                        setSelectedOrganization(org);
+                                                    }}
+                                                    size={isMobile ? "small" : "medium"}
+                                                    sx={{
+                                                        padding: isMobile ? '4px' : '8px',
+                                                        '&:hover': {
+                                                            backgroundColor: theme.palette.action.hover,
+                                                        }
+                                                    }}
+                                                >
+                                                    <MoreVert fontSize={isMobile ? "small" : "medium"} />
+                                                </IconButton>
+                                                <Menu
+                                                    anchorEl={anchorEl}
+                                                    open={
+                                                        Boolean(anchorEl) &&
+                                                        selectedOrganization?.organizationId === org.organizationId
+                                                    }
+                                                    onClose={() => setAnchorEl(null)}
+                                                    transformOrigin={{
+                                                        vertical: 'top',
+                                                        horizontal: 'right',
+                                                    }}
+                                                    anchorOrigin={{
+                                                        vertical: 'bottom',
+                                                        horizontal: 'right',
+                                                    }}
+                                                >
+                                                    <MenuItem
+                                                        onClick={() => handleOpen(org)}
+                                                        sx={{ fontSize: isMobile ? '0.8rem' : '0.875rem' }}
+                                                    >
+                                                        Abrir
+                                                    </MenuItem>
+                                                    <MenuItem
+                                                        onClick={handleOrganizationAlter}
+                                                        sx={{ fontSize: isMobile ? '0.8rem' : '0.875rem' }}
+                                                    >
+                                                        Alterar
+                                                    </MenuItem>
+                                                    <MenuItem
+                                                        onClick={handleOrganizationDelete}
+                                                        sx={{
+                                                            fontSize: isMobile ? '0.8rem' : '0.875rem',
+                                                            color: theme.palette.error.main
+                                                        }}
+                                                    >
+                                                        Excluir
+                                                    </MenuItem>
+                                                </Menu>
+                                            </Box>
                                         </Box>
 
-                                        {/* Description */}
-                                        <Typography
-                                            variant="body2"
-                                            sx={{ color: theme.palette.text.secondary, whiteSpace: "pre-line" }}
-                                        >
-                                            {org.description}
-                                        </Typography>
+                                        {org.description && (
+                                            <Typography
+                                                variant={isMobile ? "body2" : "body2"}
+                                                sx={{
+                                                    color: theme.palette.text.secondary,
+                                                    whiteSpace: "pre-line",
+                                                    fontSize: isMobile ? '0.75rem' : '0.875rem',
+                                                    lineHeight: 1.4,
+                                                    mt: isMobile ? 0.5 : 1,
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: isMobile ? 2 : 3,
+                                                    WebkitBoxOrient: 'vertical',
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis'
+                                                }}
+                                            >
+                                                {org.description}
+                                            </Typography>
+                                        )}
                                     </CardContent>
                                 </Card>
                             ))
@@ -392,11 +527,12 @@ const Organization: React.FC = () => {
                 {organizationForm && <OrganizationForm />}
                 {openConfirm && <MsgConfirm />}
             </Box>
+
             {showMessage && message && (
                 <Box
                     sx={{
-                        position: 'absolute',
-                        bottom: '0%',
+                        position: 'fixed',
+                        bottom: isMobile ? '10%' : '0%',
                         left: '50%',
                         transform: 'translateX(-50%)',
                         display: 'flex',
@@ -404,6 +540,8 @@ const Organization: React.FC = () => {
                         alignItems: 'center',
                         gap: 2,
                         textAlign: 'left',
+                        width: isMobile ? '95%' : 'auto',
+                        zIndex: 9999
                     }}>
                     <CustomAlert
                         severity={message.severity}

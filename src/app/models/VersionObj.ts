@@ -3,9 +3,9 @@ import { UserObj } from "./UserObj";
 
 export interface VersionObj {
   documentVersionId: number;
-  versionName: string;
-  versionFilePath: string;
-  createdAt: Date;
+  name: string;
+  filePath: string;
+  creationDate: Date;
   document: DocumentObj;
   user: UserObj;
 }

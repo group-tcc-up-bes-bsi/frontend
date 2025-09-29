@@ -29,7 +29,7 @@ const Register: React.FC = () => {
     useEffect(() => {
         if (message) {
             setShowMessage(true);
-            setTimeout(() => setShowMessage(false), 5000);
+            setTimeout(() => setShowMessage(false), 2000);
         }
     }, [message]);
 
@@ -68,7 +68,6 @@ const Register: React.FC = () => {
         }}>
             <CssBaseline />
 
-            {/* Right side - Image/Title (60%) */}
             {!isMobile && (
                 <Box
                     sx={{
@@ -95,7 +94,6 @@ const Register: React.FC = () => {
                         }}
                     />
 
-                    {/* Title Overlay */}
                     <Box
                         sx={{
                             position: 'absolute',
@@ -196,7 +194,13 @@ const Register: React.FC = () => {
                         />
                     </Box>
 
-                    <Box component="form" sx={{ mt: 2 }}>
+                    <Box
+                        component="form"
+                        sx={{ mt: 2 }}
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            handleSubmit();
+                        }}>
                         <CustomTextField
                             name="userName"
                             label="Usuário"
@@ -223,14 +227,14 @@ const Register: React.FC = () => {
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             showPasswordToggle
+                            
                         />
 
                         <CustomButton
                             text="Confirmar Cadastro"
-                            type="button"
+                            type="submit"
                             colorType="primary"
                             hoverColorType="primary"
-                            onClick={handleSubmit}
                         />
 
                         {showMessage && message && (
