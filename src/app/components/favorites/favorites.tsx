@@ -189,7 +189,7 @@ const Favorites: React.FC = () => {
                         />
                         <Divider sx={{
                             backgroundColor: theme.palette.text.primary,
-                            marginY: 3
+                            marginY: 1
                         }} />
                         <Box
                             sx={{
@@ -216,7 +216,7 @@ const Favorites: React.FC = () => {
                             }}>
                                 <Table size={isMobile ? "small" : "small"}>
                                     <TableHead>
-                                        <TableRow>
+                                        <TableRow sx={{ display: isMobile ? 'none' : 'table-cell' }}>
                                             <TableCell sx={{ width: isMobile ? '40px' : 'auto' }} />
                                             <TableCell sx={{
                                                 textTransform: 'uppercase',
@@ -227,7 +227,7 @@ const Favorites: React.FC = () => {
                                                 <TableCell sx={{
                                                     textTransform: 'uppercase',
                                                     fontWeight: 'bold',
-                                                    fontSize: isMobile ? '0.75rem' : '1rem'
+                                                    fontSize: isMobile ? '0.75rem' : '1rem',
                                                 }}>Organização</TableCell>
                                             )}
                                         </TableRow>
@@ -326,7 +326,7 @@ const Favorites: React.FC = () => {
 
                         <Divider sx={{
                             backgroundColor: theme.palette.text.primary,
-                            marginY: 3
+                            marginY: 1
                         }} />
 
                         <Box
@@ -355,7 +355,7 @@ const Favorites: React.FC = () => {
                             }}>
                                 <Table size={isMobile ? "small" : "small"}>
                                     <TableHead>
-                                        <TableRow>
+                                        <TableRow sx={{ display: isMobile ? 'none' : 'table-cell' }}>
                                             <TableCell sx={{ width: isMobile ? '40px' : 'auto' }} />
                                             <TableCell sx={{
                                                 textTransform: 'uppercase',

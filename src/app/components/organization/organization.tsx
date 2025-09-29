@@ -22,6 +22,8 @@ import { MessageObj } from '@/app/models/MessageObj';
 import CustomAlert from '../customAlert';
 import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
 import { getOrganizations } from '@/app/services/Organizations/getOrganizations';
+import { createFavoriteOrganization } from '@/app/services/Organizations/createFavoriteDocument';
+import { deleteFavoriteOrganization } from '@/app/services/Organizations/deleteFavoriteDocument';
 
 const Organization: React.FC = () => {
     useAuth();
@@ -182,10 +184,17 @@ const Organization: React.FC = () => {
         setAnchorEl(null);
     };
 
-    const handleFavoriteOrganizationToggle = (org: typeof organizations[number]) => {
-        org.favorite = !org.favorite;
-        setOrganizations([...organizations]);
-    };
+    const handleFavoriteOrganizationToggle = async (org: typeof organizations[number]) => {
+            if (org.favorite === false) {
+                org.favorite = true;
+                await createFavoriteOrganization(org.organizationId, userCurrent!);
+            } else {
+                org.favorite = false;
+                await deleteFavoriteOrganization(org.organizationId, userCurrent!);
+            }
+            setOrganizations([...organizations]);
+        };
+    
 
     const handleChangeFavorite = (value: string) => {
         setSelectedFavorite(value);
