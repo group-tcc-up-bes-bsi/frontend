@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTheme } from '@/app/theme/ThemeContext';
-import { Box, Divider, } from '@mui/material';
+import { Box, Divider, IconButton, useMediaQuery, } from '@mui/material';
 import CustomTypography from '../customTypography';
 import Menu from '@mui/icons-material/Menu';
 import SpaceDashboard from '@mui/icons-material/SpaceDashboard';
@@ -34,6 +34,8 @@ const DocumentsComponent: React.FC = () => {
         new MessageObj('info', 'Tela dos Documentos', '', 'info')
     );
     const [showMessage, setShowMessage] = useState(false);
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
 
     useEffect(() => {
         if (message) {
@@ -85,48 +87,85 @@ const DocumentsComponent: React.FC = () => {
 
     return (
         <Box sx={{ maxWidth: '100%' }}>
-            <Box sx={{ display: 'flex', gap: 4, alignItems: 'center', justifyContent: 'space-between' }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Box sx={{
+                display: 'flex',
+                gap: isMobile ? 2 : 4,
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexDirection: isMobile ? 'column' : 'row',
+                width: '100%',
+            }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
                     <CustomButton
                         text="+ Novo Documento"
                         type="button"
                         colorType="primary"
                         hoverColorType="primary"
                         onClick={toggleDocumentForm}
-                        paddingY={2}
-                        marginTop={0.5}
-                    />
-                </Box>
-                <Box
-                    sx={{ width: '65%' }}>
-                    <CustomTextField
-                        name="filter"
-                        label="Informe um detalhe do documento"
-                        type="text"
-                        value={filter}
-                        onChange={(e) => setFilter(e.target.value)}
-                        focusedColor="primary"
-                        hoverColor="info"
+                        paddingY={isMobile ? 1 : 2}
+                        marginTop={0}
+                        marginBottom={0}
                     />
                 </Box>
                 <Box sx={{
-                    backgroundColor: theme.palette.background.default,
-                    padding: 1,
                     display: 'flex',
-                    marginBottom: 1,
+                    gap: isMobile ? 2 : 4,
                     alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexDirection: 'row',
+                    width: isMobile ? '100%' : '75%'
                 }}>
-                    <Menu onClick={() => { toggleModeViewer(1) }} sx={{ color: colorMode1, fontSize: 32 }} />
-                    <Divider
-                        orientation="vertical"
-                        sx={{
-                            backgroundColor: theme.palette.text.primary,
-                            height: 30,
-                            margin: '0 10px',
-                            padding: 0.2,
-                            borderRadius: '20%'
-                        }} />
-                    <SpaceDashboard onClick={() => { toggleModeViewer(2) }} sx={{ color: colorMode2, fontSize: 32 }} />
+                    <Box sx={{
+                        width: isMobile ? '100%' : isTablet ? '75%' : '75%'
+                    }}>
+                        <CustomTextField
+                            name="filter"
+                            label="Detalhe do documento"
+                            type="text"
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value)}
+                            focusedColor="primary"
+                            hoverColor="info"
+                            marginBottom={0}
+                            marginTop={0}
+                        />
+                    </Box>
+
+                    <Box sx={{
+                        backgroundColor: theme.palette.background.default,
+                        padding: isMobile ? 1.4 : 0.5,
+                        display: 'flex',
+                        borderRadius: 1,
+                        alignItems: 'center',
+                    }}>
+                        <IconButton
+                            onClick={() => { toggleModeViewer(1) }}
+                            size={isMobile ? "small" : "medium"}
+                        >
+                            <Menu sx={{
+                                color: colorMode1,
+                                fontSize: isMobile ? 24 : 32
+                            }} />
+                        </IconButton>
+                        <Divider
+                            orientation="vertical"
+                            sx={{
+                                backgroundColor: theme.palette.text.primary,
+                                height: isMobile ? 30 : 40,
+                                margin: isMobile ? '0 5px' : '0 10px',
+                                padding: isMobile ? 0.1 : 0.2,
+                                borderRadius: '20%'
+                            }} />
+                        <IconButton
+                            onClick={() => { toggleModeViewer(2) }}
+                            size={isMobile ? "small" : "medium"}
+                        >
+                            <SpaceDashboard sx={{
+                                color: colorMode2,
+                                fontSize: isMobile ? 24 : 32
+                            }} />
+                        </IconButton>
+                    </Box>
                 </Box>
             </Box>
             <Box sx={{

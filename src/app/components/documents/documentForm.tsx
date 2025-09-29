@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Backdrop } from '@mui/material';
+import { Box, Backdrop, useMediaQuery } from '@mui/material';
 import CustomTextField from '../customTextField';
 import CustomComboBox from '../customComboBox';
 import CustomButton from '../customButton';
@@ -31,6 +31,7 @@ const DocumentForm: React.FC = () => {
     );
     const alterDocumentForm = useDocumentFormStore((state) => state.alter);
     const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     useEffect(() => {
         if (message) {
@@ -187,21 +188,34 @@ const DocumentForm: React.FC = () => {
                     display: 'flex',
                     flexDirection: 'column',
                     backgroundColor: theme.palette.background.default,
-                    width: '1000px',
-                    maxWidth: '90%',
+                    width: {
+                        xs: '95vw',
+                        sm: '90vw',
+                        md: '800px',
+                        lg: '900px',
+                        xl: '1000px'
+                    },
+                    maxWidth: '95vw',
+                    maxHeight: '80vh',
                     borderRadius: '4px',
                     boxShadow: 3,
-                    top: '50%',
+                    top: '55%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    p: 3
+                    p: {
+                        xs: 2,
+                        md: 3
+                    },
+                    overflowY: 'auto'
                 }}
             >
                 <Box sx={{ width: '100%', display: 'flex', justifyContent: 'space-between' }}>
                     <CustomTypography
                         text={document?.documentId == 0 ? 'Criar Documento' : 'Editar Documento'}
                         component="h2"
-                        variant="h6"
+                        variant={isMobile ? "h6" : "h6"}
+                        marginBottom={0}
+                        marginTop={0}
                         sx={{
                             color: theme.palette.text.primary,
                             mb: 1,
@@ -212,47 +226,66 @@ const DocumentForm: React.FC = () => {
                         }}
                     />
                 </Box>
-
-                <Box sx={{ width: '100%', display: 'flex', gap: 4, marginTop: 2 }}>
-                    <CustomTextField
-                        name="Name"
-                        label="Nome"
-                        type="text"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        focusedColor="primary"
-                        hoverColor="info"
-                        marginBottom={2}
-                    />
-
-                    <CustomTextField
-                        name="Type"
-                        label="Tipo"
-                        type="text"
-                        value={type}
-                        onChange={(e) => setType(e.target.value)}
-                        focusedColor="primary"
-                        hoverColor="info"
-                        marginBottom={2}
-                    />
-
-                    <CustomComboBox
-                        name="Organization"
-                        label="Organização"
-                        value={selectedOrganizationValue}
-                        onChange={(value) => {
-                            const org = organizations.find(org => org.organizationId.toString() === value);
-                            setOrganization(org || null);
-                        }}
-                        options={organizationsOptions}
-                        disabled={document?.organization.organizationId == 0 ? false : true}
-                        focusedColor="primary"
-                        hoverColor="info"
-                        marginBottom={2}
-                    />
-
+                <Box sx={{
+                    width: '100%',
+                    display: 'flex',
+                    gap: isMobile ? 2 : 4,
+                    marginTop: 2,
+                    flexDirection: isMobile ? 'column' : 'row'
+                }}>
+                    <Box sx={{
+                        width: isMobile ? '100%' : '33%',
+                        flex: 1
+                    }}>
+                        <CustomTextField
+                            name="Name"
+                            label="Nome"
+                            type="text"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
+                            focusedColor="primary"
+                            hoverColor="info"
+                            marginBottom={0}
+                            marginTop={0}
+                        />
+                    </Box>
+                    <Box sx={{
+                        width: isMobile ? '100%' : '33%',
+                        flex: 1
+                    }}>
+                        <CustomTextField
+                            name="Type"
+                            label="Tipo"
+                            type="text"
+                            value={type}
+                            onChange={(e) => setType(e.target.value)}
+                            focusedColor="primary"
+                            hoverColor="info"
+                            marginBottom={0}
+                            marginTop={0}
+                        />
+                    </Box>
+                    <Box sx={{
+                        width: isMobile ? '100%' : '33%',
+                        flex: 1
+                    }}>
+                        <CustomComboBox
+                            name="Organization"
+                            label="Organização"
+                            value={selectedOrganizationValue}
+                            onChange={(value) => {
+                                const org = organizations.find(org => org.organizationId.toString() === value);
+                                setOrganization(org || null);
+                            }}
+                            options={organizationsOptions}
+                            disabled={document?.organization.organizationId == 0 ? false : true}
+                            focusedColor="primary"
+                            hoverColor="info"
+                            marginBottom={0}
+                            sx={{ marginTop: 0 }}
+                        />
+                    </Box>
                 </Box>
-
                 <Box sx={{ width: '100%', marginTop: 2 }}>
                     <CustomTextField
                         name="Description"
@@ -265,57 +298,69 @@ const DocumentForm: React.FC = () => {
                         hoverColor="info"
                         fullWidth
                         multiline
-                        rows={10}
+                        rows={isMobile ? 6 : 10}
+                        marginBottom={0}
+                        marginTop={0}
                     />
                 </Box>
                 <Box sx={{
                     display: 'flex',
-                    flexDirection: "column",
+                    flexDirection: isMobile ? "column" : "row",
                     justifyContent: 'start',
-                    alignItems: 'start',
-                    gap: 1,
-                    width: '100%'
+                    alignItems: isMobile ? 'flex-start' : 'center',
+                    gap: isMobile ? 0.5 : 1,
+                    width: '100%',
+                    mt: 2
                 }}>
                     <CustomTypography
                         text={"Criado em: " + formatDate(document?.creationDate ? new Date(document.creationDate) : new Date())}
                         component="p"
-                        variant="h6"
+                        variant={isMobile ? "body2" : "h6"}
                         sx={{
                             color: theme.palette.text.primary,
-                            fontSize: '16px'
+                            fontSize: isMobile ? '14px' : '16px'
                         }}
                     />
+                    {!isMobile && (
+                        <Box sx={{ mx: 1, color: theme.palette.text.primary }}>•</Box>
+                    )}
                     <CustomTypography
                         text={"Ultima modificação em: " + formatDate(document?.lastModifiedDate ? new Date(document.lastModifiedDate) : new Date())}
                         component="p"
-                        variant="h6"
+                        variant={isMobile ? "body2" : "h6"}
                         sx={{
                             color: theme.palette.text.primary,
-                            fontSize: '16px'
+                            fontSize: isMobile ? '14px' : '16px'
                         }}
                     />
                 </Box>
-
-                <Box sx={{ display: 'flex', justifyContent: 'end', gap: 4, marginTop: 2 }}>
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: isMobile ? 'center' : 'end',
+                    gap: 4,
+                    marginTop: 2
+                }}>
                     <CustomButton
                         text={document?.documentId == 0 ? "Salvar" : "Atualizar"}
                         type="button"
                         colorType="primary"
                         onClick={document?.documentId === 0 ? () => handleSave() : () => handleUpdate()}
                         hoverColorType="primary"
-                        fullWidth={false}
+                        fullWidth={isMobile}
                         paddingY={1}
                         paddingX={3.0}
                         marginBottom={2}
                         marginTop={2}
+                        sx={{
+                            width: isMobile ? '100%' : 'auto'
+                        }}
                     />
                 </Box>
-
                 {showMessage && message && (
                     <Box
                         sx={{
-                            position: 'absolute',
-                            bottom: '0%',
+                            position: 'fixed',
+                            bottom: isMobile ? '5%' : '2%',
                             left: '50%',
                             transform: 'translateX(-50%)',
                             display: 'flex',
@@ -323,6 +368,8 @@ const DocumentForm: React.FC = () => {
                             alignItems: 'center',
                             gap: 2,
                             textAlign: 'left',
+                            width: isMobile ? '90%' : 'auto',
+                            zIndex: 300
                         }}>
                         <CustomAlert
                             severity={message.severity}

@@ -7,6 +7,7 @@ import {
     Menu,
     MenuItem,
     Typography,
+    useMediaQuery,
 } from '@mui/material';
 import { MoreVert } from '@mui/icons-material';
 import { useAuth } from '../useAuth';
@@ -51,6 +52,8 @@ const Versions: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [allVersions, setVersions] = useState<VersionObj[]>([]);
     const document = useDocumentStore((state) => state.document);
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
 
     useEffect(() => {
         if (userCurrent != undefined) {
@@ -257,21 +260,36 @@ const Versions: React.FC = () => {
             flexWrap="wrap"
             flexDirection={'column'}
             justifyContent='center'
-            p={1}
+            p={isMobile ? 0.5 : 1}
             sx={{ backgroundColor: theme.palette.background.default }}
         >
-            <Box display={'flex'} justifyContent={'space-between'} paddingX={12} height={90} gap={6}>
+            <Box display={'flex'}
+                justifyContent={'space-between'}
+                paddingX={isMobile ? 1 : 12}
+                height={isMobile ? 'auto' : 90}
+                gap={isMobile ? 2 : 6}
+                marginTop={2}
+                flexDirection={isMobile ? 'column' : 'row'}
+                alignItems={isMobile ? 'stretch' : 'center'}
+            >
                 <CustomButton
                     text={"+ Nova Versão"}
                     type="button"
                     colorType="primary"
                     onClick={toggleCreateVersionForm}
                     hoverColorType="primary"
-                    fullWidth={false}
+                    fullWidth={isMobile}
                     paddingY={1}
                     paddingX={3.0}
+                    sx={{
+                        width: isMobile ? '100%' : 'auto',
+                        minWidth: isMobile ? 'auto' : '140px'
+                    }}
                 />
-                <Box sx={{ width: '85%' }}>
+                <Box sx={{
+                    width: isMobile ? '100%' : '85%',
+                    mt: 0
+                }}>
                     <CustomTextField
                         name="filter"
                         label="Informe um detalhe da versão"
@@ -280,10 +298,25 @@ const Versions: React.FC = () => {
                         onChange={(e) => setFilter(e.target.value)}
                         focusedColor="primary"
                         hoverColor="info"
+                        marginTop={0}
+                        marginBottom={0}
                     />
                 </Box>
             </Box>
-            <Typography variant="h4" gutterBottom sx={{ display: 'flex', width: '100%', justifyContent: 'center' }}>
+
+            <Typography
+                variant={isMobile ? "h5" : "h4"}
+                gutterBottom
+                sx={{
+                    display: 'flex',
+                    width: '100%',
+                    justifyContent: 'center',
+                    textAlign: 'center',
+                    px: isMobile ? 1 : 0,
+                    marginTop: 0,
+                    marginBottom: 0,
+                }}
+            >
                 Versões
             </Typography>
 
@@ -291,11 +324,11 @@ const Versions: React.FC = () => {
                 display="flex"
                 gap={2}
                 flexWrap="wrap"
-                justifyContent='center'
-                p={1}
+                justifyContent={isMobile ? 'center' : 'center'}
+                p={isMobile ? 0.5 : 1}
                 sx={{
                     padding: 1,
-                    maxHeight: 'calc(85vh - 150px)',
+                    maxHeight: isMobile ? 'calc(85vh - 200px)' : 'calc(85vh - 150px)',
                     overflowY: 'auto',
                     '&::-webkit-scrollbar': {
                         width: '6px',
@@ -309,39 +342,70 @@ const Versions: React.FC = () => {
                     },
                 }}
             >
-
                 {loading ? (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '200px' }}>
+                    <Box sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        minHeight: '200px',
+                        width: '100%'
+                    }}>
                         <CircularProgress color="primary" />
                     </Box>
                 ) : filteredVersions.length === 0 ? (
                     <CustomTypography
                         text='Nenhuma versão encontrada para o filtro informado'
                         component="h6"
-                        variant="h6"
+                        variant={isMobile ? "body1" : "h6"}
                         sx={{
                             color: theme.palette.text.primary,
                             mt: 1,
+                            textAlign: 'center',
+                            width: '100%'
                         }}
                     />
                 ) : filteredVersions.map((version) => (
                     <Box
                         key={version.documentVersionId}
-                        width={240}
+                        width={isMobile ? '100%' : isTablet ? 200 : 240}
+                        maxWidth={isMobile ? '100%' : 240}
                         borderRadius={2}
-                        p={2}
+                        p={isMobile ? 1.5 : 2}
                         sx={{
                             backgroundColor: theme.palette.background.paper,
-                            boxShadow: 3,
+                            boxShadow: 2,
+                            border: `1px solid ${theme.palette.divider}`,
                         }}
                     >
-                        <Box fontWeight="bold" fontSize="0.9rem">
+                        <Box fontWeight="bold"
+                            fontSize={isMobile ? "0.8rem" : "0.9rem"}
+                            sx={{ color: theme.palette.text.primary }}
+                        >
                             Versão: {version.name}
                         </Box>
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <Box sx={{ display: 'flex', flexDirection: 'column', }}>
-                                <Box fontSize="0.8rem" mt={1} sx={{ color: theme.palette.text.primary }}>
+                        <Box sx={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'flex-start',
+                            mt: 1
+                        }}>
+                            <Box sx={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                flex: 1
+                            }}>
+                                <Box
+                                    fontSize={isMobile ? "0.7rem" : "0.8rem"}
+                                    sx={{ color: theme.palette.text.primary }}
+                                >
                                     Criador: {version.user.username}
+                                </Box>
+                                <Box
+                                    fontSize={isMobile ? "0.65rem" : "0.75rem"}
+                                    mt={1}
+                                    sx={{ color: theme.palette.text.secondary }}
+                                >
+                                    Criado em {formatDate(version.creationDate)}
                                 </Box>
                             </Box>
                             <Box mt={0.5}>
@@ -351,38 +415,58 @@ const Versions: React.FC = () => {
                                         setAnchorEl(event.currentTarget);
                                         setSelectedVersion(version);
                                     }}
+                                    size={isMobile ? "small" : "medium"}
+                                    sx={{
+                                        padding: isMobile ? '4px' : '8px',
+                                        '&:hover': {
+                                            backgroundColor: theme.palette.action.hover,
+                                        }
+                                    }}
                                 >
-                                    <MoreVert />
+                                    <MoreVert fontSize={isMobile ? "small" : "medium"} />
                                 </IconButton>
                                 <Menu
                                     anchorEl={anchorEl}
                                     open={Boolean(anchorEl) && selectedVersion?.documentVersionId === version.documentVersionId}
                                     onClose={() => setAnchorEl(null)}
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    anchorOrigin={{
+                                        vertical: 'bottom',
+                                        horizontal: 'right',
+                                    }}
                                 >
-                                    <MenuItem onClick={() => { toggleVersionForm(version) }}>Alterar</MenuItem>
-                                    <MenuItem onClick={handleDeleteVersion}>Excluir</MenuItem>
+                                    <MenuItem
+                                        onClick={() => { toggleVersionForm(version) }}
+                                        sx={{ fontSize: isMobile ? '0.8rem' : '0.875rem' }}
+                                    >
+                                        Alterar
+                                    </MenuItem>
+                                    <MenuItem
+                                        onClick={handleDeleteVersion}
+                                        sx={{
+                                            fontSize: isMobile ? '0.8rem' : '0.875rem',
+                                            color: theme.palette.text.primary
+                                        }}
+                                    >
+                                        Excluir
+                                    </MenuItem>
                                 </Menu>
                             </Box>
                         </Box>
-                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                            <Box fontSize="0.75rem" mt={1} sx={{ color: theme.palette.text.primary }}>
-                                Criado em {formatDate(version.creationDate)}
-                            </Box>
-                        </Box>
                     </Box>
-                ))
-                }
+                ))}
             </Box>
-            {openConfirm && (
-                <MsgConfirm />
-            )
-            }
-            {versionForm && (<VersionForm />)}
+
+            {openConfirm && <MsgConfirm />}
+            {versionForm && <VersionForm />}
             {showMessage && message && (
                 <Box
                     sx={{
-                        position: 'absolute',
-                        bottom: '10%',
+                        position: 'fixed',
+                        bottom: isMobile ? '10%' : '5%',
                         left: '50%',
                         transform: 'translateX(-50%)',
                         zIndex: 1500,
@@ -391,6 +475,7 @@ const Versions: React.FC = () => {
                         alignItems: 'center',
                         gap: 2,
                         textAlign: 'left',
+                        width: isMobile ? '95%' : 'auto',
                     }}
                 >
                     <CustomAlert

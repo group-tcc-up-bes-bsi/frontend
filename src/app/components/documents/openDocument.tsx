@@ -17,6 +17,7 @@ import { getVersionsByDocument } from "@/app/services/Versions/getVersions";
 import { VersionObj } from "@/app/models/VersionObj";
 import { useUserStore } from "@/app/state/userState";
 import { useVersionFormStore } from "@/app/state/versionFormState";
+import { IconButton, useMediaQuery } from "@mui/material";
 
 const OpenDocument: React.FC = () => {
   useAuth();
@@ -32,6 +33,7 @@ const OpenDocument: React.FC = () => {
   const userCurrent = useUserStore((state) => state.userCurrent);
   const versionForm = useVersionFormStore((state) => state.versionForm);
   const [monthsCount, setMonthsCount] = React.useState(6);
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   useEffect(() => {
     if (userCurrent != undefined) {
@@ -58,7 +60,9 @@ const OpenDocument: React.FC = () => {
 
   return (
     <Box sx={{
-      p: 3, background: theme.palette.background.paper, height: '100%',
+      p: isMobile ? 1 : 3,
+      background: theme.palette.background.paper,
+      height: '100%',
       maxHeight: 'calc(100vh - 50px)',
       overflowY: 'auto',
       '&::-webkit-scrollbar': {
@@ -72,104 +76,212 @@ const OpenDocument: React.FC = () => {
         borderRadius: '3px',
       }
     }}>
-      <Box sx={{ display: "flex", flexDirection: "row", justifyContent: 'space-between', alignItems: 'center' }}>
-        <Box sx={{ display: "flex", flexDirection: "row", gap: 4, alignItems: 'center' }}>
+      <Box sx={{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: 2
+      }}>
+        <Box sx={{
+          display: "flex",
+          flexDirection: "row",
+          gap: isMobile ? 2 : 4,
+          alignItems: 'center',
+          flex: 1
+        }}>
           <CustomButton
             text="Visualizar log"
             type="button"
             colorType="primary"
             hoverColorType="primary"
             paddingY={1}
-            paddingX={3}
+            paddingX={isMobile ? 2 : 3}
             fullWidth={false}
-          />
-          <Close
-            onClick={() => { alterOption(lastOption); }}
             sx={{
-              fontSize: 30,
+              minWidth: isMobile ? '140px' : 'auto'
+            }}
+          />
+          <IconButton
+            onClick={() => { alterOption(lastOption); }}
+            size={isMobile ? "small" : "medium"}
+            sx={{
               color: theme.palette.text.primary,
-              cursor: 'pointer',
               '&:hover': {
                 color: theme.palette.error.main,
+                backgroundColor: theme.palette.action.hover,
               }
             }}
-          />
+          >
+            <Close sx={{ fontSize: isMobile ? 24 : 30 }} />
+          </IconButton>
         </Box>
       </Box>
-      <Box sx={{ display: "flex", flexDirection: "row", justifyContent: 'space-between', mt: 2 }}>
-        <Typography variant="h6" gutterBottom>
-          {"Data criação: " + document?.creationDate?.toLocaleDateString("pt-BR", {})}
-        </Typography>
-        <Typography variant="h6" gutterBottom>
-          {"Organização: " + document?.organization.name}
-        </Typography>
-      </Box>
-      <Versions />
+
       <Box sx={{
         display: "flex",
-        flexDirection: { xs: "column", md: "row" },
-        gap: 3,
-        mt: 5,
-        background: theme.palette.background.default,
-        padding: 5
+        flexDirection: isMobile ? "column" : "row",
+        justifyContent: 'space-between',
+        mt: 2,
+        gap: isMobile ? 1 : 0
       }}>
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h6" gutterBottom sx={{ mb: 7 }}>
+        <Typography
+          variant={isMobile ? "body1" : "h6"}
+          gutterBottom
+          sx={{ fontWeight: isMobile ? 'bold' : 'normal' }}
+        >
+          {"Data criação: " + (document?.creationDate?.toLocaleDateString("pt-BR", {}) || 'N/A')}
+        </Typography>
+        <Typography
+          variant={isMobile ? "body1" : "h6"}
+          gutterBottom
+          sx={{ fontWeight: isMobile ? 'bold' : 'normal' }}
+        >
+          {"Organização: " + (document?.organization.name || 'N/A')}
+        </Typography>
+      </Box>
+
+      <Versions />
+
+      <Box sx={{
+        display: "flex",
+        flexDirection: isMobile ? "column" : "row",
+        gap: 3,
+        mt: isMobile ? 3 : 5,
+        background: theme.palette.background.default,
+        padding: isMobile ? 2 : 5
+      }}>
+        <Box sx={{
+          flex: 1,
+          width: isMobile ? '100%' : '50%'
+        }}>
+          <Typography
+            variant={isMobile ? "body1" : "h6"}
+            gutterBottom
+            sx={{
+              mb: isMobile ? 1 : 7,
+              fontWeight: 'bold'
+            }}
+          >
             Versões por usuário
           </Typography>
-          <PieChart
-            sx={{
-              border: '1px dashed',
-              borderColor: theme.palette.text.primary,
-              paddingX: 10,
-            }}
-            series={[
-              {
-                data: dataPie || [],
-                highlightScope: { fade: "global", highlight: "item" },
-                innerRadius: 0,
-                outerRadius: 200,
-                paddingAngle: 0,
-              },
-            ]}
-            height={500}
-            margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
-            colors={[
-              "#8e24aa", "#039be5", "#fbc02d", "#fb8c00", "#d84315", "#6d4c41", "#757575",
-              "#c62828", "#ad1457", "#4527a0", "#283593", "#0277bd", "#00838f", "#2e7d32",
-              "#f9a825", "#ff7043", "#5d4037", "#616161", "#b71c1c", "#880e4f", "#1a237e",
-            ]}
-          />
+          <Box sx={{
+            border: '1px dashed',
+            borderColor: theme.palette.text.primary,
+            padding: isMobile ? 1 : 2,
+            overflow: 'auto'
+          }}>
+            <PieChart
+              series={[
+                {
+                  data: dataPie || [],
+                  highlightScope: { fade: "global", highlight: "item" },
+                  innerRadius: 0,
+                  outerRadius: isMobile ? 120 : 200,
+                  paddingAngle: 0,
+                },
+              ]}
+              height={isMobile ? 300 : 500}
+              margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
+              colors={[
+                "#8e24aa", "#039be5", "#fbc02d", "#fb8c00", "#d84315", "#6d4c41", "#757575",
+                "#c62828", "#ad1457", "#4527a0", "#283593", "#0277bd", "#00838f", "#2e7d32",
+              ]}
+              sx={{
+                width: '100%',
+                '& .MuiChartsLegend-root': {
+                  display: 'none !important',
+                }
+              }}
+            />
+            {dataPie && dataPie.length > 0 && (
+              <Box sx={{
+                mt: 2,
+                display: 'grid',
+                gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+                gap: 1,
+                maxHeight: isMobile ? '120px' : '150px',
+                overflowY: 'auto',
+                p: 1
+              }}>
+                {dataPie.map((item, index) => (
+                  <Box key={item.id} sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 1,
+                    fontSize: isMobile ? '0.75rem' : '0.875rem'
+                  }}>
+                    <Box sx={{
+                      width: 12,
+                      height: 12,
+                      backgroundColor: [
+                        "#8e24aa", "#039be5", "#fbc02d", "#fb8c00", "#d84315", "#6d4c41", "#757575",
+                        "#c62828", "#ad1457", "#4527a0", "#283593", "#0277bd", "#00838f", "#2e7d32",
+                      ][index % 14],
+                      borderRadius: '2px'
+                    }} />
+                    <Typography
+                      variant="body2"
+                      sx={{
+                        color: theme.palette.text.primary,
+                        fontSize: 'inherit'
+                      }}
+                    >
+                      {item.label}: {item.value}
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </Box>
         </Box>
 
-        <Box sx={{ flex: 1 }}>
-          <Typography variant="h6" gutterBottom>
+        <Box sx={{
+          flex: 1,
+          width: isMobile ? '100%' : '50%'
+        }}>
+          <Typography
+            variant={isMobile ? "body1" : "h6"}
+            gutterBottom
+            sx={{ fontWeight: 'bold' }}
+          >
             Versões por mês
           </Typography>
-          <MonthsSelector
-            monthsCount={monthsCount}
-            setMonthsCount={setMonthsCount}
-          />
-          <BarChart
-            sx={{
-              border: '1px dashed',
-              borderColor: theme.palette.text.primary,
-            }}
-            xAxis={[
-              {
-                scaleType: "band",
-                data: (dataBar || []).map((item) => item?.label || ""),
-              },
-            ]}
-            series={[
-              {
-                data: (dataBar || []).map((item) => item?.value || 0),
-                color: theme.palette.info.main,
-              },
-            ]}
-            height={500}
-            margin={{ top: 20, right: 20, bottom: 50, left: 50 }}
-          />
+
+          <Box sx={{ mb: isMobile ? 0 : 2 }}>
+            <MonthsSelector
+              monthsCount={monthsCount}
+              setMonthsCount={setMonthsCount}
+            />
+          </Box>
+
+          <Box sx={{
+            border: '1px dashed',
+            borderColor: theme.palette.text.primary,
+            padding: isMobile ? 1 : 2,
+            overflow: 'auto'
+          }}>
+            <BarChart
+              xAxis={[
+                {
+                  scaleType: "band",
+                  data: (dataBar || []).map((item) => item?.label || ""),
+                },
+              ]}
+              series={[
+                {
+                  data: (dataBar || []).map((item) => item?.value || 0),
+                  color: theme.palette.info.main,
+                },
+              ]}
+              height={isMobile ? 300 : 500}
+              margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
+              sx={{
+                width: '95%',
+              }}
+            />
+          </Box>
         </Box>
       </Box>
     </Box>

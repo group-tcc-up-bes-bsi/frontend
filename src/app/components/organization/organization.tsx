@@ -489,7 +489,7 @@ const Organization: React.FC = () => {
                                                         onClick={handleOrganizationDelete}
                                                         sx={{
                                                             fontSize: isMobile ? '0.8rem' : '0.875rem',
-                                                            color: theme.palette.error.main
+                                                            color: theme.palette.text.primary
                                                         }}
                                                     >
                                                         Excluir
