@@ -15,7 +15,5 @@ export async function createFavoriteOrganization(
     });
 
     await response.json().catch(() => null);
-  } catch (error) {
-    console.error(error);
-  }
+  } finally{}
 }

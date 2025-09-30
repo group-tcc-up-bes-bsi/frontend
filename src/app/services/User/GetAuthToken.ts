@@ -33,8 +33,7 @@ export function getMeAuth(): Promise<UserObj | null> {
         jwtToken: jwtTokenCurrent,
       } as UserObj;
     })
-    .catch((error) => {
-      console.error("Error fetching user data:", error);
+    .catch(() => {
       return null;
     });
 }

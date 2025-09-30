@@ -38,8 +38,7 @@ export async function deleteVersion(
         "success"
       ),
     };
-  } catch (error) {
-    console.error(error);
+  } catch {
     return {
       message: new MessageObj(
         "error",

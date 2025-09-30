@@ -14,8 +14,7 @@ export async function removeOrganizationUser(user: UserOrganization, userCurrent
         });
 
         await response.json().catch(() => null);
-    } catch (error) {
-        console.error(error)
+    } catch {
         return {
             message: new MessageObj(
                 'error',

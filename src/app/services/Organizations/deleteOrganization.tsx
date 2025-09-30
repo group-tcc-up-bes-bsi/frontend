@@ -12,7 +12,5 @@ export async function deleteOrganization(organizationId: number, userCurrent: Us
         });
 
         await response.json().catch(() => null);
-    } catch (error) {
-        console.error(error)
-    }
+    } finally {}
 }

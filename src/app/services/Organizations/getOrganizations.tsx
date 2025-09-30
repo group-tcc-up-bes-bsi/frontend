@@ -75,8 +75,7 @@ export async function getOrganizations(
             ),
             organizations,
         };
-    } catch (error) {
-        console.error(error);
+    } catch {
         return {
             message: new MessageObj(
                 "error",

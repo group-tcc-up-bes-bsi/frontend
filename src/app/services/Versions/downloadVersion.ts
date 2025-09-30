@@ -46,8 +46,7 @@ export async function downloadVersion(
       ),
       file,
     };
-  } catch (error) {
-    console.error(error);
+  } catch {
     return {
       message: new MessageObj(
         "error",

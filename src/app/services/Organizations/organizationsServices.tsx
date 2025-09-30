@@ -56,8 +56,7 @@ export async function getMyOrganizations(userCurrent: UserObj, theme: Theme): Pr
             organizations,
         };
 
-    } catch (error) {
-        console.error(error);
+    } catch {
         return {
             message: new MessageObj(
                 'error',
@@ -119,8 +118,7 @@ export async function getOrganizationUsers(
             users,
         };
 
-    } catch (error) {
-        console.error(error);
+    } catch {
         return {
             message: new MessageObj(
                 'error',
