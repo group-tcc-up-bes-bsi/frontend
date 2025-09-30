@@ -95,7 +95,7 @@ const DocumentsComponent: React.FC = () => {
                 flexDirection: isMobile ? 'column' : 'row',
                 width: '100%',
             }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: isMobile ? '100%' : 'auto' }}>
                     <CustomButton
                         text="+ Novo Documento"
                         type="button"

@@ -155,7 +155,7 @@ const Favorites: React.FC = () => {
             </Box>
             <Box sx={{
                 backgroundColor: theme.palette.background.default,
-                padding: isMobile ? 1 : 3
+                padding: isMobile ? 1 : 1
             }}>
                 <Box sx={{
                     display: 'flex',
@@ -207,18 +207,22 @@ const Favorites: React.FC = () => {
                             }}>
                                 <Table size={isMobile ? "small" : "small"}>
                                     <TableHead>
-                                        <TableRow sx={{ display: isMobile ? 'none' : 'table-cell' }}>
-                                            <TableCell sx={{ width: isMobile ? '40px' : 'auto' }} />
+                                        <TableRow sx={{ display: isMobile ? 'none' : 'table-row' }}>
+                                            <TableCell sx={{ width: isMobile ? '40px' : '56px' }} />
                                             <TableCell sx={{
                                                 textTransform: 'uppercase',
                                                 fontWeight: 'bold',
-                                                fontSize: isMobile ? '0.75rem' : '1rem'
+                                                fontSize: isMobile ? '0.75rem' : '1rem',
+                                                width: isMobile ? 'auto' : '40%',
+                                                minWidth: '120px'
                                             }}>Documento</TableCell>
                                             {!isMobile && (
                                                 <TableCell sx={{
                                                     textTransform: 'uppercase',
                                                     fontWeight: 'bold',
                                                     fontSize: isMobile ? '0.75rem' : '1rem',
+                                                    width: '40%',
+                                                    minWidth: '120px'
                                                 }}>Organização</TableCell>
                                             )}
                                         </TableRow>
@@ -238,7 +242,7 @@ const Favorites: React.FC = () => {
                                         ) :
                                             filteredDocuments.map((doc) => (
                                                 <TableRow key={doc.documentId}>
-                                                    <TableCell>
+                                                    <TableCell sx={{ width: isMobile ? '40px' : '56px' }}>
                                                         <IconButton
                                                             aria-label="star"
                                                             onClick={() => handleFavoriteToggle(doc)}
@@ -256,7 +260,9 @@ const Favorites: React.FC = () => {
                                                     </TableCell>
                                                     <TableCell sx={{
                                                         color: theme.palette.text.primary,
-                                                        fontSize: isMobile ? '0.8rem' : '1rem'
+                                                        fontSize: isMobile ? '0.8rem' : '1rem',
+                                                        width: isMobile ? 'auto' : '40%',
+                                                        minWidth: '120px'
                                                     }}>
                                                         {doc.name}
                                                         {isMobile && (
@@ -272,7 +278,11 @@ const Favorites: React.FC = () => {
                                                         )}
                                                     </TableCell>
                                                     {!isMobile && (
-                                                        <TableCell sx={{ color: theme.palette.text.primary }}>
+                                                        <TableCell sx={{
+                                                            color: theme.palette.text.primary,
+                                                            width: '40%',
+                                                            minWidth: '120px'
+                                                        }}>
                                                             {doc.organization.name}
                                                         </TableCell>
                                                     )}
@@ -341,12 +351,22 @@ const Favorites: React.FC = () => {
                             <TableContainer component={Paper} sx={{
                                 background: 'transparent',
                                 boxShadow: 'none',
-                                maxWidth: '100%',
-                                overflowX: 'auto'
+                                maxWidth: '95%',
+                                overflowX: 'auto',
+                                '&::-webkit-scrollbar': {
+                                    height: '6px',
+                                },
+                                '&::-webkit-scrollbar-track': {
+                                    background: theme.palette.background.default,
+                                },
+                                '&::-webkit-scrollbar-thumb': {
+                                    backgroundColor: theme.palette.primary.main,
+                                    borderRadius: '3px',
+                                },
                             }}>
                                 <Table size={isMobile ? "small" : "small"}>
                                     <TableHead>
-                                        <TableRow sx={{ display: isMobile ? 'none' : 'table-cell' }}>
+                                        <TableRow sx={{ display: isMobile ? 'none' : 'table-row' }}>
                                             <TableCell sx={{ width: isMobile ? '40px' : 'auto' }} />
                                             <TableCell sx={{
                                                 textTransform: 'uppercase',
@@ -358,7 +378,7 @@ const Favorites: React.FC = () => {
                                                     textTransform: 'uppercase',
                                                     fontWeight: 'bold',
                                                     fontSize: isMobile ? '0.75rem' : '1rem'
-                                                }}>Total de Documentos</TableCell>
+                                                }}>Documentos</TableCell>
                                             )}
                                         </TableRow>
                                     </TableHead>

@@ -41,7 +41,7 @@ export async function getOrganizationDocuments(
     );
 
     if (
-      !responseData ||
+      responseData?.statusCode ||
       !Array.isArray(responseData) ||
       responseData.length === 0
     ) {
