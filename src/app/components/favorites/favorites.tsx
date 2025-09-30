@@ -16,8 +16,6 @@ import { useAuth } from '../useAuth';
 import { useUserStore } from '@/app/state/userState';
 import { OrganizationObj } from '@/app/models/OrganizationObj';
 import { getOrganizations } from '@/app/services/Organizations/getOrganizations';
-import { MessageObj } from '@/app/models/MessageObj';
-import CustomAlert from '../customAlert';
 import CustomComboBox from '../customComboBox';
 import { favoriteTypeOptions } from '@/app/services/ConstantsTypes';
 import { DocumentObj } from '@/app/models/DocumentObj';
@@ -34,20 +32,8 @@ const Favorites: React.FC = () => {
     const userCurrent = useUserStore((state) => state.userCurrent)
     const [documents, setDocuments] = useState<DocumentObj[]>([]);
     const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
-    const [message] = useState<MessageObj>(
-        new MessageObj('info', 'Tela dos Favoritos', '', 'info')
-    );
-    const [showMessage, setShowMessage] = useState(false);
     const [selectedFavorite, setSelectedFavorite] = useState('');
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-
-    useEffect(() => {
-        if (message) {
-            setShowMessage(true);
-            setTimeout(() => setShowMessage(false), 5000);
-        }
-    }, [message]);
-
 
     useEffect(() => {
         if (userCurrent != undefined) {
@@ -443,29 +429,6 @@ const Favorites: React.FC = () => {
                     </Box>
                 </Box>
             </Box>
-            {showMessage && message && (
-                <Box
-                    sx={{
-                        position: 'fixed',
-                        bottom: isMobile ? '10%' : '0%',
-                        left: '50%',
-                        transform: 'translateX(-50%)',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        gap: 2,
-                        textAlign: 'left',
-                        width: isMobile ? '95%' : 'auto',
-                        zIndex: 9999
-                    }}>
-                    <CustomAlert
-                        severity={message.severity}
-                        colorType={message.colorType}
-                        title={message.title}
-                        description={message.description}
-                    />
-                </Box>
-            )}
         </Box>
     );
 };

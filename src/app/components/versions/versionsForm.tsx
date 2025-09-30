@@ -27,9 +27,7 @@ const VersionForm: React.FC = () => {
     const [file, setFile] = useState<File | null>(null);
     const [previewOpen, setPreviewOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [message, setMessage] = useState<MessageObj>(
-        new MessageObj()
-    );
+    const [message, setMessage] = useState<MessageObj>();
     const [showMessage, setShowMessage] = useState(false);
     const doc = useDocumentStore((state) => state.document);
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));

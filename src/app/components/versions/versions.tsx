@@ -45,9 +45,7 @@ const Versions: React.FC = () => {
     const alterVersion = useVersionStore((state) => state.alter);
     const userCurrent = useUserStore((state) => state.userCurrent);
     const organization = useOrganizationStore((state) => state.organization);
-    const [message, setMessage] = useState<MessageObj>(
-        new MessageObj('info', 'Tela das Versões', '', 'info')
-    );
+    const [message, setMessage] = useState<MessageObj>();
     const [showMessage, setShowMessage] = useState(false);
     const [loading, setLoading] = useState(false);
     const [allVersions, setVersions] = useState<VersionObj[]>([]);

@@ -47,9 +47,7 @@ const OpenOrganization: React.FC = () => {
     const userCurrent = useUserStore((state) => state.userCurrent);
     const [documentsCount, setDocumentsCount] = useState(0);
     const [pieDataDoc, setPieDataDoc] = useState(() => buildPieDataDocumentsType(documents));
-    const [message, setMessage] = useState<MessageObj>(
-        new MessageObj('info', 'Tela das Organizações', '', 'info')
-    );
+    const [message, setMessage] = useState<MessageObj>();
     const [showMessage, setShowMessage] = useState(false);
     const pieDataUser = useMemo(() => buildPieDataUser(usersInvite), [usersInvite]);
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));

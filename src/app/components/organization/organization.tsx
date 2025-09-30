@@ -41,9 +41,7 @@ const Organization: React.FC = () => {
     const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
     const userCurrent = useUserStore((state) => state.userCurrent);
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState<MessageObj>(
-        new MessageObj('info', 'Tela das Organizações', '', 'info')
-    );
+    const [message, setMessage] = useState<MessageObj>();
     const [showMessage, setShowMessage] = useState(false);
     const alterOption = useOptionsDashboardStore((state) => state.alter);
     const [selectedFavorite, setSelectedFavorite] = useState('');
