@@ -11,7 +11,6 @@ import CustomTextField from '../customTextField';
 import { CachedRounded, Delete } from '@mui/icons-material';
 import CustomButton from '../customButton';
 import { DocumentObj } from '@/app/models/DocumentObj';
-import { getDocumentsTrash } from '@/app/services/Documents/DocumentsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
 import MsgConfirm from '../notification/msgConfirm';
@@ -19,6 +18,9 @@ import { useAuth } from '../useAuth';
 import { formatDate } from '@/app/services/ConstantsTypes';
 import { MessageObj } from '@/app/models/MessageObj';
 import CustomAlert from '../customAlert';
+import { useUserStore } from '@/app/state/userState';
+import { getAllDocumentsTrash } from '@/app/services/Documents/DocumentsServices';
+import { restoreDocumentFromTrash } from '@/app/services/Documents/trashDocument';
 
 const Trash: React.FC = () => {
     useAuth();
@@ -34,6 +36,8 @@ const Trash: React.FC = () => {
         new MessageObj('info', 'Tela da Lixeira', '', 'info')
     );
     const [showMessage, setShowMessage] = useState(false);
+    const [documents, setDocuments] = useState<DocumentObj[]>([]);
+        const userCurrent = useUserStore((state) => state.userCurrent);
 
     useEffect(() => {
         if (message) {
@@ -42,8 +46,17 @@ const Trash: React.FC = () => {
         }
     }, [message]);
 
-
-    const documents: DocumentObj[] = getDocumentsTrash();
+    useEffect(() =>{
+        if(userCurrent != undefined){
+            (async () =>{   
+                try{
+                    const result = await getAllDocumentsTrash(userCurrent, theme)
+                    setDocuments(result.documents)
+                }finally{}
+            })();
+        }
+    }, [userCurrent, theme, documents])
+    
 
     const filteredDocuments = useMemo(() => {
         if (!filter.trim()) {
@@ -61,6 +74,12 @@ const Trash: React.FC = () => {
             doc.organization.name.toLowerCase().includes(searchTerm)
         );
     }, [documents, filter]);
+
+    const toggleRestore = async (document: DocumentObj) =>{
+        if(userCurrent != undefined){
+            await restoreDocumentFromTrash(userCurrent, document.documentId)
+        }
+    }
 
     const toggleConfirm = (document: DocumentObj) => {
         alterMsgConfirm(`excluir permanentemente documento ${document.name}?`);
@@ -185,11 +204,6 @@ const Trash: React.FC = () => {
                                                 textTransform: 'uppercase',
                                                 fontWeight: 'bold',
                                                 fontSize: isMobile ? '0.75rem' : '1rem'
-                                            }}>Versão Atual</TableCell>
-                                            <TableCell sx={{
-                                                textTransform: 'uppercase',
-                                                fontWeight: 'bold',
-                                                fontSize: isMobile ? '0.75rem' : '1rem'
                                             }}>Ações</TableCell>
                                         </TableRow>
                                     </TableHead>
@@ -223,23 +237,10 @@ const Trash: React.FC = () => {
                                                     display: isMobile ? 'none' : 'table-cell'
                                                 }}>{doc.organization.name}</TableCell>
                                                 <TableCell sx={{ background: theme.palette.background.default }}>
-                                                    <Box
-                                                        sx={{
-                                                            backgroundColor: theme.palette.background.paper,
-                                                            color: theme.palette.text.primary,
-                                                            px: 1,
-                                                            borderRadius: 1,
-                                                            display: 'inline-block',
-                                                            fontSize: isMobile ? '0.8rem' : '1rem'
-                                                        }}
-                                                    >
-                                                        {doc.version}
-                                                    </Box>
-                                                </TableCell>
-                                                <TableCell sx={{ background: theme.palette.background.default }}>
                                                     <Box sx={{ display: 'flex', gap: isMobile ? 0.5 : 1 }}>
                                                         <IconButton
                                                             aria-label="more"
+                                                            onClick={() => toggleRestore(doc)}
                                                             size={isMobile ? "small" : "medium"}
                                                             sx={{ padding: isMobile ? '4px' : '8px' }}
                                                         >

@@ -50,8 +50,7 @@ const Dashboard = () => {
         try {
             const result = await getInvitesCount(userCurrent, theme);
             setInvites(result.count);
-        } catch (error) {
-            console.error("Erro ao carregar convites:", error);
+        } catch {
             setInvites(0);
         }
     };

@@ -124,8 +124,7 @@ export async function getOrganizationDocuments(
       ),
       documents: [],
     };
-  } catch (error) {
-    console.error(error);
+  } catch {
     return {
       message: new MessageObj(
         "error",

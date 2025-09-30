@@ -222,9 +222,7 @@ const OrganizationForm: React.FC = () => {
                                         }
                                         await addOrganizationUser(userAdd, userCurrent);
                                     }
-                                } catch (err) {
-                                    console.error(`Erro ao adicionar ${user.username}`, err);
-                                }
+                                } finally {}
                             }
                         }
                     }

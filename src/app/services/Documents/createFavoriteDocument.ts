@@ -15,7 +15,5 @@ export async function createFavoriteDocument(
     });
 
     await response.json().catch(() => null);
-  } catch (error) {
-    console.error(error);
-  }
+  } finally {}
 }

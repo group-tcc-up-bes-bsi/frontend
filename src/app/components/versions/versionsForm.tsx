@@ -74,8 +74,7 @@ const VersionForm: React.FC = () => {
                     alterVersionForm(false);
                 }
             }
-        } catch (error) {
-            console.error(error);
+        } catch {
             setMessage(new MessageObj("error", "Erro de servidor", "Não foi possível criar a versão.", "error"));
         }
     };
@@ -97,8 +96,7 @@ const VersionForm: React.FC = () => {
                     alterVersionForm(false);
                 }
             }
-        } catch (error) {
-            console.error(error);
+        } catch {
             setMessage(new MessageObj("error", "Erro de servidor", "Não foi possível atualizar a versão.", "error"));
         }
     }
