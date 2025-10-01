@@ -33,7 +33,7 @@ export function buildBarDataVersions(
     }).length;
 
     months.push({
-      id: monthsCount - i, // garante id único
+      id: monthsCount - i,
       label,
       value: count,
     });

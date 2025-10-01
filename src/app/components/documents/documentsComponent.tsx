@@ -30,9 +30,7 @@ const DocumentsComponent: React.FC = () => {
     const documentForm = useDocumentFormStore((state) => state.documentForm);
     const alterDocumentForm = useDocumentFormStore((state) => state.alter);
     const alterDoc = useDocumentStore((state) => state.alter);
-    const [message] = useState<MessageObj>(
-        new MessageObj('info', 'Tela dos Documentos', '', 'info')
-    );
+    const [message] = useState<MessageObj>();
     const [showMessage, setShowMessage] = useState(false);
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const isTablet = useMediaQuery(theme.breakpoints.down('lg'));

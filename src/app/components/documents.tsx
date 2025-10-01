@@ -102,8 +102,11 @@ const Documents: React.FC = () => {
   const toggleConfirm = async (document: DocumentObj) => {
     if (userCurrent != undefined) {
       const result = await moveDocumentToTrash(userCurrent, document.documentId)
-      if(result.message.severity = 'success'){
+      if (result.message.severity = 'success') {
         setMessage(new MessageObj('success', 'Documento Movido', 'Documento Movido para a Lixeira', 'success'))
+        setDocuments((prev) =>
+          prev.filter((doc) => doc.documentId !== document.documentId)
+        );
       }
     }
     setAnchorEl(null);
