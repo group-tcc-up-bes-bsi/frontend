@@ -12,7 +12,5 @@ export async function deleteFavoriteOrganization(organizationId: number, userCur
         });
 
         await response.json().catch(() => null);
-    } catch (error) {
-        console.error(error)
-    }
+    } finally{}
 }

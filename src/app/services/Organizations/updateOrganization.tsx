@@ -28,8 +28,7 @@ export async function updateOrganization(orgId: number, Name: string, Descriptio
             'success'
         ),
     };
-} catch (error) {
-    console.error(error)
+} catch {
     return {
         message: new MessageObj(
             'error',

@@ -34,8 +34,7 @@ export async function updateVersion(
       "A versão foi atualizada com sucesso",
       "success"
     );
-  } catch (error) {
-    console.error(error);
+  } catch {
     return new MessageObj(
       "error",
       "Erro de servidor",

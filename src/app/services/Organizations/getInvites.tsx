@@ -54,8 +54,7 @@ export async function getInvites(
             users,
             organizationsInvite,
         };
-    } catch (error) {
-        console.error(error);
+    } catch {
         return {
             message: new MessageObj(
                 "error",

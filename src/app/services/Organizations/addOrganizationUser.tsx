@@ -21,8 +21,7 @@ export async function addOrganizationUser(user: UserOrganization, userCurrent: U
 
         await response.json().catch(() => null);
 
-    } catch (error) {
-        console.error(error)
+    } catch {
         return {
             message: new MessageObj(
                 'error',

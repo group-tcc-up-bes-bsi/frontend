@@ -41,7 +41,7 @@ export async function getOrganizationDocuments(
     );
 
     if (
-      !responseData ||
+      responseData?.statusCode ||
       !Array.isArray(responseData) ||
       responseData.length === 0
     ) {
@@ -124,8 +124,7 @@ export async function getOrganizationDocuments(
       ),
       documents: [],
     };
-  } catch (error) {
-    console.error(error);
+  } catch {
     return {
       message: new MessageObj(
         "error",

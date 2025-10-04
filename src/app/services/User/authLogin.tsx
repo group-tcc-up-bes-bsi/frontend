@@ -64,8 +64,7 @@ export async function authLoginUser(User: string, Password: string) {
                 'success'),
             token: responseData.token,
         };
-    } catch (error) {
-        console.error(error);
+    } catch {
         return {
             message: new MessageObj(
                 'error',

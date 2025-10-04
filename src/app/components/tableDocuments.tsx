@@ -33,6 +33,7 @@ import { getOrganizationDocuments } from '../services/Documents/getOrganizationD
 import { MessageObj } from '../models/MessageObj';
 import { getOrganizationUsers } from '../services/Organizations/organizationsServices';
 import CustomAlert from './customAlert';
+import { moveDocumentToTrash } from '../services/Documents/trashDocument';
 
 const TableDocuments = () => {
     useAuth();
@@ -43,8 +44,6 @@ const TableDocuments = () => {
     const alterOption = useOptionsDashboardStore((state) => state.alter);
     const { filter } = useFilterStore();
     const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
-    const alterConfirm = useMsgConfirmStore((state) => state.alter);
-    const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
     const documentForm = useDocumentFormStore((state) => state.documentForm);
     const alterDocumentForm = useDocumentFormStore((state) => state.alter);
     const [orderBy, setOrderBy] = useState<keyof DocumentObj | null>(null);
@@ -134,9 +133,17 @@ const TableDocuments = () => {
         setOrderBy(property);
     };
 
-    const toggleConfirm = (document: DocumentObj) => {
-        alterMsgConfirm(`mover o documento ${document.name} para a Lixeira?`);
-        alterConfirm(!openConfirm);
+    const toggleConfirm = async (document: DocumentObj) => {
+        if (userCurrent != undefined) {
+            const result = await moveDocumentToTrash(userCurrent, document.documentId)
+            if (result.message.severity = 'success') {
+                setMessage(new MessageObj('success', 'Documento Movido', 'Documento Movido para a Lixeira', 'success'))
+                setDocuments((prev) =>
+                    prev.filter((doc) => doc.documentId !== document.documentId)
+                );
+            }
+        }
+        setAnchorEl(null);
     }
 
     const toggleDocumentForm = async (document: DocumentObj) => {

@@ -34,8 +34,7 @@ export async function getByUserName(userName: string, userCurrent: UserObj) {
             ),
             user: responseData
         };
-    } catch (error) {
-        console.error(error);
+    } catch {
         return {
             message: new MessageObj(
                 'error',

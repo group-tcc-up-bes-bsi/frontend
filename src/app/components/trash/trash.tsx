@@ -11,7 +11,6 @@ import CustomTextField from '../customTextField';
 import { CachedRounded, Delete } from '@mui/icons-material';
 import CustomButton from '../customButton';
 import { DocumentObj } from '@/app/models/DocumentObj';
-import { getDocumentsTrash } from '@/app/services/Documents/DocumentsServices';
 import { useFilterStore } from '@/app/state/filterState';
 import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
 import MsgConfirm from '../notification/msgConfirm';
@@ -19,6 +18,11 @@ import { useAuth } from '../useAuth';
 import { formatDate } from '@/app/services/ConstantsTypes';
 import { MessageObj } from '@/app/models/MessageObj';
 import CustomAlert from '../customAlert';
+import { useUserStore } from '@/app/state/userState';
+import { getAllDocumentsTrash } from '@/app/services/Documents/DocumentsServices';
+import { restoreDocumentFromTrash } from '@/app/services/Documents/trashDocument';
+import { getOrganizationUsers } from '@/app/services/Organizations/organizationsServices';
+import { deleteDocument } from '@/app/services/Documents/deleteDocument';
 
 const Trash: React.FC = () => {
     useAuth();
@@ -30,10 +34,10 @@ const Trash: React.FC = () => {
     const openConfirm = useMsgConfirmStore((state) => state.openConfirm);
     const alterConfirm = useMsgConfirmStore((state) => state.alter);
     const alterMsgConfirm = useMsgConfirmStore((state) => state.alterMsg);
-    const [message] = useState<MessageObj>(
-        new MessageObj('info', 'Tela da Lixeira', '', 'info')
-    );
+    const [message, setMessage] = useState<MessageObj>();
     const [showMessage, setShowMessage] = useState(false);
+    const [documents, setDocuments] = useState<DocumentObj[]>([]);
+    const userCurrent = useUserStore((state) => state.userCurrent);
 
     useEffect(() => {
         if (message) {
@@ -42,8 +46,17 @@ const Trash: React.FC = () => {
         }
     }, [message]);
 
+    useEffect(() => {
+        if (userCurrent != undefined) {
+            (async () => {
+                try {
+                    const result = await getAllDocumentsTrash(userCurrent, theme)
+                    setDocuments(result.documents)
+                } finally { }
+            })();
+        }
+    }, [userCurrent, theme, documents])
 
-    const documents: DocumentObj[] = getDocumentsTrash();
 
     const filteredDocuments = useMemo(() => {
         if (!filter.trim()) {
@@ -62,14 +75,75 @@ const Trash: React.FC = () => {
         );
     }, [documents, filter]);
 
-    const toggleConfirm = (document: DocumentObj) => {
-        alterMsgConfirm(`excluir permanentemente documento ${document.name}?`);
-        alterConfirm(!openConfirm);
+    const toggleRestore = async (document: DocumentObj) => {
+        if (userCurrent != undefined) {
+            await restoreDocumentFromTrash(userCurrent, document.documentId)
+        }
     }
 
-    const toggleConfirmEmpty = () => {
-        alterMsgConfirm(`esvaziar a lixeira?`);
-        alterConfirm(!openConfirm);
+    const toggleConfirm = async (document: DocumentObj) => {
+        if (userCurrent != undefined) {
+            try {
+                const result = await getOrganizationUsers(document.organization.organizationId, userCurrent)
+                const users = result.users;
+                for (const user of users) {
+                    if (user.username == userCurrent.username) {
+                        if (user.userType.toString() == 'OWNER') {
+                            alterMsgConfirm(`excluir permanentemente documento ${document.name}?`);
+                            alterConfirm(!openConfirm);
+                            useMsgConfirmStore.getState().setOnConfirm(async () => {
+                                if (userCurrent) {
+                                    await deleteDocument(userCurrent, document.documentId);
+                                    setDocuments((prev) =>
+                                        prev.filter((doc) => doc.documentId !== document.documentId)
+                                    );
+                                }
+                            });
+                        } else {
+                            setMessage(new MessageObj('warning', 'Não Permitido', 'Somente o proprietario realizar Exclusão', 'warning'));
+                        }
+                    }
+                }
+            } catch (error) {
+                setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));
+            }
+        }
+    }
+
+    const toggleConfirmEmpty = async () => {
+        if (userCurrent != undefined && documents.length > 0) {
+            let isOwner = true;
+            for (const doc of documents) {
+                try {
+                    const result = await getOrganizationUsers(doc.organization.organizationId, userCurrent);
+                    const users = result.users;
+                    const ownerUser = users.find(user => user.username === userCurrent.username && user.userType.toString() === 'OWNER');
+                    if (!ownerUser) {
+                        isOwner = false;
+                        break;
+                    }
+                } catch {
+                    isOwner = false;
+                    break;
+                }
+            }
+            if (isOwner) {
+                alterMsgConfirm(`Esvaziar a lixeira?`);
+                alterConfirm(!openConfirm);
+                useMsgConfirmStore.getState().setOnConfirm(async () => {
+                    if (userCurrent) {
+                        for (const doc of documents) {
+                            await deleteDocument(userCurrent, doc.documentId);
+                        }
+                        setDocuments([]);
+                    }
+                });
+            } else {
+                setMessage(new MessageObj('warning', 'Não Permitido', 'Somente o proprietário pode esvaziar a lixeira', 'warning'));
+            }
+        } else {
+            setMessage(new MessageObj('warning', 'Sem Documentos', 'Nenhum documento na lixeira', 'warning'));
+        }
     }
 
     return (
@@ -145,7 +219,7 @@ const Trash: React.FC = () => {
                                     borderRadius: '3px',
                                 },
                             }}>
-                                <Table sx={{ minWidth: 650 }} aria-label="tabela de Documentos" size={isMobile ? "small" : "medium"}>
+                                <Table sx={{ minWidth: isMobile ? 250 : 650 }} aria-label="tabela de Documentos" size={isMobile ? "small" : "medium"}>
                                     <TableHead>
                                         <TableRow sx={{ backgroundColor: theme.palette.background.default }}>
                                             <TableCell sx={{
@@ -185,80 +259,70 @@ const Trash: React.FC = () => {
                                                 textTransform: 'uppercase',
                                                 fontWeight: 'bold',
                                                 fontSize: isMobile ? '0.75rem' : '1rem'
-                                            }}>Versão Atual</TableCell>
-                                            <TableCell sx={{
-                                                textTransform: 'uppercase',
-                                                fontWeight: 'bold',
-                                                fontSize: isMobile ? '0.75rem' : '1rem'
                                             }}>Ações</TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
-                                        {filteredDocuments.map((doc) => (
-                                            <TableRow key={doc.documentId}>
-                                                <TableCell sx={{
-                                                    background: theme.palette.background.default,
-                                                    display: isSmallScreen ? 'none' : 'table-cell'
-                                                }}>{doc.name}</TableCell>
-                                                <TableCell sx={{
-                                                    background: theme.palette.background.default,
-                                                    display: isMobile ? 'none' : 'table-cell'
-                                                }}>{doc.type}</TableCell>
-                                                <TableCell sx={{ background: theme.palette.background.default }}>
-                                                    <Box sx={{ display: 'flex', flexDirection: 'column' }}>
-                                                        <span>{formatDate(doc.creationDate)}</span>
-                                                        {isSmallScreen && (
-                                                            <span style={{ fontSize: '0.8rem', color: theme.palette.text.secondary }}>
-                                                                {doc.name}
-                                                            </span>
-                                                        )}
-                                                    </Box>
-                                                </TableCell>
-                                                <TableCell sx={{
-                                                    background: theme.palette.background.default,
-                                                    display: isLargeScreen ? 'table-cell' : 'none'
-                                                }}>{formatDate(doc.lastModifiedDate)}</TableCell>
-                                                <TableCell sx={{
-                                                    background: theme.palette.background.default,
-                                                    display: isMobile ? 'none' : 'table-cell'
-                                                }}>{doc.organization.name}</TableCell>
-                                                <TableCell sx={{ background: theme.palette.background.default }}>
-                                                    <Box
-                                                        sx={{
-                                                            backgroundColor: theme.palette.background.paper,
-                                                            color: theme.palette.text.primary,
-                                                            px: 1,
-                                                            borderRadius: 1,
-                                                            display: 'inline-block',
-                                                            fontSize: isMobile ? '0.8rem' : '1rem'
-                                                        }}
-                                                    >
-                                                        {doc.version}
-                                                    </Box>
-                                                </TableCell>
-                                                <TableCell sx={{ background: theme.palette.background.default }}>
-                                                    <Box sx={{ display: 'flex', gap: isMobile ? 0.5 : 1 }}>
-                                                        <IconButton
-                                                            aria-label="more"
-                                                            size={isMobile ? "small" : "medium"}
-                                                            sx={{ padding: isMobile ? '4px' : '8px' }}
-                                                        >
-                                                            <CachedRounded sx={{
-                                                                fontSize: isMobile ? '1.2rem' : '1.5rem'
-                                                            }} />
-                                                        </IconButton>
-                                                        <IconButton
-                                                            aria-label="delete"
-                                                            onClick={() => toggleConfirm(doc)}
-                                                            size={isMobile ? "small" : "medium"}
-                                                            sx={{ padding: isMobile ? '4px' : '8px' }}
-                                                        >
-                                                            <Delete color="error" sx={{ fontSize: isMobile ? '1.2rem' : '1.5rem' }} />
-                                                        </IconButton>
-                                                    </Box>
+                                        {filteredDocuments.length === 0 ? (
+                                            <TableRow>
+                                                <TableCell colSpan={6} align="center" sx={{ background: theme.palette.background.default }}>
+                                                    Nenhum documento na lixeira.
                                                 </TableCell>
                                             </TableRow>
-                                        ))}
+                                        ) : (
+                                            filteredDocuments.map((doc) => (
+                                                <TableRow key={doc.documentId}>
+                                                    <TableCell sx={{
+                                                        background: theme.palette.background.default,
+                                                        display: isSmallScreen ? 'none' : 'table-cell'
+                                                    }}>{doc.name}</TableCell>
+                                                    <TableCell sx={{
+                                                        background: theme.palette.background.default,
+                                                        display: isMobile ? 'none' : 'table-cell'
+                                                    }}>{doc.type}</TableCell>
+                                                    <TableCell sx={{ background: theme.palette.background.default }}>
+                                                        <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                                                            <span>{formatDate(doc.creationDate)}</span>
+                                                            {isSmallScreen && (
+                                                                <span style={{ fontSize: '0.8rem', color: theme.palette.text.secondary }}>
+                                                                    {doc.name}
+                                                                </span>
+                                                            )}
+                                                        </Box>
+                                                    </TableCell>
+                                                    <TableCell sx={{
+                                                        background: theme.palette.background.default,
+                                                        display: isLargeScreen ? 'table-cell' : 'none'
+                                                    }}>{formatDate(doc.lastModifiedDate)}</TableCell>
+                                                    <TableCell sx={{
+                                                        background: theme.palette.background.default,
+                                                        display: isMobile ? 'none' : 'table-cell'
+                                                    }}>{doc.organization.name}</TableCell>
+                                                    <TableCell sx={{ background: theme.palette.background.default }}>
+                                                        <Box sx={{ display: 'flex', gap: isMobile ? 0.5 : 1 }}>
+                                                            <IconButton
+                                                                aria-label="more"
+                                                                onClick={() => toggleRestore(doc)}
+                                                                size={isMobile ? "small" : "medium"}
+                                                                sx={{ padding: isMobile ? '4px' : '8px' }}
+                                                            >
+                                                                <CachedRounded sx={{
+                                                                    fontSize: isMobile ? '1.2rem' : '1.5rem'
+                                                                }} />
+                                                            </IconButton>
+                                                            <IconButton
+                                                                aria-label="delete"
+                                                                onClick={() => toggleConfirm(doc)}
+                                                                size={isMobile ? "small" : "medium"}
+                                                                sx={{ padding: isMobile ? '4px' : '8px' }}
+                                                            >
+                                                                <Delete color="error" sx={{ fontSize: isMobile ? '1.2rem' : '1.5rem' }} />
+                                                            </IconButton>
+                                                        </Box>
+                                                    </TableCell>
+                                                </TableRow>
+                                            ))
+                                        )}
                                     </TableBody>
                                 </Table>
                             </TableContainer>

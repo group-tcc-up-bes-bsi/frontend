@@ -1,12 +1,12 @@
 import { MessageObj } from "@/app/models/MessageObj";
-import { UserObj } from "@/app/models/UserObj";
 import { getErrorTitle } from "../ErrorTitle";
+import { UserObj } from "@/app/models/UserObj";
 
-export async function deleteVersion(
+export async function deleteDocument(
   userCurrent: UserObj,
-  versionId: number
-): Promise<{ message: MessageObj }> {
-  const url = `${process.env.NEXT_PUBLIC_BACKEND}/document-versions/${versionId}`;
+  documentId: number
+): Promise<{ message: MessageObj; success: boolean }> {
+  const url = `${process.env.NEXT_PUBLIC_BACKEND}/documents/${documentId}`;
 
   try {
     const response = await fetch(url, {
@@ -15,37 +15,41 @@ export async function deleteVersion(
         "Content-Type": "application/json",
         Authorization: `Bearer ${userCurrent?.jwtToken}`,
       },
+      body: null,
     });
 
-    const responseData = await response.json().catch(() => null);
-
     if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
       return {
         message: new MessageObj(
           "error",
-          getErrorTitle(responseData?.statusCode || 500),
-          responseData?.message || "Erro ao excluir versão",
+          getErrorTitle(response.status),
+          errorData?.message || "Erro ao deletar documento",
           "error"
         ),
+        success: false,
       };
     }
 
     return {
       message: new MessageObj(
         "success",
-        "Versão removida",
-        "A versão foi removida com sucesso",
+        "Documento deletado",
+        `Documento de ID ${documentId} deletado com sucesso`,
         "success"
       ),
+      success: true,
     };
-  } catch {
+  } catch (error) {
+    console.error(error);
     return {
       message: new MessageObj(
         "error",
         getErrorTitle(500),
-        "Erro: Servidor inoperante",
+        "Erro: Servidor inoperante ao tentar deletar documento",
         "error"
       ),
+      success: false,
     };
   }
 }

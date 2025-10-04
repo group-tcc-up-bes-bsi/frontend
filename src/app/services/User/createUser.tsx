@@ -46,8 +46,7 @@ export async function createUser(UserName: string, Password: string) {
                 'success'
             )
         };
-    } catch (error) {
-        console.error(error)
+    } catch {
         return {
             message: new MessageObj(
                 'error',

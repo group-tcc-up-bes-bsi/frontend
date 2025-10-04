@@ -76,8 +76,7 @@ export async function getVersionsByDocument(
       ),
       versions: [],
     };
-  } catch (error) {
-    console.error(error);
+  } catch {
     return {
       message: new MessageObj(
         "error",

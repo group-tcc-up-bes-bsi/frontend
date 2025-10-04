@@ -36,9 +36,7 @@ const PasswordModal: React.FC = () => {
                     handleClose();
                 }
             }
-        } catch (error) {
-            console.error('Erro ao atualizar usuário:', error);
-        }
+        } finally {}
     };
 
     useEffect(() => {

@@ -66,8 +66,7 @@ export async function updatePasswordUser(userId: number, UserName: string, Passw
                 'success'
             )
         };
-    } catch (error) {
-        console.error(error);
+    } catch {
         return {
             message: new MessageObj(
                 'error',

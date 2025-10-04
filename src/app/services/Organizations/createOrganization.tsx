@@ -51,8 +51,7 @@ export async function createOrganization(Name: string, Description: string, Orga
         ),
         organizationId: responseData.organizationId
     };
-} catch (error) {
-    console.error(error)
+} catch {
     return {
         message: new MessageObj(
             'error',

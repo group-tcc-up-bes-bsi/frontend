@@ -48,8 +48,7 @@ export async function createDocument(
       ),
       documentId: 0,
     };
-  } catch (error) {
-    console.error(error);
+  } catch {
     return {
       message: new MessageObj(
         "error",

@@ -19,9 +19,7 @@ const Notification: React.FC = () => {
     const alterNotification = useNotificationStore((state) => state.alter);
     const userCurrent = useUserStore((state) => state.userCurrent);
     const [loading, setLoading] = useState(false);
-    const [message, setMessage] = useState<MessageObj>(
-        new MessageObj('info', 'Tela Principal', '', 'info')
-    );
+    const [message, setMessage] = useState<MessageObj>();
     const [showMessage, setShowMessage] = useState(false);
     const [invites, setInvites] = useState<UserOrganization[]>([]);
     const [organizationsInvite, setOrganizationsInvite] = useState<{ organizationId: number; name: string }[]>([]);

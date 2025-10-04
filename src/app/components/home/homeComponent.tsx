@@ -25,9 +25,7 @@ const HomeComponent: React.FC = () => {
     const [colorMode1, setColorMode1] = useState(theme.palette.button.primary);
     const [colorMode2, setColorMode2] = useState(theme.palette.text.primary);
     const userCurrent = useUserStore((state) => state.userCurrent)
-    const [message] = useState<MessageObj>(
-        new MessageObj('info', 'Tela Inicial', '', 'info')
-    );
+    const [message] = useState<MessageObj>();
     const [showMessage, setShowMessage] = useState(false);
     const [organizations, setOrganizations] = useState<OrganizationObj[]>([]);
     const openNotification = useNotificationStore((state) => state.openNotification);
