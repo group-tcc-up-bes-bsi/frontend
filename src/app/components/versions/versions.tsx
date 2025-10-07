@@ -372,7 +372,9 @@ const Versions: React.FC = () => {
                         sx={{
                             backgroundColor: theme.palette.background.paper,
                             boxShadow: 2,
-                            border: `1px solid ${theme.palette.divider}`,
+                            border: `2px solid ${document?.version == version.name
+                                ? theme.palette.button.primary
+                                : theme.palette.divider}`,
                         }}
                     >
                         <Box fontWeight="bold"
@@ -457,6 +459,15 @@ const Versions: React.FC = () => {
                     </Box>
                 ))}
             </Box>
+                <CustomTypography
+                    text={`Versão atual em azul`}
+                    component="p"
+                    sx={{
+                        fontStyle: 'italic',
+                        color: theme.palette.button.primary,
+                        fontSize: '0.9rem'
+                    }}
+                />
 
             {openConfirm && <MsgConfirm />}
             {versionForm && <VersionForm />}
