@@ -138,6 +138,13 @@ const OpenDocument: React.FC = () => {
         >
           {"Data criação: " + (document?.creationDate?.toLocaleDateString("pt-BR", {}) || 'N/A')}
         </Typography>
+        <Typography
+          variant={isMobile ? "body1" : "h6"}
+          gutterBottom
+          sx={{ fontWeight: isMobile ? 'bold' : 'normal' }}
+        >
+          {"Organização: " + (document?.organization.name || 'N/A')}
+        </Typography>
       </Box>
 
       <Versions />
