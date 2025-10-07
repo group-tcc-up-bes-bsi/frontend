@@ -197,7 +197,7 @@ const Documents: React.FC = () => {
                   Tipo: {doc.type.toUpperCase()}
                 </Box>
                 <Box fontSize="0.8rem" mb={1} sx={{ color: theme.palette.text.primary }}>
-                  Versões: {doc.documentId}
+                  Versões: {doc.version}
                 </Box>
               </Box>
               <Box mt={0.5}>
