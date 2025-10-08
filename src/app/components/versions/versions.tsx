@@ -30,6 +30,7 @@ import { MessageObj } from '@/app/models/MessageObj';
 import { getVersionsByDocument } from '@/app/services/Versions/getVersions';
 import { useDocumentStore } from '@/app/state/documentState';
 import { deleteVersion } from '@/app/services/Versions/deleteVersion';
+import { getDocumentById } from '@/app/services/Documents/getDocumentByID';
 
 const Versions: React.FC = () => {
     useAuth();
@@ -52,39 +53,57 @@ const Versions: React.FC = () => {
     const document = useDocumentStore((state) => state.document);
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const isTablet = useMediaQuery(theme.breakpoints.down('lg'));
+    const [currentVersion, setCurrentVersion] = useState<string>("");
 
     useEffect(() => {
-        if (userCurrent != undefined) {
-            (async () => {
-                setLoading(true);
-                try {
-                    if (document) {
-                        const result = await getVersionsByDocument(userCurrent, document);
-                        setVersions(result.versions);
+        const fetchDocumentVersion = async () => {
+            try {
+                if (userCurrent && document) {
+                    const result = await getDocumentById(userCurrent, document);
+                    if (result.document) {
+                        setCurrentVersion(result.document.version);
+                        console.log(currentVersion)
                     }
-
-                } finally {
-                    setLoading(false);
                 }
-            })();
-        }
-    }, [userCurrent, theme, versionForm]);
+            } finally { }
+        };
+
+        fetchDocumentVersion();
+    }, [allVersions, userCurrent, document]);
+
+    useEffect(() => {
+        if (!userCurrent || !document) return;
+        (async () => {
+            setLoading(true);
+            try {
+                const result = await getVersionsByDocument(userCurrent, document);
+                const sorted = result.versions.sort((a, b) => {
+                    if (a.name === document.version) return -1;
+                    if (b.name === document.version) return 1;
+                    return b.creationDate.getTime() - a.creationDate.getTime();
+                });
+                setVersions(sorted);
+            } finally {
+                setLoading(false);
+            }
+        })();
+    }, [userCurrent, document, versionForm]);
 
     const filteredVersions = useMemo(() => {
-        let version = [...allVersions];
-
-        if (filter.trim()) {
-            const searchTerm = filter.toLowerCase().trim();
-
-            version = version.filter((version) =>
-                version.name.toLowerCase().includes(searchTerm) ||
-                version.filePath.toLowerCase().includes(searchTerm) ||
-                formatDate(version.creationDate).toLowerCase().includes(searchTerm) ||
-                version.document.name.toLowerCase().includes(searchTerm)
-            );
-        }
-        return version.sort((a, b) => b.creationDate.getTime() - a.creationDate.getTime());
-    }, [allVersions, filter]);
+        const term = filter.toLowerCase().trim();
+        return allVersions
+            .filter(
+                (v) =>
+                    v.name.toLowerCase().includes(term) ||
+                    v.filePath.toLowerCase().includes(term) ||
+                    formatDate(v.creationDate).toLowerCase().includes(term)
+            )
+            .sort((a, b) => {
+                if (a.name === currentVersion) return -1;
+                if (b.name === currentVersion) return 1;
+                return b.creationDate.getTime() - a.creationDate.getTime();
+            });
+    }, [allVersions, filter, currentVersion]);
 
     useEffect(() => {
         if (message) {
@@ -372,7 +391,7 @@ const Versions: React.FC = () => {
                         sx={{
                             backgroundColor: theme.palette.background.paper,
                             boxShadow: 2,
-                            border: `2px solid ${document?.version == version.name
+                            border: `2px solid ${currentVersion == version.name
                                 ? theme.palette.button.primary
                                 : theme.palette.divider}`,
                         }}
@@ -459,15 +478,15 @@ const Versions: React.FC = () => {
                     </Box>
                 ))}
             </Box>
-                <CustomTypography
-                    text={`Versão atual em azul`}
-                    component="p"
-                    sx={{
-                        fontStyle: 'italic',
-                        color: theme.palette.button.primary,
-                        fontSize: '0.9rem'
-                    }}
-                />
+            <CustomTypography
+                text={`Versão atual em azul`}
+                component="p"
+                sx={{
+                    fontStyle: 'italic',
+                    color: theme.palette.button.primary,
+                    fontSize: '0.9rem'
+                }}
+            />
 
             {openConfirm && <MsgConfirm />}
             {versionForm && <VersionForm />}
