@@ -10,6 +10,17 @@ export enum userType {
   READ = "Visualizador",
 }
 
+export enum logsType {
+  CREATED = "Documento criado",
+  UPDATED = "Documento alterado",
+  DELETED = "Documento excluído",
+  TRASHED = "Documento enviado para à lixeira",
+  RESTORED = "Documento restaurado da lixeira",
+  CREATED_VERSION = "Adicionada nova versão",
+  UPDATED_VERSION = "Versão atualizada",
+  DELETED_VERSION = "Versão deletada",
+}
+
 export const organizationsTypeOptions = [
   { value: "ALL", label: "Todos" },
   { value: "INDIVIDUAL", label: "Individual" },
