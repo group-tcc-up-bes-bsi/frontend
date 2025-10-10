@@ -46,6 +46,16 @@ const DocumentForm: React.FC = () => {
                 try {
                     const result = await getOrganizations(userCurrent, theme);
                     setOrganizations(result.organizations);
+                    if(result.organizations.length <= 0){
+                        setMessage(
+                            new MessageObj(
+                                'error',
+                                'Sem Organizações',
+                                'Cadastre uma organização inicialmente',
+                                'error'
+                            ));
+                        setTimeout(() => alterDocumentForm(false), 5000);
+                    }
                 } finally {
                 }
             })();
