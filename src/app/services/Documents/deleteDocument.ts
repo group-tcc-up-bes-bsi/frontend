@@ -1,12 +1,13 @@
 import { MessageObj } from "@/app/models/MessageObj";
 import { getErrorTitle } from "../ErrorTitle";
 import { UserObj } from "@/app/models/UserObj";
+import { DocumentObj } from "@/app/models/DocumentObj";
 
 export async function deleteDocument(
   userCurrent: UserObj,
-  documentId: number
+  document: DocumentObj
 ): Promise<{ message: MessageObj; success: boolean }> {
-  const url = `${process.env.NEXT_PUBLIC_BACKEND}/documents/${documentId}`;
+  const url = `${process.env.NEXT_PUBLIC_BACKEND}/documents/${document.documentId}`;
 
   try {
     const response = await fetch(url, {
@@ -35,13 +36,12 @@ export async function deleteDocument(
       message: new MessageObj(
         "success",
         "Documento deletado",
-        `Documento de ID ${documentId} deletado com sucesso`,
+        `Documento de ID ${document.name} deletado com sucesso`,
         "success"
       ),
       success: true,
     };
-  } catch (error) {
-    console.error(error);
+  } catch {
     return {
       message: new MessageObj(
         "error",

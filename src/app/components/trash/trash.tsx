@@ -93,10 +93,11 @@ const Trash: React.FC = () => {
                             alterConfirm(!openConfirm);
                             useMsgConfirmStore.getState().setOnConfirm(async () => {
                                 if (userCurrent) {
-                                    await deleteDocument(userCurrent, document.documentId);
+                                    const resultDel = await deleteDocument(userCurrent, document);
                                     setDocuments((prev) =>
                                         prev.filter((doc) => doc.documentId !== document.documentId)
                                     );
+                                    setMessage(resultDel.message)
                                 }
                             });
                         } else {
@@ -133,7 +134,8 @@ const Trash: React.FC = () => {
                 useMsgConfirmStore.getState().setOnConfirm(async () => {
                     if (userCurrent) {
                         for (const doc of documents) {
-                            await deleteDocument(userCurrent, doc.documentId);
+                            const result = await deleteDocument(userCurrent, doc);
+                            setMessage(result.message)
                         }
                         setDocuments([]);
                     }

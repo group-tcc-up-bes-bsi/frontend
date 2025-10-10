@@ -27,6 +27,13 @@ import { getInvitesCount } from '@/app/services/Organizations/getInvites';
 import OpenOrganization from '@/app/components/organization/openOrganization';
 import { useDocumentStore } from '@/app/state/documentState';
 import { OrganizationObj } from '@/app/models/OrganizationObj';
+import { useDocumentFormStore } from '@/app/state/documentFormState';
+import { useOrganizationFormStore } from '@/app/state/organizationFormState';
+import { useVersionFormStore } from '@/app/state/versionFormState';
+import { useAuditLogStore } from '@/app/state/auditLogState';
+import { useAdminPassStore } from '@/app/state/adminPassState';
+import { useMsgConfirmStore } from '@/app/state/msgConfirmState';
+import { useTermFormStore } from '@/app/state/termFormState';
 
 const Dashboard = () => {
     useAuth();
@@ -42,8 +49,15 @@ const Dashboard = () => {
     const document = useDocumentStore((state) => state.document);
     const userCurrent = useUserStore((state) => state.userCurrent);
     const [invites, setInvites] = useState(0);
-    const alterOrganization = useOrganizationStore((state) => state.alter);
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+    const alterOrganization = useOrganizationStore((state) => state.alter);
+    const alterDocumentForm = useDocumentFormStore((state) => state.alter);
+    const alterVersionForm = useVersionFormStore((state) => state.alter);
+    const alterOrganizationForm = useOrganizationFormStore((state) => state.alter);
+    const alterLogViewer = useAuditLogStore((state) => state.alter);
+    const alterAdminPass = useAdminPassStore((state) => state.alter);
+    const alterOpenConfirm = useMsgConfirmStore((state) => state.alter);
+    const alterTermsForm = useTermFormStore((state) => state.alter);
 
     const loadInvitesCount = async () => {
         if (!userCurrent) return;
@@ -77,6 +91,13 @@ const Dashboard = () => {
                     icon: undefined
                 };
                 alterOrganization(orgNull);
+                alterDocumentForm(false);
+                alterVersionForm(false);
+                alterOrganizationForm(false);
+                alterLogViewer(false);
+                alterAdminPass(false);
+                alterOpenConfirm(false);
+                alterTermsForm(false);
                 break;
             case 'Documents':
                 setOptionMenu("Meus Documentos");
@@ -90,18 +111,53 @@ const Dashboard = () => {
                     icon: undefined
                 };
                 alterOrganization(orgNullDocuments);
+                alterDocumentForm(false);
+                alterVersionForm(false);
+                alterOrganizationForm(false);
+                alterLogViewer(false);
+                alterAdminPass(false);
+                alterOpenConfirm(false);
+                alterTermsForm(false);
                 break;
             case 'Organizations':
                 setOptionMenu("Organizações");
+                alterDocumentForm(false);
+                alterVersionForm(false);
+                alterOrganizationForm(false);
+                alterLogViewer(false);
+                alterAdminPass(false);
+                alterOpenConfirm(false);
+                alterTermsForm(false);
                 break;
             case 'Open Organization':
                 setOptionMenu("Organização: " + organization?.name);
+                alterDocumentForm(false);
+                alterVersionForm(false);
+                alterOrganizationForm(false);
+                alterLogViewer(false);
+                alterAdminPass(false);
+                alterOpenConfirm(false);
+                alterTermsForm(false);
                 break;
             case 'Favorites':
                 setOptionMenu("Favoritos");
+                alterDocumentForm(false);
+                alterVersionForm(false);
+                alterOrganizationForm(false);
+                alterLogViewer(false);
+                alterAdminPass(false);
+                alterOpenConfirm(false);
+                alterTermsForm(false);
                 break;
             case 'Recycle Bin':
                 setOptionMenu("Lixeira");
+                alterDocumentForm(false);
+                alterVersionForm(false);
+                alterOrganizationForm(false);
+                alterLogViewer(false);
+                alterAdminPass(false);
+                alterOpenConfirm(false);
+                alterTermsForm(false);
                 break;
             case 'Settings':
                 setOptionMenu("Configurações");
@@ -115,12 +171,33 @@ const Dashboard = () => {
                     icon: undefined
                 };
                 alterOrganization(orgNullSettings);
+                alterDocumentForm(false);
+                alterVersionForm(false);
+                alterOrganizationForm(false);
+                alterLogViewer(false);
+                alterAdminPass(false);
+                alterOpenConfirm(false);
+                alterTermsForm(false);
                 break;
             case 'Open Document':
                 setOptionMenu("Documento: " + document?.name);
+                alterDocumentForm(false);
+                alterVersionForm(false);
+                alterOrganizationForm(false);
+                alterLogViewer(false);
+                alterAdminPass(false);
+                alterOpenConfirm(false);
+                alterTermsForm(false);
                 break;
             default:
                 setOptionMenu("");
+                alterDocumentForm(false);
+                alterVersionForm(false);
+                alterOrganizationForm(false);
+                alterLogViewer(false);
+                alterAdminPass(false);
+                alterOpenConfirm(false);
+                alterTermsForm(false);
         }
     };
 

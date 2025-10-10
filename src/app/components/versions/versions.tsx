@@ -62,7 +62,6 @@ const Versions: React.FC = () => {
                     const result = await getDocumentById(userCurrent, document);
                     if (result.document) {
                         setCurrentVersion(result.document.version);
-                        console.log(currentVersion)
                     }
                 }
             } finally { }

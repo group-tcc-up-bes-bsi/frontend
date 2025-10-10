@@ -51,7 +51,6 @@ export async function getDocumentById(
         userCurrent,
         document
       );
-      console.log(versionsResponse)
       if (versionsResponse.versions.length > 0) {
         const activeVersion: VersionObj | undefined =
           versionsResponse.versions.find(
@@ -64,9 +63,7 @@ export async function getDocumentById(
           doc.version = versionsResponse.versions[0].name;
         }
       }
-    } catch (err) {
-      console.error("Erro ao carregar versões:", err);
-    }
+    } finally {}
 
     return {
       message: new MessageObj(
