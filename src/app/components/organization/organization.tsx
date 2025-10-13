@@ -24,6 +24,7 @@ import { useOptionsDashboardStore } from '@/app/state/optionsDashboard';
 import { getOrganizations } from '@/app/services/Organizations/getOrganizations';
 import { createFavoriteOrganization } from '@/app/services/Organizations/createFavoriteDocument';
 import { deleteFavoriteOrganization } from '@/app/services/Organizations/deleteFavoriteDocument';
+import { getOrganizationDocuments } from '@/app/services/Documents/getOrganizationDocuments';
 
 const Organization: React.FC = () => {
     useAuth();
@@ -146,10 +147,19 @@ const Organization: React.FC = () => {
                                 alterConfirm(true);
                                 useMsgConfirmStore.getState().setOnConfirm(async () => {
                                     if (userCurrent) {
-                                        await deleteOrganization(selectedOrganization.organizationId, userCurrent);
-                                        setOrganizations((prev) =>
-                                            prev.filter((org) => org.organizationId !== selectedOrganization.organizationId)
-                                        );
+                                        const responseDocs = await getOrganizationDocuments(userCurrent, selectedOrganization);
+                                        if (responseDocs.documents.length <= 0) {
+                                            await deleteOrganization(selectedOrganization.organizationId, userCurrent);
+                                            setOrganizations((prev) =>
+                                                prev.filter((org) => org.organizationId !== selectedOrganization.organizationId)
+                                            );
+                                        } else {
+                                            setMessage(new MessageObj(
+                                                'error',
+                                                'Não excluído',
+                                                "A Organização possui documentos associados. Exclua todos os documentos antes de remover a organização.",
+                                                'error'));
+                                        }
                                     }
                                 });
                             } else {

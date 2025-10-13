@@ -3,6 +3,7 @@ import { MessageObj } from "@/app/models/MessageObj";
 import { UserObj } from "@/app/models/UserObj";
 import { OrganizationObj } from "@/app/models/OrganizationObj";
 import { getErrorTitle } from "../ErrorTitle";
+import { getVersionsByDocument } from "../Versions/getVersions";
 
 export async function getDocumentsTrash(
   userCurrent: UserObj,
@@ -21,7 +22,11 @@ export async function getDocumentsTrash(
 
     const responseData = await response.json().catch(() => null);
 
-    if (!responseData || !Array.isArray(responseData) || responseData.length === 0) {
+    if (
+      !responseData ||
+      !Array.isArray(responseData) ||
+      responseData.length === 0
+    ) {
       return {
         message: new MessageObj(
           "error",
@@ -32,18 +37,23 @@ export async function getDocumentsTrash(
         documents: [],
       };
     }
+    const documents: DocumentObj[] = [];
 
-    const documents: DocumentObj[] = responseData.map((item: DocumentObj) => ({
-      documentId: item.documentId,
-      name: item.name,
-      type: item.type,
-      description: item.description,
-      creationDate: new Date(item.creationDate),
-      lastModifiedDate: new Date(item.lastModifiedDate),
-      organization: organization,
-      version: "Sem Versão",
-      favorite: false,
-    }));
+    for (const item of responseData) {
+      const document: DocumentObj = {
+        documentId: item.documentId,
+        name: item.name,
+        type: item.type,
+        description: item.description,
+        creationDate: new Date(item.creationDate),
+        lastModifiedDate: new Date(item.lastModifiedDate),
+        organization: organization,
+        version: "Sem Versão",
+        favorite: false,
+      };
+
+      documents.push(document);
+    }
 
     return {
       message: new MessageObj(
@@ -54,6 +64,7 @@ export async function getDocumentsTrash(
       ),
       documents,
     };
+
   } catch {
     return {
       message: new MessageObj(
@@ -69,11 +80,22 @@ export async function getDocumentsTrash(
 
 export async function moveDocumentToTrash(
   userCurrent: UserObj,
-  documentId: number
+  document: DocumentObj
 ): Promise<{ message: MessageObj }> {
-  const url = `${process.env.NEXT_PUBLIC_BACKEND}/documents/${documentId}/trash`;
+  const url = `${process.env.NEXT_PUBLIC_BACKEND}/documents/${document.documentId}/trash`;
 
   try {
+    const responseVersion = await getVersionsByDocument(userCurrent, document);
+    if (responseVersion.versions.length > 0) {
+      return {
+        message: new MessageObj(
+          "error",
+          `${document.name} não foi excluído`,
+          "O documento possui versões associadas. Exclua todas as versões antes de remover o documento.",
+          "error"
+        ),
+      };
+    }
     const response = await fetch(url, {
       method: "PATCH",
       headers: {

@@ -18,11 +18,15 @@ import { VersionObj } from "@/app/models/VersionObj";
 import { useUserStore } from "@/app/state/userState";
 import { useVersionFormStore } from "@/app/state/versionFormState";
 import { IconButton, useMediaQuery } from "@mui/material";
+import { useAuditLogStore } from "@/app/state/auditLogState";
+import LogsViewer from "../logs/logsViewer";
 
 const OpenDocument: React.FC = () => {
   useAuth();
   const theme = useTheme();
   const document = useDocumentStore((state) => state.document);
+  const openLog = useAuditLogStore((state) => state.openLog);
+  const alterOpenLog = useAuditLogStore((state) => state.alter);
   const lastOption = useOptionsDashboardStore((state) => state.lastOption);
   const alterOption = useOptionsDashboardStore((state) => state.alter);
   const dataBar = useDocumentVersionStore((state) => state.dataBar);
@@ -102,6 +106,7 @@ const OpenDocument: React.FC = () => {
             sx={{
               minWidth: isMobile ? '140px' : 'auto'
             }}
+            onClick={() => alterOpenLog(!openLog)}
           />
           <IconButton
             onClick={() => { alterOption(lastOption); }}
@@ -133,13 +138,7 @@ const OpenDocument: React.FC = () => {
         >
           {"Data criação: " + (document?.creationDate?.toLocaleDateString("pt-BR", {}) || 'N/A')}
         </Typography>
-        <Typography
-          variant={isMobile ? "body1" : "h6"}
-          gutterBottom
-          sx={{ fontWeight: isMobile ? 'bold' : 'normal' }}
-        >
-          {"Organização: " + (document?.organization.name || 'N/A')}
-        </Typography>
+        
       </Box>
 
       <Versions />
@@ -275,7 +274,7 @@ const OpenDocument: React.FC = () => {
                   color: theme.palette.info.main,
                 },
               ]}
-              height={isMobile ? 300 : 500}
+              height={isMobile ? 300 : 553}
               margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
               sx={{
                 width: '95%',
@@ -284,6 +283,7 @@ const OpenDocument: React.FC = () => {
           </Box>
         </Box>
       </Box>
+      {openLog && <LogsViewer />}
     </Box>
   );
 };
