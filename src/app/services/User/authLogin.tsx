@@ -23,8 +23,6 @@ export async function authLoginUser(User: string, Password: string) {
         });
         
         const responseData = await response.json().catch(() => null);
-
-        console.log(responseData);
         if (!response.ok) {
             if (responseData.message == 'Invalid user') {
                 return {
