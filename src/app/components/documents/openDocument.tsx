@@ -54,12 +54,19 @@ const OpenDocument: React.FC = () => {
   }, [userCurrent, theme, versionForm]);
 
   useEffect(() => {
-    if (!allVersions) return;
+    if (userCurrent != undefined) {
+      (async () => {
+        try {
+          if (document) {
+            const result = await getVersionsByDocument(userCurrent, document);
+            setVersions(result.versions);
+          }
 
-    if (allVersions) {
-      alterPie(buildPieDataVersions(allVersions));
-      alterBar(buildBarDataVersions(allVersions, monthsCount));
+        } finally { }
+      })();
     }
+    alterPie(buildPieDataVersions(allVersions));
+    alterBar(buildBarDataVersions(allVersions, monthsCount));
   }, [allVersions, monthsCount, alterPie, alterBar]);
 
   return (

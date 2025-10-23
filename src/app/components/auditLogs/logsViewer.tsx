@@ -8,6 +8,7 @@ import { useDocumentStore } from '@/app/state/documentState';
 import { AuditLogObj } from '@/app/models/AuditLogObj';
 import { useAuditLogStore } from '@/app/state/auditLogState';
 import { getAuditLogsByDocument } from '@/app/services/Documents/getAuditLogsByDocument';
+import { formatDate } from '@/app/services/ConstantsTypes';
 
 const LogsViewer: React.FC = () => {
     useAuth();
@@ -36,10 +37,6 @@ const LogsViewer: React.FC = () => {
 
         fetchLogs();
     }, [userCurrent, document]);
-
-    const formatDateTime = (timestamp: string) => {
-        return new Date(timestamp).toLocaleString('pt-BR');
-    };
 
     return (
         <Box>
@@ -160,7 +157,7 @@ const LogsViewer: React.FC = () => {
                                     />
                                     {'timestamp' in log && (
                                         <CustomTypography
-                                            text={formatDateTime((log as AuditLogObj).timestamp)}
+                                            text={formatDate(log.timestamp)}
                                             component="span"
                                             sx={{
                                                 color: theme.palette.text.secondary,

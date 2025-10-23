@@ -44,16 +44,12 @@ export async function getAuditLogsByDocument(
         const userResponse = await getUserById(item.userId, userCurrent);
 
         const username = userResponse?.user?.username ?? `User ${item.userId}`;
-
         return {
           action: logsType[item.action as keyof typeof logsType] || item.action,
           message: item.message,
           userId: item.userId,
           username,
-          timestamp: new Date(item.timestamp).toLocaleString("pt-BR", {
-            dateStyle: "short",
-            timeStyle: "medium",
-          }),
+          timestamp: new Date(item.timestamp),
         };
       })
     );

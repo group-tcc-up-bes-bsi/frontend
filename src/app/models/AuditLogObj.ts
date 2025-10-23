@@ -3,5 +3,5 @@ export interface AuditLogObj {
   message: string;
   userId: number;
   username: string;
-  timestamp: string;
+  timestamp: Date;
 }
