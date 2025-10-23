@@ -30,6 +30,9 @@ export async function createVersion(
       if(error.message == 'File too large'){
         return new MessageObj("error", "Tamanho inválido", "Documento maior que o permitido Max. (100 MB)", "error");
       }
+      if(error.message == 'Version name contains invalid characters. Only letters, numbers, "-", and "_" are allowed.'){
+        return new MessageObj("error", "Nome inválido", 'O nome da versão contém caracteres inválidos. Apenas letras, números, "-", e "_" são permitidos.', "error");
+      }
       return new MessageObj("error", "Erro", error.message, "error");
     }
 
