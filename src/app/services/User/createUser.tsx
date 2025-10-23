@@ -1,11 +1,16 @@
 import { MessageObj } from "@/app/models/MessageObj";
 import { getErrorTitle } from "../ErrorTitle";
+import bcrypt from 'bcryptjs';
+import { STATIC_SALT } from "../ConstantsTypes";
 
 export async function createUser(UserName: string, Password: string) {
     const url = `${process.env.NEXT_PUBLIC_BACKEND}/users`;
+
+    const hashedPassword = bcrypt.hashSync(Password, STATIC_SALT);
+
     const userData = {
         username: UserName,
-        password: Password,
+        password: hashedPassword,
     };
 
     try {

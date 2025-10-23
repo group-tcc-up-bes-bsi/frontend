@@ -19,7 +19,7 @@ import { useUserStore } from "@/app/state/userState";
 import { useVersionFormStore } from "@/app/state/versionFormState";
 import { IconButton, useMediaQuery } from "@mui/material";
 import { useAuditLogStore } from "@/app/state/auditLogState";
-import LogsViewer from "../logs/logsViewer";
+import LogsViewer from "../auditLogs/logsViewer";
 
 const OpenDocument: React.FC = () => {
   useAuth();
@@ -138,7 +138,7 @@ const OpenDocument: React.FC = () => {
         >
           {"Data criação: " + (document?.creationDate?.toLocaleDateString("pt-BR", {}) || 'N/A')}
         </Typography>
-        
+
       </Box>
 
       <Versions />
@@ -165,36 +165,37 @@ const OpenDocument: React.FC = () => {
           >
             Versões por usuário
           </Typography>
-          <Box sx={{
-            border: '1px dashed',
-            borderColor: theme.palette.text.primary,
-            padding: isMobile ? 1 : 2,
-            overflow: 'auto'
-          }}>
-            <PieChart
-              series={[
-                {
-                  data: dataPie || [],
-                  highlightScope: { fade: "global", highlight: "item" },
-                  innerRadius: 0,
-                  outerRadius: isMobile ? 120 : 200,
-                  paddingAngle: 0,
-                },
-              ]}
-              height={isMobile ? 300 : 500}
-              margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
-              colors={[
-                "#8e24aa", "#039be5", "#fbc02d", "#fb8c00", "#d84315", "#6d4c41", "#757575",
-                "#c62828", "#ad1457", "#4527a0", "#283593", "#0277bd", "#00838f", "#2e7d32",
-              ]}
-              sx={{
-                width: '100%',
-                '& .MuiChartsLegend-root': {
-                  display: 'none !important',
-                }
-              }}
-            />
-            {dataPie && dataPie.length > 0 && (
+          {dataPie && dataPie.length > 0 ? (
+            <Box sx={{
+              border: '1px dashed',
+              borderColor: theme.palette.text.primary,
+              padding: isMobile ? 1 : 2,
+              overflow: 'auto'
+            }}>
+
+              <PieChart
+                series={[
+                  {
+                    data: dataPie || [],
+                    highlightScope: { fade: "global", highlight: "item" },
+                    innerRadius: 0,
+                    outerRadius: isMobile ? 120 : 200,
+                    paddingAngle: 0,
+                  },
+                ]}
+                height={isMobile ? 300 : 500}
+                margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
+                colors={[
+                  "#8e24aa", "#039be5", "#fbc02d", "#fb8c00", "#d84315", "#6d4c41", "#757575",
+                  "#c62828", "#ad1457", "#4527a0", "#283593", "#0277bd", "#00838f", "#2e7d32",
+                ]}
+                sx={{
+                  width: '100%',
+                  '& .MuiChartsLegend-root': {
+                    display: 'none !important',
+                  }
+                }}
+              />
               <Box sx={{
                 mt: 2,
                 display: 'grid',
@@ -232,8 +233,30 @@ const OpenDocument: React.FC = () => {
                   </Box>
                 ))}
               </Box>
-            )}
-          </Box>
+            </Box>
+          ) : (
+            <Box
+              sx={{
+                height: isMobile ? 200 : 500,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                border: '1px dashed',
+                borderColor: theme.palette.text.primary,
+              }}
+            >
+              <Typography
+                variant="body1"
+                sx={{
+                  color: theme.palette.text.primary,
+                  textAlign: 'center',
+                  p: 2
+                }}
+              >
+                Sem versões para o documento selecionado
+              </Typography>
+            </Box>
+          )}
         </Box>
 
         <Box sx={{
@@ -255,32 +278,55 @@ const OpenDocument: React.FC = () => {
             />
           </Box>
 
-          <Box sx={{
-            border: '1px dashed',
-            borderColor: theme.palette.text.primary,
-            padding: isMobile ? 1 : 2,
-            overflow: 'auto'
-          }}>
-            <BarChart
-              xAxis={[
-                {
-                  scaleType: "band",
-                  data: (dataBar || []).map((item) => item?.label || ""),
-                },
-              ]}
-              series={[
-                {
-                  data: (dataBar || []).map((item) => item?.value || 0),
-                  color: theme.palette.info.main,
-                },
-              ]}
-              height={isMobile ? 300 : 553}
-              margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
+          {dataBar?.length && dataBar?.length > 0 ? (
+            <Box sx={{
+              border: '1px dashed',
+              borderColor: theme.palette.text.primary,
+              padding: isMobile ? 1 : 2,
+              overflow: 'auto'
+            }}>
+              <BarChart
+                xAxis={[
+                  {
+                    scaleType: "band",
+                    data: (dataBar || []).map((item) => item?.label || ""),
+                  },
+                ]}
+                series={[
+                  {
+                    data: (dataBar || []).map((item) => item?.value || 0),
+                    color: theme.palette.info.main,
+                  },
+                ]}
+                height={isMobile ? 300 : 553}
+                margin={{ top: 20, right: 0, bottom: 20, left: 0 }}
+                sx={{
+                  width: '95%',
+                }}
+              />
+            </Box>) : (
+            <Box
               sx={{
-                width: '95%',
+                height: isMobile ? 200 : 500,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                border: '1px dashed',
+                borderColor: theme.palette.text.primary,
               }}
-            />
-          </Box>
+            >
+              <Typography
+                variant="body1"
+                sx={{
+                  color: theme.palette.text.primary,
+                  textAlign: 'center',
+                  p: 2
+                }}
+              >
+                Sem versões para o documento selecionado
+              </Typography>
+            </Box>
+          )}
         </Box>
       </Box>
       {openLog && <LogsViewer />}

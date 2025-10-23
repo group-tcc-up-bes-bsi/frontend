@@ -25,7 +25,11 @@ export async function createVersion(
     });
 
     if (!response.ok) {
+
       const error = await response.json();
+      if(error.message == 'File too large'){
+        return new MessageObj("error", "Tamanho inválido", "Documento maior que o permitido Max. (100 MB)", "error");
+      }
       return new MessageObj("error", "Erro", error.message, "error");
     }
 
