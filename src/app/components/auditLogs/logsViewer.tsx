@@ -37,10 +37,6 @@ const LogsViewer: React.FC = () => {
         fetchLogs();
     }, [userCurrent, document]);
 
-    const formatDateTime = (timestamp: string) => {
-        return new Date(timestamp).toLocaleString('pt-BR');
-    };
-
     return (
         <Box>
             <Backdrop
@@ -160,7 +156,7 @@ const LogsViewer: React.FC = () => {
                                     />
                                     {'timestamp' in log && (
                                         <CustomTypography
-                                            text={formatDateTime((log as AuditLogObj).timestamp)}
+                                            text={log.timestamp.toLocaleDateString("pt-BR", {}) || 'N/A'}
                                             component="span"
                                             sx={{
                                                 color: theme.palette.text.secondary,
