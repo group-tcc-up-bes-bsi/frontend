@@ -71,3 +71,5 @@ export const formatDate = (date: Date) => {
     minute: "2-digit",
   });
 };
+
+export const STATIC_SALT = "$2a$10$CwTycUXWue0Thq9StjUM0u";

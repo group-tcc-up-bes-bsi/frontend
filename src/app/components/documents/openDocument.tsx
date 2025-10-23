@@ -19,7 +19,7 @@ import { useUserStore } from "@/app/state/userState";
 import { useVersionFormStore } from "@/app/state/versionFormState";
 import { IconButton, useMediaQuery } from "@mui/material";
 import { useAuditLogStore } from "@/app/state/auditLogState";
-import LogsViewer from "../logs/logsViewer";
+import LogsViewer from "../auditLogs/logsViewer";
 
 const OpenDocument: React.FC = () => {
   useAuth();
