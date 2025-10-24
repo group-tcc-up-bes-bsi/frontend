@@ -50,8 +50,13 @@ export async function getVersionsByDocument(
       const versions: VersionObj[] = await Promise.all(
         responseData.map(async (item) => {
           const userResponse = await getUserById(item.userId, userCurrent);
-          const username =
-            userResponse?.user?.username ?? `User ${item.userId}`;
+          const userNameCreator = userResponse?.user?.username ?? `User ${item.userId}`;
+
+          const userCreator: UserObj = {
+            userId: item.userId,
+            username: userNameCreator,
+            jwtToken: ''
+          };
 
           return {
             documentVersionId: item.documentVersionId,
@@ -59,7 +64,7 @@ export async function getVersionsByDocument(
             filePath: item.filePath,
             creationDate: new Date(item.creationDate),
             document: doc,
-            user: username,
+            user: userCreator,
           };
         })
       );
