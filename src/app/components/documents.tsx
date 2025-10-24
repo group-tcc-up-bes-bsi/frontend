@@ -7,7 +7,7 @@ import {
   Menu,
   MenuItem,
 } from '@mui/material';
-import { MoreVert } from '@mui/icons-material';
+import { MoreVert, Star } from '@mui/icons-material';
 import { useDocumentStore } from '../state/documentState';
 import { useOptionsDashboardStore } from '../state/optionsDashboard';
 import { DocumentObj } from '../models/DocumentObj';
@@ -27,6 +27,8 @@ import { getOrganizationUsers } from '../services/Organizations/organizationsSer
 import { MessageObj } from '../models/MessageObj';
 import CustomAlert from './customAlert';
 import { moveDocumentToTrash } from '../services/Documents/trashDocument';
+import { createFavoriteDocument } from '../services/Documents/createFavoriteDocument';
+import { deleteFavoriteDocument } from '../services/Documents/deleteFavoriteDocument';
 
 const Documents: React.FC = () => {
   useAuth();
@@ -152,6 +154,19 @@ const Documents: React.FC = () => {
     }
   }
 
+  const handleFavoriteDocumentToggle = async (doc: DocumentObj) => {
+    if (userCurrent) {
+      if (doc.favorite === false) {
+        doc.favorite = true;
+        await createFavoriteDocument(doc.documentId, userCurrent);
+      } else {
+        doc.favorite = false;
+        await deleteFavoriteDocument(doc.documentId, userCurrent);
+      }
+      setDocuments([...allDocuments]);
+    }
+  };
+
   return (
     <Box
       display="flex"
@@ -185,11 +200,35 @@ const Documents: React.FC = () => {
             sx={{
               backgroundColor: theme.palette.background.paper,
               boxShadow: 3,
+              borderColor: doc.favorite ? theme.palette.button.star : theme.palette.text.primary,
+              borderWidth: 1,
+              borderStyle: "solid",
             }}
           >
-            <Box fontWeight="bold" fontSize="0.9rem">
-              {doc.name}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+              <IconButton
+                aria-label="star"
+                onClick={() => handleFavoriteDocumentToggle(doc)}
+                size="small"
+                sx={{
+                  padding: '4px',
+                  '&:hover': {
+                    backgroundColor: theme.palette.action.hover,
+                  }
+                }}
+              >
+                <Star sx={{
+                  color: doc.favorite ? theme.palette.button.star : theme.palette.text.primary,
+                  transition: 'all 0.2s ease-in-out',
+                  fontSize: '1.1rem'
+                }} />
+              </IconButton>
+              
+              <Box fontWeight="bold" fontSize="0.9rem">
+                {doc.name}
+              </Box>
             </Box>
+            
             <Box fontWeight="bold" fontSize="0.9rem" mb={1}>
               Organização: {doc.organization.name}
             </Box>
