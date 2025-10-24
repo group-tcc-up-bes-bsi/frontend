@@ -25,7 +25,7 @@ export async function updatePasswordUser(userId: number, UserName: string, Passw
 
         const responseData = await response.json().catch(() => null);
         if (!response.ok) {
-            if (responseData.message == `No user found with ID ${userId} to update`) {
+            if (responseData.message == `User not found`) {
                 return {
                     message: new MessageObj(
                         'error',

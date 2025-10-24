@@ -47,7 +47,13 @@ const VersionForm: React.FC = () => {
         if (event.target.files && event.target.files.length > 0) {
             const selectedFile = event.target.files[0];
             if (versionName.trim() === "") {
-                setVersionName(selectedFile.name);
+                const fullName = selectedFile.name;
+                const lastDot = fullName.lastIndexOf('.');
+                if (lastDot > 0) {
+                    setVersionName(fullName.slice(0, lastDot));
+                } else {
+                    setVersionName(fullName);
+                }
             }
             setFile(selectedFile);
         }

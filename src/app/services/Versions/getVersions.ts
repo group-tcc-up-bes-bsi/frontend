@@ -4,6 +4,7 @@ import { UserObj } from "@/app/models/UserObj";
 import { VersionObj } from "@/app/models/VersionObj";
 import { getErrorTitle } from "../ErrorTitle";
 import { getOrganizationUsers } from "../Organizations/organizationsServices";
+import { getUserById } from "../User/getUserById";
 
 export async function getVersionsByDocument(
   userCurrent: UserObj,
@@ -37,8 +38,6 @@ export async function getVersionsByDocument(
       };
     }
 
-    let versions: VersionObj[];
-
     const orgUsersResponse = await getOrganizationUsers(
       doc.organization.organizationId,
       userCurrent
@@ -48,14 +47,22 @@ export async function getVersionsByDocument(
       (user) => user.username === userCurrent.username
     );
     if (myUser?.inviteAccepted !== false) {
-      versions = responseData.map((item) => ({
-        documentVersionId: item.documentVersionId,
-        name: item.name,
-        filePath: item.filePath,
-        creationDate: new Date(item.creationDate),
-        document: doc,
-        user: userCurrent
-      }));
+      const versions: VersionObj[] = await Promise.all(
+        responseData.map(async (item) => {
+          const userResponse = await getUserById(item.userId, userCurrent);
+          const username =
+            userResponse?.user?.username ?? `User ${item.userId}`;
+
+          return {
+            documentVersionId: item.documentVersionId,
+            name: item.name,
+            filePath: item.filePath,
+            creationDate: new Date(item.creationDate),
+            document: doc,
+            user: username,
+          };
+        })
+      );
       return {
         message: new MessageObj(
           "success",
