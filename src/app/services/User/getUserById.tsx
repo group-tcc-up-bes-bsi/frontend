@@ -3,7 +3,7 @@ import { getErrorTitle } from "../ErrorTitle";
 import { UserObj } from "@/app/models/UserObj";
 
 export async function getUserById(userId: number, userCurrent: UserObj) {
-    const url = `${process.env.NEXT_PUBLIC_BACKEND}/users/by-id/${userId}`;
+    const url = `${process.env.NEXT_PUBLIC_BACKEND}/users/username/${userId}`;
 
     try {
         const response = await fetch(url, {

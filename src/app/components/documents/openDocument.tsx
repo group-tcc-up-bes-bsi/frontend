@@ -20,6 +20,8 @@ import { useVersionFormStore } from "@/app/state/versionFormState";
 import { IconButton, useMediaQuery } from "@mui/material";
 import { useAuditLogStore } from "@/app/state/auditLogState";
 import LogsViewer from "../auditLogs/logsViewer";
+import { useOrganizationStore } from "@/app/state/organizationState";
+import { getOrganizationUsers } from "@/app/services/Organizations/organizationsServices";
 
 const OpenDocument: React.FC = () => {
   useAuth();
@@ -38,14 +40,32 @@ const OpenDocument: React.FC = () => {
   const versionForm = useVersionFormStore((state) => state.versionForm);
   const [monthsCount, setMonthsCount] = React.useState(6);
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const org = useOrganizationStore((state) => state.organization);
+  const alterOrg = useOrganizationStore((state) => state.alter);
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     if (userCurrent != undefined) {
       (async () => {
         try {
-          if (document) {
-            const result = await getVersionsByDocument(userCurrent, document);
-            setVersions(result.versions);
+          if (document && org) {
+            alterOrg(document.organization)
+            const result = await getOrganizationUsers(
+              org?.organizationId,
+              userCurrent
+            );
+
+            const users = result.users;
+
+            for (const user of users) {
+              if (user.username === userCurrent.username) {
+                if (user.userType.toString() === "OWNER") {
+                  setIsOwner(true);
+                }
+              }
+            }
+            const resultVersion = await getVersionsByDocument(userCurrent, document);
+            setVersions(resultVersion.versions);
           }
 
         } finally { }
@@ -102,19 +122,21 @@ const OpenDocument: React.FC = () => {
           alignItems: 'center',
           flex: 1
         }}>
-          <CustomButton
-            text="Visualizar log"
-            type="button"
-            colorType="primary"
-            hoverColorType="primary"
-            paddingY={1}
-            paddingX={isMobile ? 2 : 3}
-            fullWidth={false}
-            sx={{
-              minWidth: isMobile ? '140px' : 'auto'
-            }}
-            onClick={() => alterOpenLog(!openLog)}
-          />
+          {isOwner && (
+            <CustomButton
+              text="Visualizar log"
+              type="button"
+              colorType="primary"
+              hoverColorType="primary"
+              paddingY={1}
+              paddingX={isMobile ? 2 : 3}
+              fullWidth={false}
+              sx={{
+                minWidth: isMobile ? '140px' : 'auto'
+              }}
+              onClick={() => alterOpenLog(!openLog)}
+            />
+          )}
           <IconButton
             onClick={() => { alterOption(lastOption); }}
             size={isMobile ? "small" : "medium"}

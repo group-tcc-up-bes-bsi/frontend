@@ -25,10 +25,12 @@ const AdminPasswordModal: React.FC = () => {
                 const result = await updatePasswordUser(admin.userId, admin.UserName, admin.Password, adminPass);
                 setMessage(result.message);
 
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 3000));
                 if (result.message.severity === 'success') {
                     handleClose();
                     window.location.href = "/";
+                }else{
+                    handleClose();
                 }
             }
         } finally { }
