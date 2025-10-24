@@ -39,6 +39,17 @@ export async function createDocument(
         documentId: responseData.documentId,
       };
     }
+    if(responseData.message == 'You do not have edit permissions in this organization'){
+      return {
+        message: new MessageObj(
+          "error",
+          getErrorTitle(401),
+          "Você não tem permissão para criar documentos nesta organização",
+          "error"
+        ),
+        documentId: 0,
+      };
+    }
     return {
       message: new MessageObj(
         "error",

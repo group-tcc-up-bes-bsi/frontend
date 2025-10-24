@@ -15,6 +15,7 @@ export async function getUserById(userId: number, userCurrent: UserObj) {
         });
 
         const responseData = await response.json().catch(() => null);
+        if (userId == 5) console.log("Audit Log User:", responseData);
         if (!responseData.userId) {
             return {
                 message: new MessageObj(

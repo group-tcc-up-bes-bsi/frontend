@@ -118,7 +118,7 @@ const DocumentForm: React.FC = () => {
                 const result = await createDocument(name, description, type, organization?.organizationId, userCurrent)
                 setMessage(result.message);
 
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 5000));
                 alterDocumentForm(false);
 
             } catch (error) {
