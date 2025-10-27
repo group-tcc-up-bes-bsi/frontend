@@ -33,6 +33,9 @@ export async function createVersion(
       if(error.message == 'Version name contains invalid characters. Only letters, numbers, "-", and "_" are allowed.'){
         return new MessageObj("error", "Nome inválido", 'O nome da versão contém caracteres inválidos. Apenas letras, números, "-", e "_" são permitidos.', "error");
       }
+      if(error.message == 'A version with this name already exists for this document'){
+        return new MessageObj("error", "Nome inválido", "Já existe uma versão com esse nome para este documento", "error");
+      }
       return new MessageObj("error", "Erro", error.message, "error");
     }
 

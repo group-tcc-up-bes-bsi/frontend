@@ -2,19 +2,12 @@ import { MessageObj } from "@/app/models/MessageObj";
 import { getErrorTitle } from "../ErrorTitle";
 import { UserObj } from "@/app/models/UserObj";
 
-export async function updateDocument(
+export async function updateActiveVersion(
   documentId: number,
-  Name: string,
-  Description: string,
-  Type: string,
-  userCurrent: UserObj
+  versionId: number,
+  userCurrent: UserObj,
 ): Promise<{ message: MessageObj }> {
-  const url = `${process.env.NEXT_PUBLIC_BACKEND}/documents/${documentId}`;
-  const documentData = {
-    name: Name,
-    type: Type,
-    description: Description,
-  };
+  const url = `${process.env.NEXT_PUBLIC_BACKEND}/documents/${documentId}/active-version/${versionId}`;
   try {
     const response = await fetch(url, {
       method: "PATCH",
@@ -22,7 +15,6 @@ export async function updateDocument(
         "Content-Type": "application/json",
         Authorization: `Bearer ${userCurrent?.jwtToken}`,
       },
-      body: JSON.stringify(documentData),
     });
 
     await response.json().catch(() => null);
