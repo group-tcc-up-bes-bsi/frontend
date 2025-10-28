@@ -30,6 +30,7 @@ import { MessageObj } from '@/app/models/MessageObj';
 import { getVersionsByDocument } from '@/app/services/Versions/getVersions';
 import { useDocumentStore } from '@/app/state/documentState';
 import { deleteVersion } from '@/app/services/Versions/deleteVersion';
+import { updateActiveVersion } from '@/app/services/Documents/updateActiveVersion';
 import { getDocumentById } from '@/app/services/Documents/getDocumentByID';
 
 const Versions: React.FC = () => {
@@ -232,13 +233,29 @@ const Versions: React.FC = () => {
                                             userCurrent,
                                             selectedVersion.documentVersionId
                                         );
-                                        setVersions((prev) =>
-                                            prev.filter(
-                                                (version) =>
-                                                    version.documentVersionId !==
-                                                    selectedVersion.documentVersionId
-                                            )
-                                        );
+                                        setLoading(true);
+                                        const resultVersions = await getVersionsByDocument(userCurrent, document);
+                                        setVersions(resultVersions.versions);
+                                        if (currentVersion === selectedVersion.name) {
+                                            const versionsUpdated = resultVersions.versions;
+
+                                            if (versionsUpdated.length > 0) {
+                                                const activeVersion = versionsUpdated.reduce((latest, current) =>
+                                                    current.creationDate > latest.creationDate ? current : latest
+                                                );
+
+                                                await updateActiveVersion(
+                                                    document.documentId,
+                                                    activeVersion.documentVersionId,
+                                                    userCurrent
+                                                );
+                                                setCurrentVersion(activeVersion.name);
+                                            } else {
+                                                setCurrentVersion("");
+                                            }
+                                        }
+
+                                        setLoading(false);
                                         setMessage(result.message);
                                     }
                                 });
