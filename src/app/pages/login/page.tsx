@@ -15,6 +15,7 @@ import CustomTypography from '../../components/customTypography';
 import CustomAlert from '../../components/customAlert';
 import { authLoginUser } from '../../services/User/authLogin';
 import { MessageObj } from '@/app/models/MessageObj';
+import { getMeAuth } from '@/app/services/User/GetAuthToken';
 
 const Login: React.FC = () => {
   const [user, setUser] = useState('');
@@ -32,6 +33,15 @@ const Login: React.FC = () => {
       setTimeout(() => setShowMessage(false), 5000);
     }
   }, [message]);
+
+  useEffect(() => {
+    (async () => {
+      const me = await getMeAuth();
+      if (me) {
+        window.location.replace('/pages/dashboard');
+      }
+    })();
+  }, []);
 
   const handleSubmit = async () => {
     if (!user.trim()) {
@@ -53,7 +63,7 @@ const Login: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       if (result.message.severity === 'success') {
         localStorage.setItem('jwtToken', result.token);
-        window.location.href = "/pages/dashboard";
+        window.location.replace('/pages/dashboard');
       }
     } catch (error) {
       setMessage(new MessageObj('error', 'Erro inesperado', `${error}`, 'error'));

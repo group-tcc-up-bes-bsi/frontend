@@ -71,7 +71,7 @@ const LogsViewer: React.FC = () => {
                     maxHeight: '80vh',
                     borderRadius: '4px',
                     boxShadow: theme.shadows[3],
-                    top: '50%',
+                    top: '55%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
                     p: {
